@@ -1,3 +1,3 @@
 import '../../source/gen.js'
-import 'uno.css'
+import 'virtual:teacss.css'
 import '../../source/gen.css'
