@@ -62,7 +62,7 @@ export async function writeMock() {
       .map(
         (c, i) =>
           `a${i} {
-  @apply ${c.join(' ')};
+  --apply:  ${c.join(' ')};
 }`,
       )
       .join('\n')

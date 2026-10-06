@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { execSync } from 'node:child_process'
 import { join } from 'node:path'
-import { escapeSelector } from '@unocss/core'
+import { escapeSelector } from '@teacss/core'
 import fs from 'fs-extra'
 import { classes, writeMock } from './gen.mjs'
 import { dir, getVersions, targetPkgMap, targets } from './meta.mjs'
