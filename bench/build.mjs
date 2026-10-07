@@ -1,57 +1,57 @@
 /* eslint-disable no-console */
-import { join } from 'node:path'
-import { performance } from 'node:perf_hooks'
-import process from 'node:process'
-import fs from 'fs-extra'
-import { build } from 'vite'
-import { dir, targets } from './meta.mjs'
+import { join } from "node:path";
+import { performance } from "node:perf_hooks";
+import process from "node:process";
+import fs from "fs-extra";
+import { build } from "vite";
+import { dir, targets } from "./meta.mjs";
 
-const result = {}
-const date = new Date().toISOString()
+const result = {};
+const date = new Date().toISOString();
 
 function BuildTimePlugin(name) {
-  let start = 0
+  let start = 0;
 
   return {
-    name: 'time-log',
-    apply: 'build',
+    name: "time-log",
+    apply: "build",
     buildStart() {
-      start = performance.now()
+      start = performance.now();
     },
     closeBundle() {
-      result[name].time = performance.now() - start
+      result[name].time = performance.now() - start;
     },
-  }
+  };
 }
 
-console.log('warming up...')
+console.log("warming up...");
 for (let i = 0; i < 10; i++) {
-  await run('none')
+  await run("none");
 }
 
-targets.sort(() => Math.random() - 0.5)
+targets.sort(() => Math.random() - 0.5);
 
 for (const [i, name] of targets.entries()) {
-  console.log(`- ${name}`)
-  result[name] = { index: i, name, date }
-  await run(name, true)
+  console.log(`- ${name}`);
+  result[name] = { index: i, name, date };
+  await run(name, true);
 }
 
 async function run(target, bench = false) {
-  const cwd = join(dir, 'fixtures', target)
-  process.chdir(cwd)
+  const cwd = join(dir, "fixtures", target);
+  process.chdir(cwd);
   await build({
     root: cwd,
-    logLevel: 'silent',
+    logLevel: "silent",
     build: {
       minify: false,
     },
     plugins: bench ? [BuildTimePlugin(target)] : [],
-  })
+  });
 }
 
-const full = (await fs.readJSON(`${dir}/result.json`)) || []
+const full = (await fs.readJSON(`${dir}/result.json`)) || [];
 
-full.push(...Object.values(result))
+full.push(...Object.values(result));
 
-await fs.writeJSON(`${dir}/result.json`, full, { spaces: 2 })
+await fs.writeJSON(`${dir}/result.json`, full, { spaces: 2 });
