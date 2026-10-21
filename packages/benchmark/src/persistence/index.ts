@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { SubjectId, SubjectVersions } from "@bench/infrastructure";
-import type { EngineScenario } from "../contract/index.ts";
+import type { DevSize, EngineScenario } from "../contract/index.ts";
 import type { EnvironmentRecord } from "../features/environment/index.ts";
 import type { ProfileSummary } from "../features/profile/index.ts";
 
@@ -22,7 +22,10 @@ interface SampleBase {
   readonly nativeModules: readonly string[];
 }
 
-export type Sample = (SampleBase & { readonly tier: "engine"; readonly scenario: EngineScenario }) | (SampleBase & { readonly tier: "build"; readonly cpuUserMs: number; readonly cpuSystemMs: number; readonly maxRssBytes: number; readonly cssGzipBytes: number });
+export type Sample =
+  | (SampleBase & { readonly tier: "engine"; readonly scenario: EngineScenario })
+  | (SampleBase & { readonly tier: "dev"; readonly size: DevSize; readonly polls: number })
+  | (SampleBase & { readonly tier: "build"; readonly cpuUserMs: number; readonly cpuSystemMs: number; readonly maxRssBytes: number; readonly cssGzipBytes: number });
 
 export interface CellRecord {
   readonly cell: Cell;

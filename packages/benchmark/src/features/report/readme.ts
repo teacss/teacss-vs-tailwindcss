@@ -52,9 +52,9 @@ function engineTable(table: CellTable): string[] {
   return [`**Generating the CSS for ${count(table.cell.utilities)} classes** (median of ${fastest.wall.n} runs)`, "", "| | Time |", "| --- | --- |", ...order.map((entry) => `| ${name(entry.subject)} | ${seconds(entry.wall.median)}${comparison(table, entry, fastest)} |`), ""];
 }
 
-function incrementalTable(model: ReportModel): string[] {
-  const ten = largest(model, "engine/incremental-10");
-  const hundred = largest(model, "engine/incremental-100");
+function pairTable(model: ReportModel, series: readonly [Series, Series], title: (table: CellTable) => string): string[] {
+  const ten = largest(model, series[0]);
+  const hundred = largest(model, series[1]);
   if (ten === undefined || hundred === undefined) return [];
   const order = ranked(ten);
   const fastestTen = order[0];
@@ -64,14 +64,7 @@ function incrementalTable(model: ReportModel): string[] {
     const entry = row(table, subject);
     return entry === undefined ? "" : `${seconds(entry.wall.median)}${comparison(table, entry, fastest)}`;
   };
-  return [
-    `**Adding new classes to a running build** that already holds those ${count(ten.cell.utilities)} (what a save in the editor costs; median of ${fastestTen.wall.n} runs)`,
-    "",
-    "| | +10 classes | +100 classes |",
-    "| --- | --- | --- |",
-    ...order.map((entry) => `| ${name(entry.subject)} | ${cell(ten, entry.subject, fastestTen)} | ${cell(hundred, entry.subject, fastestHundred)} |`),
-    "",
-  ];
+  return [`${title(ten)} (median of ${fastestTen.wall.n} runs)`, "", "| | +10 classes | +100 classes |", "| --- | --- | --- |", ...order.map((entry) => `| ${name(entry.subject)} | ${cell(ten, entry.subject, fastestTen)} | ${cell(hundred, entry.subject, fastestHundred)} |`), ""];
 }
 
 function buildTable(table: CellTable): string[] {
@@ -125,7 +118,8 @@ export function renderReadmeSummary(model: ReportModel, stem: string): string {
   const build = largest(model, "build");
   const lines = [README_START, "", `### Results from ${model.record.startedAt.slice(0, 10)}`, ""];
   if (engine !== undefined) lines.push(...engineTable(engine));
-  lines.push(...incrementalTable(model));
+  lines.push(...pairTable(model, ["engine/incremental-10", "engine/incremental-100"], (table) => `**Adding new classes to an engine** that already holds those ${count(table.cell.utilities)}`));
+  lines.push(...pairTable(model, ["dev/+10", "dev/+100"], (table) => `**Saving a new file in the Vite dev server** with ${count(table.cell.utilities)} classes already in ${table.cell.files} files, until the page's stylesheet has the new classes`));
   if (build !== undefined) lines.push(...buildTable(build));
   if (engine === undefined && build === undefined) lines.push("No measurements in this run.", "");
   lines.push("**In short**", "", ...takeaways(model, engine, build), "", `[Full report](docs/reports/${stem}.md) · [audit](docs/reports/${stem}.audit.md) · [raw samples](results/${stem}.json) · [method](docs/specs/v01.1-benchmark-protocol.md)`, "", README_END);

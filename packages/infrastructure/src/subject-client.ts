@@ -36,6 +36,12 @@ export interface ProjectFiles {
   readonly files: ReadonlyMap<string, string>;
 }
 
+export interface DevServer {
+  /** `http://host:port` of the running development server. */
+  readonly origin: string;
+  close(): Promise<void>;
+}
+
 export interface BuildOutput {
   readonly css: string;
 }
@@ -51,6 +57,10 @@ export interface SubjectClient {
   prepare(workspace: Workspace, project: ProjectFiles): Promise<void>;
   /** Runs the production build in the prepared workspace and returns its CSS asset. */
   build(workspace: Workspace): Promise<BuildOutput>;
+  /** Starts the tool's development server on the prepared workspace, listening on a free local port. */
+  devServer(workspace: Workspace): Promise<DevServer>;
+  /** Text the tool needs at the top of a source module before it reads the classes in it. */
+  readonly moduleHeader: string;
 }
 
 /** What a subject module exports; the subject process imports one module and calls this once. */

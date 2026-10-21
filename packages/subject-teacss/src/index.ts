@@ -1,11 +1,11 @@
 import { createRequire } from "node:module";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { describePackages, resolvePackage, type SubjectClient, subjectId, type Workspace } from "@bench/infrastructure";
+import { type DevServer, describePackages, resolvePackage, type SubjectClient, subjectId, type Workspace } from "@bench/infrastructure";
 import { createGenerator, type EngineMode } from "@teacss/core";
 import presetStandard from "@teacss/preset-standard";
 import { pluginTeacss } from "@teacss/vite";
-import { build } from "vite";
+import { build, createServer, type PluginOption } from "vite";
 
 const require = createRequire(import.meta.url);
 const PACKAGES = ["@teacss/core", "@teacss/preset-standard", "@teacss/vite", "vite"];
@@ -36,6 +36,15 @@ async function viteBuild(workspace: Workspace, engine: EngineMode): Promise<stri
     .join("");
 }
 
+async function startDevServer(workspace: Workspace, plugins: PluginOption[]): Promise<DevServer> {
+  process.chdir(workspace.dir);
+  const server = await createServer({ root: workspace.dir, configFile: false, logLevel: "silent", plugins, server: { port: 0, host: "127.0.0.1" } });
+  await server.listen();
+  const origin = server.resolvedUrls?.local[0]?.replace(/\/$/, "");
+  if (origin === undefined) throw new Error("the development server reported no local URL");
+  return { origin, close: () => server.close() };
+}
+
 /** One subject per engine mode over the same packages; the mode is explicit so the environment cannot flip it. */
 export function teacssSubject(engine: "ts" | "rust"): SubjectClient {
   return {
@@ -57,5 +66,7 @@ export function teacssSubject(engine: "ts" | "rust"): SubjectClient {
       workspace.write("src/main.js", `${INCLUDE}${project.modules.map((module) => `import "./${module.replace(/^src\//, "")}";`).join("\n")}\nimport "virtual:teacss.css";\n`);
     },
     build: async (workspace) => ({ css: await viteBuild(workspace, engine) }),
+    devServer: (workspace) => startDevServer(workspace, pluginTeacss(undefined, { engine })),
+    moduleHeader: INCLUDE,
   };
 }

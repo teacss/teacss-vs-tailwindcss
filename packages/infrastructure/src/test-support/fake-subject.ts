@@ -14,6 +14,10 @@ export const fakeSubject: SubjectClient = {
     for (const [path, content] of project.files) workspace.write(path, content);
   },
   build: async (workspace) => ({ css: workspace.read("src/main.js").length > 0 ? ".built{}" : "" }),
+  devServer: async () => {
+    throw new Error("the fake subject has no development server");
+  },
+  moduleHeader: "",
 };
 
 export const createSubject: SubjectFactory = () => fakeSubject;

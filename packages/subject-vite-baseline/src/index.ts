@@ -37,4 +37,8 @@ export const createSubject: SubjectFactory = (): SubjectClient => ({
     workspace.write("src/main.js", entryModule(project.modules, undefined));
   },
   build: async (workspace) => ({ css: await viteBuild(workspace, []) }),
+  devServer: async () => {
+    throw new Error("vite-baseline has no dev tier");
+  },
+  moduleHeader: "",
 });

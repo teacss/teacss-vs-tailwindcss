@@ -24,3 +24,9 @@ test("a response without usage is refused", () => {
 test("an unknown engine scenario is refused with the known ones", () => {
   assert.throws(() => parseSubjectRequest({ version: 1, sentAt: 0, subject: "fake", module: "x", task: { kind: "engine", scenario: "lukewarm", candidates: [] } }), /lukewarm is not one of cold, warm, incremental-10, incremental-100/);
 });
+
+test("a dev request round-trips and an unknown size is refused", () => {
+  const request = { version: 1, sentAt: 1, subject: "fake", module: "m", task: { kind: "dev", size: 100, modules: ["src/a.js"], files: { "src/a.js": "x" }, corpusClasses: ["p:4"], extra: [["m:1"]] } };
+  assert.deepEqual(parseSubjectRequest(JSON.parse(JSON.stringify(request))), request);
+  assert.throws(() => parseSubjectRequest({ ...request, task: { ...request.task, size: 7 } }), /dev size 7 is not one of 10, 100/);
+});

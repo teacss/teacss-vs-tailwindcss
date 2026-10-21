@@ -2,7 +2,9 @@ import { type ResourceUsage, type SubjectId, type SubjectVersions, subjectId } f
 
 export const CONTRACT_VERSION = 1;
 
-export type Tier = "engine" | "build";
+export type Tier = "engine" | "build" | "dev";
+export const DEV_SIZES = [10, 100] as const;
+export type DevSize = (typeof DEV_SIZES)[number];
 export type EngineScenario = "cold" | "warm" | "incremental-10" | "incremental-100";
 export const ENGINE_SCENARIOS: readonly EngineScenario[] = ["cold", "warm", "incremental-10", "incremental-100"];
 
@@ -21,7 +23,16 @@ export type SubjectTask =
       readonly extra: readonly (readonly string[])[];
       readonly includeCss: boolean;
     }
-  | { readonly kind: "build"; readonly modules: readonly string[]; readonly files: Readonly<Record<string, string>>; readonly includeCss: boolean };
+  | { readonly kind: "build"; readonly modules: readonly string[]; readonly files: Readonly<Record<string, string>>; readonly includeCss: boolean }
+  | {
+      readonly kind: "dev";
+      readonly size: DevSize;
+      readonly modules: readonly string[];
+      readonly files: Readonly<Record<string, string>>;
+      readonly corpusClasses: readonly string[];
+      /** One group of `size` new classes per round. */
+      readonly extra: readonly (readonly string[])[];
+    };
 
 export interface SubjectRequest {
   readonly version: typeof CONTRACT_VERSION;
@@ -38,10 +49,18 @@ export interface EngineSample {
   readonly cssSha256: string;
 }
 
+export interface DevSample {
+  readonly wallMs: number;
+  readonly polls: number;
+  readonly cssBytes: number;
+  readonly cssSha256: string;
+}
+
 export type TaskResult =
   | { readonly kind: "describe"; readonly versions: SubjectVersions }
   | { readonly kind: "engine"; readonly samples: readonly EngineSample[]; readonly css: string | undefined }
   | { readonly kind: "build"; readonly cssBytes: number; readonly cssGzipBytes: number; readonly cssSha256: string; readonly css: string | undefined }
+  | { readonly kind: "dev"; readonly samples: readonly DevSample[] }
   | { readonly kind: "error"; readonly message: string; readonly stack: string | undefined };
 
 export interface SubjectResponse {
@@ -90,6 +109,14 @@ function parseTask(value: unknown): SubjectTask {
       if (!isStringRecord(value["files"])) throw new Error("request: build files are not a string map");
       if (!isStringArray(value["modules"])) throw new Error("request: build modules are not strings");
       return { kind: "build", modules: value["modules"], files: value["files"], includeCss: value["includeCss"] === true };
+    case "dev": {
+      const size = DEV_SIZES.find((entry) => entry === value["size"]);
+      if (size === undefined) throw new Error(`request: dev size ${String(value["size"])} is not one of ${DEV_SIZES.join(", ")}`);
+      if (!isStringRecord(value["files"]) || !isStringArray(value["modules"]) || !isStringArray(value["corpusClasses"])) throw new Error("request: dev project shape");
+      const extra = value["extra"];
+      if (!Array.isArray(extra) || !extra.every(isStringArray)) throw new Error("request: dev extra is not a list of string lists");
+      return { kind: "dev", size, modules: value["modules"], files: value["files"], corpusClasses: value["corpusClasses"], extra };
+    }
     default:
       throw new Error(`request: unknown task kind ${String(value["kind"])}`);
   }
@@ -125,6 +152,16 @@ function parseResult(value: unknown): TaskResult {
     case "build":
       if (typeof value["cssBytes"] !== "number" || typeof value["cssGzipBytes"] !== "number" || typeof value["cssSha256"] !== "string") throw new Error("response: build result shape");
       return { kind: "build", cssBytes: value["cssBytes"], cssGzipBytes: value["cssGzipBytes"], cssSha256: value["cssSha256"], css: optionalCss(value["css"]) };
+    case "dev":
+      if (!Array.isArray(value["samples"])) throw new Error("response: dev samples are not an array");
+      return {
+        kind: "dev",
+        samples: value["samples"].map((sample: unknown) => {
+          const parsed = parseSample(sample);
+          if (!isRecord(sample) || typeof sample["polls"] !== "number") throw new Error("response: dev sample shape");
+          return { ...parsed, polls: sample["polls"] };
+        }),
+      };
     case "error":
       if (typeof value["message"] !== "string") throw new Error("response: error message is not a string");
       return { kind: "error", message: value["message"], stack: typeof value["stack"] === "string" ? value["stack"] : undefined };
