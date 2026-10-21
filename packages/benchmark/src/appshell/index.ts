@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { version as nodeVersion } from "node:process";
 import { type Invocation, parseInvocation, type SubjectId, type SubjectVersions, subjectId } from "@bench/infrastructure";
-import { DEFAULT_SEED, generateCorpus, PAIR_TABLE_VERSION, profileCorpus } from "../features/corpus/index.ts";
+import { DEFAULT_SEED, generateCorpus, PAIR_TABLE_VERSION, profileCorpus } from "../corpus/index.ts";
 import { captureEnvironment, loadShare } from "../features/environment/index.ts";
 import { measure, type Tier } from "../features/measure/run.ts";
 import { profileSubjects } from "../features/profile/run.ts";

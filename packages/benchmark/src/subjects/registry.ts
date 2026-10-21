@@ -1,6 +1,6 @@
 import type { SubjectId } from "@bench/infrastructure";
 import { subjectId } from "@bench/infrastructure";
-import type { Syntax } from "../features/corpus/index.ts";
+import type { Syntax } from "../corpus/index.ts";
 import type { NativeExpectation } from "../features/verify/index.ts";
 
 export interface SubjectRegistration {

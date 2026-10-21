@@ -1,12 +1,12 @@
 ---
-status: draft
+status: accepted
 priority: P1
 ---
 # 公平性与 Rust 价值：对比的第二阶段
 
 ## Status
 
-2026-10-22 起草，等所有者确认方向与优先级。规格见 [v02.1](../specs/v02.1-fairness-and-rust-value.md)，计划见 [v02](../plans/v02-fairness-and-rust-value.md)。第一阶段（[v01](v01-credible-benchmark.md)）已完成一次正式运行并发布报告。
+2026-10-22 起草；所有者同日以 `/build` 要求按计划实施，提案接受。三个待决事项按下面的默认执行，所有者可改口：dev 层级以轮询样式表为完成判定；社区语料的仓库清单仍待所有者给出，工具先用本机的 Tailwind 示例做冒烟；PostCSS 作为单独一轮。规格见 [v02.1](../specs/v02.1-fairness-and-rust-value.md)，计划见 [v02](../plans/v02-fairness-and-rust-value.md)。第一阶段（[v01](v01-credible-benchmark.md)）已完成一次正式运行并发布报告。
 
 ## Problem
 

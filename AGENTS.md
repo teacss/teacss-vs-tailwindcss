@@ -19,7 +19,10 @@ v4. `CLAUDE.md` points here.
 - The base `tsconfig.base.json` owns every compiler setting. A package only
   extends it.
 - Features see the `SubjectClient` interface, never a `subject-*` package;
-  only the composition root picks an implementation.
+  only the composition root picks an implementation. A feature never imports
+  another feature; code two features share lives beside them in
+  `packages/benchmark/src/` (`corpus`, `css`, `contract`, `persistence`).
+  Biome enforces both.
 - A measured runtime (a napi addon, Oxide) is loaded by one subject process
   only; the orchestrator never loads one.
 - Keep versions of the measured packages exact in the manifests and

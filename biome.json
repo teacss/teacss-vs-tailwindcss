@@ -18,6 +18,10 @@
                   {
                     "group": ["**/appshell", "**/appshell/**"],
                     "message": "A feature never imports the composition root."
+                  },
+                  {
+                    "group": ["../*", "../*/**", "!../../**"],
+                    "message": "A feature never imports another feature; shared domain code lives beside the features (corpus, css, contract, persistence)."
                   }
                 ]
               }

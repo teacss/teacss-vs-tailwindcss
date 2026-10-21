@@ -1,6 +1,6 @@
 import type { SubjectId } from "@bench/infrastructure";
 import type { SubjectTask } from "../../contract/index.ts";
-import { type Corpus, candidates, corpusProject } from "../corpus/index.ts";
+import { type Corpus, candidates, corpusProject } from "../../corpus/index.ts";
 import { checkNativeModules, checkStructure, type Mismatch } from "./index.ts";
 
 export interface VerifySubject {
