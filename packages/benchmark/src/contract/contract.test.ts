@@ -5,7 +5,7 @@ import { parseSubjectRequest, parseSubjectResponse } from "./index.ts";
 const usage = { cpuUserMs: 1, cpuSystemMs: 1, maxRssBytes: 1 };
 
 test("a request round-trips through JSON", () => {
-  const request = { version: 1, sentAt: 5, subject: "fake", module: "file:///fake.ts", task: { kind: "engine", scenario: "warm", candidates: ["p:4"] } };
+  const request = { version: 1, sentAt: 5, subject: "fake", module: "file:///fake.ts", task: { kind: "engine", scenario: "warm", candidates: ["p:4"], includeCss: false } };
   assert.deepEqual(parseSubjectRequest(JSON.parse(JSON.stringify(request))), request);
 });
 

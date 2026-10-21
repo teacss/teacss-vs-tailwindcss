@@ -26,15 +26,17 @@ async function runTask(request: SubjectRequest, deps: SubjectMainDeps): Promise<
   switch (task.kind) {
     case "describe":
       return { kind: "describe", versions: await (await loadSubject(request)).describe() };
-    case "engine":
-      return { kind: "engine", samples: await runEngineScenario(task.scenario, task.candidates, () => loadSubject(request), deps.clock) };
+    case "engine": {
+      const { samples, css } = await runEngineScenario(task.scenario, task.candidates, () => loadSubject(request), deps.clock);
+      return { kind: "engine", samples, css: task.includeCss ? css : undefined };
+    }
     case "build": {
       const subject = await loadSubject(request);
       const workspace = createWorkspace(`bench-${request.subject}`);
       try {
-        await subject.prepare(workspace, { files: new Map(Object.entries(task.files)) });
+        await subject.prepare(workspace, { modules: task.modules, files: new Map(Object.entries(task.files)) });
         const { css } = await subject.build(workspace);
-        return { kind: "build", cssBytes: Buffer.byteLength(css), cssGzipBytes: gzipSync(css).byteLength, cssSha256: createHash("sha256").update(css).digest("hex") };
+        return { kind: "build", cssBytes: Buffer.byteLength(css), cssGzipBytes: gzipSync(css).byteLength, cssSha256: createHash("sha256").update(css).digest("hex"), css: task.includeCss ? css : undefined };
       } finally {
         workspace.remove();
       }

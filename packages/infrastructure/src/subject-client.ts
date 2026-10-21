@@ -24,7 +24,9 @@ export interface EngineOutput {
 }
 
 export interface ProjectFiles {
-  /** Relative path to content; the corpus modules, the entry module and index.html. */
+  /** The corpus modules in import order; the subject writes the entry module that imports them. */
+  readonly modules: readonly string[];
+  /** Relative path to content: the modules and index.html. */
   readonly files: ReadonlyMap<string, string>;
 }
 

@@ -1,7 +1,8 @@
 import { type ProcessResult, runProcess, type SubjectId } from "@bench/infrastructure";
 import { CONTRACT_VERSION, parseSubjectResponse, type SubjectRequest, type SubjectResponse, type SubjectTask } from "../contract/index.ts";
+import type { SubjectRegistry } from "./registry.ts";
 
-export type SubjectRegistry = ReadonlyMap<SubjectId, string>;
+export { productionRegistry, type SubjectRegistration, type SubjectRegistry } from "./registry.ts";
 
 export interface SubjectProcessDeps {
   /** The shell's subject entry file. */
@@ -28,10 +29,10 @@ export interface SubjectInvocation {
 }
 
 export async function invokeSubject(registry: SubjectRegistry, subject: SubjectId, task: SubjectTask, deps: SubjectProcessDeps): Promise<SubjectInvocation> {
-  const module = registry.get(subject);
-  if (module === undefined) throw new Error(`${subject}: not a registered subject (${[...registry.keys()].join(", ") || "none registered"})`);
-  const request: SubjectRequest = { version: CONTRACT_VERSION, sentAt: Date.now(), subject, module, task };
-  const process = await runProcess(deps.subjectEntry, { args: [], cwd: deps.cwd, env: deps.env, stdin: JSON.stringify(request), timeoutMs: deps.timeoutMs });
+  const registration = registry.get(subject);
+  if (registration === undefined) throw new Error(`${subject}: not a registered subject (${[...registry.keys()].join(", ") || "none registered"})`);
+  const request: SubjectRequest = { version: CONTRACT_VERSION, sentAt: Date.now(), subject, module: registration.module, task };
+  const process = await runProcess(deps.subjectEntry, { args: [], cwd: deps.cwd, env: { ...deps.env, ...registration.env }, stdin: JSON.stringify(request), timeoutMs: deps.timeoutMs });
   if (process.signal !== null) throw new SubjectProcessError(subject, `killed by ${process.signal} after ${deps.timeoutMs} ms`, process);
   let parsed: unknown;
   try {

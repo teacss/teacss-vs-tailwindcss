@@ -5,7 +5,10 @@ export const CONTRACT_VERSION = 1;
 export type Tier = "engine" | "build";
 export type EngineScenario = "cold" | "warm";
 
-export type SubjectTask = { readonly kind: "describe" } | { readonly kind: "engine"; readonly scenario: EngineScenario; readonly candidates: readonly string[] } | { readonly kind: "build"; readonly files: Readonly<Record<string, string>> };
+export type SubjectTask =
+  | { readonly kind: "describe" }
+  | { readonly kind: "engine"; readonly scenario: EngineScenario; readonly candidates: readonly string[]; readonly includeCss: boolean }
+  | { readonly kind: "build"; readonly modules: readonly string[]; readonly files: Readonly<Record<string, string>>; readonly includeCss: boolean };
 
 export interface SubjectRequest {
   readonly version: typeof CONTRACT_VERSION;
@@ -24,8 +27,8 @@ export interface EngineSample {
 
 export type TaskResult =
   | { readonly kind: "describe"; readonly versions: SubjectVersions }
-  | { readonly kind: "engine"; readonly samples: readonly EngineSample[] }
-  | { readonly kind: "build"; readonly cssBytes: number; readonly cssGzipBytes: number; readonly cssSha256: string }
+  | { readonly kind: "engine"; readonly samples: readonly EngineSample[]; readonly css: string | undefined }
+  | { readonly kind: "build"; readonly cssBytes: number; readonly cssGzipBytes: number; readonly cssSha256: string; readonly css: string | undefined }
   | { readonly kind: "error"; readonly message: string; readonly stack: string | undefined };
 
 export interface SubjectResponse {
@@ -65,10 +68,11 @@ function parseTask(value: unknown): SubjectTask {
     case "engine":
       if (value["scenario"] !== "cold" && value["scenario"] !== "warm") throw new Error("request: engine scenario is not cold or warm");
       if (!isStringArray(value["candidates"])) throw new Error("request: engine candidates are not strings");
-      return { kind: "engine", scenario: value["scenario"], candidates: value["candidates"] };
+      return { kind: "engine", scenario: value["scenario"], candidates: value["candidates"], includeCss: value["includeCss"] === true };
     case "build":
       if (!isStringRecord(value["files"])) throw new Error("request: build files are not a string map");
-      return { kind: "build", files: value["files"] };
+      if (!isStringArray(value["modules"])) throw new Error("request: build modules are not strings");
+      return { kind: "build", modules: value["modules"], files: value["files"], includeCss: value["includeCss"] === true };
     default:
       throw new Error(`request: unknown task kind ${String(value["kind"])}`);
   }
@@ -85,6 +89,11 @@ function parseSample(value: unknown): EngineSample {
   return { wallMs: value["wallMs"], cssBytes: value["cssBytes"], cssSha256: value["cssSha256"] };
 }
 
+function optionalCss(value: unknown): string | undefined {
+  if (value !== undefined && typeof value !== "string") throw new Error("response: css is not a string");
+  return value;
+}
+
 function parseResult(value: unknown): TaskResult {
   if (!isRecord(value)) throw new Error("response: result is not an object");
   switch (value["kind"]) {
@@ -95,10 +104,10 @@ function parseResult(value: unknown): TaskResult {
     }
     case "engine":
       if (!Array.isArray(value["samples"])) throw new Error("response: engine samples are not an array");
-      return { kind: "engine", samples: value["samples"].map(parseSample) };
+      return { kind: "engine", samples: value["samples"].map(parseSample), css: optionalCss(value["css"]) };
     case "build":
       if (typeof value["cssBytes"] !== "number" || typeof value["cssGzipBytes"] !== "number" || typeof value["cssSha256"] !== "string") throw new Error("response: build result shape");
-      return { kind: "build", cssBytes: value["cssBytes"], cssGzipBytes: value["cssGzipBytes"], cssSha256: value["cssSha256"] };
+      return { kind: "build", cssBytes: value["cssBytes"], cssGzipBytes: value["cssGzipBytes"], cssSha256: value["cssSha256"], css: optionalCss(value["css"]) };
     case "error":
       if (typeof value["message"] !== "string") throw new Error("response: error message is not a string");
       return { kind: "error", message: value["message"], stack: typeof value["stack"] === "string" ? value["stack"] : undefined };

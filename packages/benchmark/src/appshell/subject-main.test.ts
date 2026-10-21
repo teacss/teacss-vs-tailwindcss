@@ -17,17 +17,17 @@ test("describe, engine and build answer through the fake module", async () => {
   assert.deepEqual(describe.result, { kind: "describe", versions: { packages: { fake: "0.0.0" } } });
   assert.ok(describe.usage.maxRssBytes > 0);
 
-  const engine = parseSubjectResponse(JSON.parse((await subjectMain(request({ kind: "engine", scenario: "warm", candidates: ["p:4"] }), deps)).stdout));
+  const engine = parseSubjectResponse(JSON.parse((await subjectMain(request({ kind: "engine", scenario: "warm", candidates: ["p:4"], includeCss: false }), deps)).stdout));
   assert.equal(engine.result.kind === "engine" && engine.result.samples.length, 10);
 
-  const build = await subjectMain(request({ kind: "build", files: { "src/main.js": "document.body.innerHTML = '<div class=\"p:4\"></div>'" } }), deps);
+  const build = await subjectMain(request({ kind: "build", modules: ["src/main.js"], files: { "src/main.js": "document.body.innerHTML = '<div class=\"p:4\"></div>'" }, includeCss: true }), deps);
   assert.equal(build.exitCode, 0);
   const parsed = parseSubjectResponse(JSON.parse(build.stdout));
   assert.equal(parsed.result.kind === "build" && parsed.result.cssBytes, ".built{}".length);
 });
 
 test("a subject that throws yields an error result and exit code 1", async () => {
-  const result = await subjectMain(request({ kind: "engine", scenario: "cold", candidates: ["p:4"] }, failingModule), deps);
+  const result = await subjectMain(request({ kind: "engine", scenario: "cold", candidates: ["p:4"], includeCss: false }, failingModule), deps);
   assert.equal(result.exitCode, 1);
   const parsed = parseSubjectResponse(JSON.parse(result.stdout));
   assert.equal(parsed.result.kind === "error" && parsed.result.message, "planted engine failure");

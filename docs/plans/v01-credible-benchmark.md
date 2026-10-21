@@ -52,13 +52,15 @@
 
 ## 第 4 片：四个被测对象与等价校验
 
-- [ ] 先回答提案待决事项 4：在干净目录安装 `@teacss/vite@0.8.5` 与 `@teacss/engine@0.8.5-alpha.3`，`engine: "rust"`、`TEACSS_ENGINE_STRICT=1`、`TEACSS_ENGINE_STATS=1` 跑一次最小构建，确认 Rust 路径运行且无回退。能则全部用发布包；不能则加 `--local` 模式（link `../teacss-ts` 与 `../teacss-rs/packages/engine`），并把这个事实写进报告。
-- [ ] `packages/subject-vite-baseline`、`subject-teacss-ts`、`subject-teacss-rs`、`subject-tailwind-v4`：各实现 `SubjectClient`；engine 层分别调用 `createGenerator().generate()`（ts/rust 由 `engine` 选项决定）与 `@tailwindcss/node` `compile` + `@tailwindcss/oxide` `Scanner`；build 层各用官方 vite 插件与文档推荐配置；`loadedNativeModules()` 从 `process.moduleLoadList` 与 `require.cache` 中筛 `.node`。
-- [ ] `packages/benchmark/features/verify`：（a）teacss-ts 与 teacss-rs 输出逐字节比较；（b）每个对象输出中每个用例的类都出现（选择器转义后查找）；（c）用 lightningcss 解析 TeaCSS 与 Tailwind 的输出，按用例比较属性名集合与条件结构；（d）被测进程上报的原生模块与期望表比较。
-- [ ] 每个对象一个进程冒烟测试：`bench run --subject X --runs 1 --tier engine` 与 `--tier build` 成功，且 verify 全部通过。
-- 验收：`bench verify --utilities 5000 --files 30` 四项全部通过；故意在配对表加入一个 Tailwind 不支持的类时，(b) 失败并指出该用例。
-- 验证命令：`node apps/bench/src/main.ts verify --utilities 5000 --files 30`。
-- 风险：Rust 引擎对某些配置回退（如 `mergeSelectors:false`）。处理方式是改语料或配置到两边都原生支持的子集，绝不把 TS 的数字记成 Rust 的。
+完成于 2026-10-21。
+
+- [x] 待决事项 4 的答案见第 0 片；被测对象全部用发布包，`pnpm-lock.yaml` 钉死。
+- [x] `packages/subject-vite-baseline`、`subject-tailwind-v4`、`subject-teacss`（一个包、两个入口 `./ts` 与 `./rs`，同一套 teacss 包只换引擎模式）。engine 层：teacss 走 `createGenerator` + `generate`，Tailwind 走 `compile` + `build(candidates)`，都不带 preflight。build 层：Vite JS API 在临时目录构建，入口与软链见 `docs/knowledge/engine-probe-2026-10-21.md`。版本从各包自己的 `node_modules/<name>/package.json` 读。
+- [x] 注册表 `subjects/registry.ts`：每个对象的模块（`import.meta.resolve` 得到的文件 URL）、环境（teacss 两个对象都带 `TEACSS_ENGINE_STRICT=1`）、语法、是否有 engine 层、原生模块的必须与禁止前缀。
+- [x] `features/verify`：css-tree 解析；强等价按哈希；覆盖与结构检查合一（每个用例的选择器存在、声明的属性集包含期望、条件结构按伪类与宽度媒体查询归类）；物理 longhand 对归一为逻辑属性；`not` 媒体查询取反；原生模块期望。
+- [x] `bench verify --utilities --files --seed`：四个对象共 7 次子进程往返，输出每项检查与失败明细，非零退出。
+- 验收：300 × 3 与 5000 × 30 都通过（后者 7 次往返共 5 秒；ts 与 rs 的 engine 输出 379 015 字节、build 输出 388 499 字节，哈希相同；Tailwind engine 1 003 742 字节、build 720 684 字节）。配对表里植入不支持的类时结构检查报 `no rule selects it`（单元测试）。
+- 偏离：`cpu` 与 RSS 由子进程自报（见第 2 片）；三个被测包各自重复了 `packageVersion` 与 `viteBuild` 两个小函数，因为它们依赖 vite，不能下沉到基础层。
 
 ## 第 5 片：测量
 
