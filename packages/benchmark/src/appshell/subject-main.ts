@@ -1,7 +1,10 @@
 import { createHash } from "node:crypto";
+import { createRequire } from "node:module";
+import { basename } from "node:path";
 import { gzipSync } from "node:zlib";
 import { type Clock, createWorkspace, loadedNativeModules, ownResourceUsage, type SubjectClient, type SubjectFactory, systemClock } from "@bench/infrastructure";
 import { CONTRACT_VERSION, parseSubjectRequest, type SubjectRequest, type SubjectResponse, type TaskResult } from "../contract/index.ts";
+import { countOutput } from "../css/index.ts";
 import { connectDevIo, runDevScenario } from "../features/measure/dev-scenario.ts";
 import { runEngineScenario } from "../features/measure/index.ts";
 
@@ -27,9 +30,19 @@ async function runTask(request: SubjectRequest, deps: SubjectMainDeps): Promise<
   switch (task.kind) {
     case "describe":
       return { kind: "describe", versions: await (await loadSubject(request)).describe() };
+    case "native-load": {
+      if (loadedNativeModules().includes(basename(task.path))) throw new Error(`${basename(task.path)} was loaded before the timed region`);
+      const started = deps.clock.now();
+      createRequire(import.meta.url)(task.path);
+      const wallMs = Number(deps.clock.now() - started) / 1e6;
+      if (!loadedNativeModules().includes(basename(task.path))) throw new Error(`${basename(task.path)} did not load`);
+      return { kind: "native-load", wallMs };
+    }
+    case "coverage":
+      return { kind: "coverage", results: await (await loadSubject(request)).coverage(task.entries) };
     case "engine": {
       const { samples, css } = await runEngineScenario(task, () => loadSubject(request), deps.clock);
-      return { kind: "engine", samples, css: task.includeCss ? css : undefined };
+      return { kind: "engine", samples, output: countOutput(css), css: task.includeCss ? css : undefined };
     }
     case "dev": {
       const subject = await loadSubject(request);
@@ -56,7 +69,7 @@ async function runTask(request: SubjectRequest, deps: SubjectMainDeps): Promise<
       try {
         await subject.prepare(workspace, { modules: task.modules, files: new Map(Object.entries(task.files)) });
         const { css } = await subject.build(workspace);
-        return { kind: "build", cssBytes: Buffer.byteLength(css), cssGzipBytes: gzipSync(css).byteLength, cssSha256: createHash("sha256").update(css).digest("hex"), css: task.includeCss ? css : undefined };
+        return { kind: "build", cssBytes: Buffer.byteLength(css), cssGzipBytes: gzipSync(css).byteLength, cssSha256: createHash("sha256").update(css).digest("hex"), output: countOutput(css), css: task.includeCss ? css : undefined };
       } finally {
         workspace.remove();
       }

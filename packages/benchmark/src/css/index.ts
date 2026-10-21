@@ -36,3 +36,9 @@ export function escapeClass(name: string): string {
 export function containsClass(css: string, name: string): boolean {
   return css.includes(`.${escapeClass(name)}`);
 }
+
+/** Style rules and their declarations in a stylesheet. */
+export function countOutput(css: string): { rules: number; declarations: number } {
+  const rules = parseRules(css);
+  return { rules: rules.length, declarations: rules.reduce((sum, rule) => sum + rule.properties.length, 0) };
+}

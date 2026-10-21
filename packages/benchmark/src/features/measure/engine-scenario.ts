@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import process from "node:process";
 import type { Clock, SubjectClient } from "@bench/infrastructure";
 import { type EngineSample, type EngineScenario, incrementalSize } from "../../contract/index.ts";
 import { containsClass } from "../../css/index.ts";
@@ -26,9 +27,13 @@ export interface EngineScenarioInput {
 }
 
 async function timed(clock: Clock, call: () => Promise<{ css: string }>): Promise<{ sample: EngineSample; css: string }> {
+  const cpu = process.cpuUsage();
   const started = clock.now();
   const { css } = await call();
-  return { sample: { wallMs: milliseconds(started, clock.now()), cssBytes: Buffer.byteLength(css), cssSha256: sha256(css) }, css };
+  const wallMs = milliseconds(started, clock.now());
+  const used = process.cpuUsage(cpu);
+  const memory = process.memoryUsage();
+  return { sample: { wallMs, cssBytes: Buffer.byteLength(css), cssSha256: sha256(css), cpuMs: (used.user + used.system) / 1000, rssBytes: memory.rss, heapBytes: memory.heapUsed }, css };
 }
 
 /**

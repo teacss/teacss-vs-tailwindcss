@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { countOutput } from "../../css/index.ts";
 import { checkNativeModules, checkStructure, escapeClass, parseRules } from "./index.ts";
 
 const cases = [
@@ -53,4 +54,8 @@ test("a missing selector, a missing property and a wrong condition are each name
 test("native module expectations name what was missing or forbidden", () => {
   assert.deepEqual(checkNativeModules(["teacss-engine.darwin-arm64.node", "fsevents.node"], { required: ["teacss-engine"], forbidden: ["tailwindcss-oxide"] }), []);
   assert.deepEqual(checkNativeModules(["fsevents.node"], { required: ["teacss-engine"], forbidden: ["fsevents"] }), ["did not load teacss-engine", "loaded fsevents"]);
+});
+
+test("countOutput counts style rules and their declarations, inside at-rules too", () => {
+  assert.deepEqual(countOutput(".a{color:red;margin:0}@media (width>=1px){.b{padding:0}}"), { rules: 2, declarations: 3 });
 });

@@ -1,5 +1,6 @@
-import { existsSync, readFileSync, realpathSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { dirname, join, sep } from "node:path";
+import type { NativeArtifact } from "./subject-client.ts";
 
 export interface ResolvedPackage {
   readonly name: string;
@@ -29,4 +30,21 @@ export function describePackages(packages: readonly ResolvedPackage[]): { packag
     packages: Object.fromEntries(packages.map((entry) => [entry.name, entry.version])),
     local: Object.fromEntries(packages.filter((entry) => !entry.fromLockfile).map((entry) => [entry.name, entry.dir])),
   };
+}
+
+/** The platform package of `tool` installed beside it and the `.node` file inside it. */
+export function nativeArtifact(tool: ResolvedPackage): NativeArtifact | undefined {
+  const manifest: unknown = JSON.parse(readFileSync(join(tool.dir, "package.json"), "utf8"));
+  const optional = typeof manifest === "object" && manifest !== null && "optionalDependencies" in manifest && typeof manifest.optionalDependencies === "object" && manifest.optionalDependencies !== null ? Object.keys(manifest.optionalDependencies) : [];
+  for (const name of optional) {
+    let platform: ResolvedPackage;
+    try {
+      platform = resolvePackage(name, tool.dir);
+    } catch {
+      continue;
+    }
+    const file = readdirSync(platform.dir).find((entry) => entry.endsWith(".node"));
+    if (file !== undefined) return { package: name, file, path: join(platform.dir, file), bytes: statSync(join(platform.dir, file)).size, platformPackages: optional.length };
+  }
+  return undefined;
 }

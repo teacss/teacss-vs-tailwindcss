@@ -69,3 +69,8 @@ test("an incremental scenario with the wrong group sizes is refused", async () =
     /needs 10 groups of 100/,
   );
 });
+
+test("every timed call records its CPU time, resident memory and heap", async () => {
+  const { samples } = await runEngineScenario({ scenario: "warm", candidates: ["p:4"], extra: none }, async () => fakeSubject, fakeClock());
+  assert.ok(samples.every((sample) => sample.cpuMs >= 0 && sample.rssBytes > 0 && sample.heapBytes > 0));
+});

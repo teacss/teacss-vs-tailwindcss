@@ -1,7 +1,8 @@
+import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname } from "node:path";
-import { fileURLToPath } from "node:url";
-import { type DevServer, describePackages, resolvePackage, type SubjectClient, subjectId, type Workspace } from "@bench/infrastructure";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { type CoverageResult, type DevServer, describePackages, nativeArtifact, type ResolvedPackage, resolvePackage, type SubjectClient, subjectId, type Workspace } from "@bench/infrastructure";
 import { createGenerator, type EngineMode } from "@teacss/core";
 import presetStandard from "@teacss/preset-standard";
 import { pluginTeacss } from "@teacss/vite";
@@ -45,11 +46,46 @@ async function startDevServer(workspace: Workspace, plugins: PluginOption[]): Pr
   return { origin, close: () => server.close() };
 }
 
+/** Imports `specifier` the way the package at `dir` would, so a linked checkout uses its own copy. */
+async function importFrom(dir: string, specifier: string): Promise<Record<string, unknown>> {
+  return (await import(pathToFileURL(createRequire(`${dir}/package.json`).resolve(specifier)).href)) as Record<string, unknown>;
+}
+
+function callable(module: Record<string, unknown>, name: string): (...args: unknown[]) => Promise<unknown> {
+  const value = module[name];
+  if (typeof value !== "function") throw new Error(`${name} is not exported`);
+  return value as (...args: unknown[]) => Promise<unknown>;
+}
+
+/** The Rust engine's own verdict on each entry's configuration, through the facade's `translateConfig`. */
+async function engineCoverage(packages: readonly ResolvedPackage[], entries: readonly string[]): Promise<CoverageResult[]> {
+  const vite = packages.find((entry) => entry.name === "@teacss/vite");
+  const engine = packages.find((entry) => entry.name === "@teacss/engine");
+  if (vite === undefined || engine === undefined) throw new Error("@teacss/vite or @teacss/engine is not resolved");
+  const resolveEntryConfig = callable(await importFrom(vite.dir, "@teacss/config"), "resolveEntryConfig");
+  const translateConfig = callable(await importFrom(engine.dir, "@teacss/engine/facade"), "translateConfig");
+  const results: CoverageResult[] = [];
+  for (const entry of entries) {
+    const resolved = await resolveEntryConfig(readFileSync(entry, "utf8"), dirname(entry), entry);
+    const config = typeof resolved === "object" && resolved !== null && "config" in resolved ? resolved.config : {};
+    const outcome = await translateConfig(config, {});
+    const served = typeof outcome === "object" && outcome !== null && "ok" in outcome && outcome.ok === true;
+    const reason = !served && typeof outcome === "object" && outcome !== null && "reason" in outcome ? `${String(outcome.reason)}${"path" in outcome ? ` at ${String(outcome.path)}` : ""}` : undefined;
+    results.push({ entry, served, reason });
+  }
+  return results;
+}
+
 /** One subject per engine mode over the same packages; the mode is explicit so the environment cannot flip it. */
 export function teacssSubject(engine: "ts" | "rust"): SubjectClient {
   return {
     id: subjectId(engine === "ts" ? "teacss-ts" : "teacss-rs"),
-    describe: async () => describePackages(resolved()),
+    describe: async () => {
+      const packages = resolved();
+      const engineDir = packages.find((entry) => entry.name === "@teacss/engine");
+      const native = engine === "rust" && engineDir !== undefined ? nativeArtifact(engineDir) : undefined;
+      return { ...describePackages(packages), ...(native === undefined ? {} : { native }) };
+    },
     engine: async ({ candidates }) => {
       const generator = await createGenerator({ presets: [presetStandard()], engine });
       const { css } = await generator.generate(new Set(candidates), { preflights: false, minify: true });
@@ -68,5 +104,6 @@ export function teacssSubject(engine: "ts" | "rust"): SubjectClient {
     build: async (workspace) => ({ css: await viteBuild(workspace, engine) }),
     devServer: (workspace) => startDevServer(workspace, pluginTeacss(undefined, { engine })),
     moduleHeader: INCLUDE,
+    coverage: async (entries) => (engine === "rust" ? engineCoverage(resolved(), entries) : []),
   };
 }

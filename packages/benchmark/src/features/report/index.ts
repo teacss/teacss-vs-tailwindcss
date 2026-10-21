@@ -1,4 +1,5 @@
 import type { Cell, RunRecord, Sample } from "../../persistence/index.ts";
+import { type RustFindings, rustFindings } from "./rust.ts";
 import { compare, type Summary, summarize, type Verdict } from "./statistics.ts";
 
 export { compare, mannWhitneyU, summarize } from "./statistics.ts";
@@ -34,6 +35,8 @@ export interface ReportModel {
   readonly record: Omit<RunRecord, "samples">;
   readonly tables: readonly CellTable[];
   readonly sampleCount: number;
+  /** Spec v02.1 value and price of Rust, empty for records that predate it. */
+  readonly rust: RustFindings;
 }
 
 function seriesOf(sample: Sample): Series {
@@ -87,7 +90,7 @@ export function buildReport(record: RunRecord): ReportModel {
       tables.push({ series, cell, rows, fastest, verdicts });
     }
   }
-  return { record: rest, tables, sampleCount: samples.length };
+  return { record: rest, tables, sampleCount: samples.length, rust: rustFindings(record) };
 }
 
 const ms = (value: number): string => `${value.toFixed(1)} ms`;
@@ -160,6 +163,7 @@ export function renderMarkdown(model: ReportModel): string {
     "## Results",
     "",
     ...SERIES.flatMap((series) => model.tables.filter((table) => table.series === series).map(tableMarkdown)),
+    ...model.rust.sections,
     "## Environment",
     "",
     "| Field | Value |",

@@ -7,6 +7,8 @@ export interface Frame {
 export interface ProfileSummary {
   readonly totalMs: number;
   readonly top: readonly Frame[];
+  /** The garbage collector's self time over the profile total; absent before spec v02.1. */
+  readonly gcShare?: number;
 }
 
 interface ProfileNode {
@@ -51,5 +53,5 @@ export function summarizeProfile(profile: unknown, top = 3): ProfileSummary {
     .map(([name, micros]): Frame => ({ name, selfMs: micros / 1000, share: micros / totalMicros }))
     .sort((left, right) => right.selfMs - left.selfMs || left.name.localeCompare(right.name))
     .slice(0, top);
-  return { totalMs: totalMicros / 1000, top: frames };
+  return { totalMs: totalMicros / 1000, top: frames, gcShare: (selfMicros.get("(garbage collector)") ?? 0) / totalMicros };
 }

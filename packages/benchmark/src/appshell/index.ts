@@ -1,10 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { basename, join } from "node:path";
+import { basename, join, relative } from "node:path";
 import { version as nodeVersion } from "node:process";
 import { type Invocation, parseInvocation, type SubjectId, type SubjectVersions, subjectId } from "@bench/infrastructure";
 import { DEFAULT_SEED, generateCorpus, PAIR_TABLE_VERSION, profileCorpus } from "../corpus/index.ts";
 import { captureEnvironment, loadShare } from "../features/environment/index.ts";
 import { measure, type Tier } from "../features/measure/run.ts";
+import { installFresh, measurePrice, type PriceRecord, teacssEntries } from "../features/price/index.ts";
 import { profileSubjects } from "../features/profile/run.ts";
 import { buildReport, renderMarkdown, renderSummary } from "../features/report/index.ts";
 import { renderReadmeSummary, updateReadme } from "../features/report/readme.ts";
@@ -33,7 +34,10 @@ const USAGE = `bench <command>
   run         measure the scale matrix and write results/<time>-<host>.json
               --utilities <a,b,c> (1000,5000,20000)  --files <a,b,c> (3,30,300)
               --samples <n> (30)  --tier engine|dev|build|all (all)  --subjects <a,b>
-              --seed <n>  --out <dir> (results)  --allow-busy  --no-profile  --allow-node-mismatch
+              --seed <n>  --out <dir> (results)  --allow-busy  --no-profile  --no-price
+              --install-runs <n> (3)  --configs <dir>  --allow-node-mismatch
+  price       what each tool ships, loads and installs, and what the native engine can serve
+              --subjects <a,b>  --install-runs <n> (3)  --configs <dir> (../teacss-ts/examples)
   report      render a results file as Markdown and a JSON summary
               <results.json>  --out <dir> (docs/reports)  --readme <README.md>
 `;
@@ -175,6 +179,12 @@ export async function createApp(deps: AppDeps): Promise<number> {
             await invokeSubject(registry, subject, task, { ...processDeps, nodeArgs });
           },
         );
+    const price = invocation.options.has("no-price")
+      ? undefined
+      : await runPrice(
+          invocation,
+          chosen.filter(([, registration]) => registration.engineTier).map(([id]) => id),
+        );
     const record: RunRecord = {
       version: 1,
       specRevision: SPEC_REVISION,
@@ -189,6 +199,7 @@ export async function createApp(deps: AppDeps): Promise<number> {
       cells: output.cells,
       samples: output.samples,
       limiters,
+      ...(price === undefined ? {} : { price }),
     };
     const path = writeRunRecord(typeof invocation.options.get("out") === "string" ? String(invocation.options.get("out")) : "results", record);
     deps.stdout(`run: ${output.samples.length} samples over ${output.cells.length} cell(s) written to ${path}\n`);
@@ -209,6 +220,41 @@ export async function createApp(deps: AppDeps): Promise<number> {
       writeFileSync(readme, updateReadme(readFileSync(readme, "utf8"), renderReadmeSummary(model, stem)));
       deps.stdout(`report: plain-language summary written between the markers in ${readme}\n`);
     }
+    return 0;
+  };
+  async function runPrice(invocation: Invocation, subjects: readonly SubjectId[]): Promise<PriceRecord> {
+    const configs = typeof invocation.options.get("configs") === "string" ? String(invocation.options.get("configs")) : join(deps.cwd, "..", "teacss-ts", "examples");
+    const entries = existsSync(configs) ? teacssEntries(configs) : [];
+    return measurePrice(
+      { subjects, installRuns: integerOption(invocation, "install-runs", 3), coverage: entries.length === 0 ? undefined : { source: relative(deps.cwd, configs) || ".", entries } },
+      {
+        describe: async (subject) => {
+          const { response } = await invokeSubject(registry, subject, { kind: "describe" }, processDeps);
+          if (response.result.kind !== "describe") throw new Error(`${subject}: expected a describe result`);
+          return response.result.versions;
+        },
+        loadNative: async (subject, path) => {
+          const { response } = await invokeSubject(registry, subject, { kind: "native-load", path }, processDeps);
+          if (response.result.kind !== "native-load") throw new Error(`${subject}: expected a native-load result`);
+          return response.result.wallMs;
+        },
+        coverage: async (subject, list) => {
+          const { response } = await invokeSubject(registry, subject, { kind: "coverage", entries: list }, processDeps);
+          if (response.result.kind !== "coverage") throw new Error(`${subject}: expected a coverage result`);
+          return response.result.results;
+        },
+        install: (packages) => installFresh(packages, deps.env),
+        progress: (message) => deps.stdout(`  ${message}\n`),
+      },
+    );
+  }
+  commands["price"] = async (invocation) => {
+    const chosen = chosenSubjects(invocation, registry).filter(([, registration]) => registration.engineTier);
+    const price = await runPrice(
+      invocation,
+      chosen.map(([id]) => id),
+    );
+    deps.stdout(`${JSON.stringify(price, null, 2)}\n`);
     return 0;
   };
   const command = commands[invocation.command ?? "help"];

@@ -12,7 +12,7 @@ const NAMES: Readonly<Record<string, string>> = {
 const KEY_PACKAGES = ["@teacss/core", "@teacss/engine", "tailwindcss", "vite"];
 
 const name = (subject: string): string => NAMES[subject] ?? subject;
-const seconds = (ms: number): string => (ms >= 1000 ? `${(ms / 1000).toFixed(2)} s` : `${ms.toFixed(0)} ms`);
+const seconds = (ms: number): string => (ms >= 1000 ? `${(ms / 1000).toFixed(2)} s` : ms >= 10 ? `${ms.toFixed(0)} ms` : `${ms.toFixed(1)} ms`);
 const count = (value: number): string => value.toLocaleString("en-US");
 
 function largest(model: ReportModel, series: Series): CellTable | undefined {
@@ -67,6 +67,35 @@ function pairTable(model: ReportModel, series: readonly [Series, Series], title:
   return [`${title(ten)} (median of ${fastestTen.wall.n} runs)`, "", "| | +10 classes | +100 classes |", "| --- | --- | --- |", ...order.map((entry) => `| ${name(entry.subject)} | ${cell(ten, entry.subject, fastestTen)} | ${cell(hundred, entry.subject, fastestHundred)} |`), ""];
 }
 
+const VALUE_ROWS = ["Generate the CSS (warm process)", "Add 10 classes to a running engine", "Dev server: save a file with 10 new classes", "Vite production build", "JavaScript heap after generating"];
+
+function rustTable(model: ReportModel): string[] {
+  const rows = model.rust.value.filter((row) => VALUE_ROWS.includes(row.label) && row.ts !== undefined && row.rs !== undefined);
+  if (rows.length === 0) return [];
+  const lines = ["**What the Rust engine changes for TeaCSS**", "", "| | TypeScript engine | Rust engine |", "| --- | --- | --- |"];
+  for (const row of rows) {
+    const ts = row.ts ?? 0;
+    const rs = row.rs ?? 0;
+    const factor = ts / rs;
+    const note = Math.abs(factor - 1) < 0.05 ? " (about the same)" : factor > 1 ? ` (${factor.toFixed(1)}× ${row.label.startsWith("JavaScript heap") ? "less" : "faster"})` : ` (${(1 / factor).toFixed(1)}× ${row.label.startsWith("JavaScript heap") ? "more" : "slower"})`;
+    lines.push(`| ${row.label} | ${row.format(ts)} | ${row.format(rs)}${note} |`);
+  }
+  const { identical, compared } = model.rust.identical;
+  if (compared > 0) lines.push(`| Same CSS output | | ${identical === compared ? "byte-identical in every measured case" : `${identical} of ${compared} groups identical`} |`);
+  lines.push("");
+  return lines;
+}
+
+function priceTakeaway(model: ReportModel): string | undefined {
+  const rust = model.record.price?.subjects["teacss-rs"];
+  const native = rust?.native;
+  if (rust === undefined || native === undefined) return undefined;
+  const load = rust.nativeLoadMs.length === 0 ? undefined : [...rust.nativeLoadMs].sort((left, right) => left - right)[Math.floor(rust.nativeLoadMs.length / 2)];
+  const served = rust.coverage.filter((result) => result.served).length;
+  const coverage = rust.coverage.length === 0 ? "" : ` It served ${served} of the ${rust.coverage.length} example configurations it was given${served === rust.coverage.length ? "" : "; the rest fall back to the TypeScript engine"}.`;
+  return `The price of the Rust engine is a native file of ${(native.bytes / 1048576).toFixed(1)} MB per platform (${native.platformPackages} platform packages), loaded in ${load === undefined ? "an unmeasured time" : seconds(load)}.${coverage}`;
+}
+
 function buildTable(table: CellTable): string[] {
   const order = ranked(table);
   const fastest = order[0];
@@ -76,6 +105,10 @@ function buildTable(table: CellTable): string[] {
   for (const entry of order) lines.push(`| ${name(entry.subject)} | ${seconds(entry.wall.median)}${comparison(table, entry, fastest)} | ${entry.deltaMs === undefined ? "" : seconds(entry.deltaMs)} |`);
   lines.push("");
   return lines;
+}
+
+function joinWords(items: readonly string[]): string {
+  return items.length <= 1 ? (items[0] ?? "") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
 }
 
 function takeaways(model: ReportModel, engine: CellTable | undefined, build: CellTable | undefined): string[] {
@@ -93,7 +126,7 @@ function takeaways(model: ReportModel, engine: CellTable | undefined, build: Cel
       })
       .filter((item): item is { subject: string; share: number } => item !== undefined);
     const low = shares.filter((item) => item.share < 0.25);
-    if (low.length > 0) points.push(`For ${low.map((item) => name(item.subject)).join(" and ")}, generating the CSS is only ${low.map((item) => `${Math.round(item.share * 100)} %`).join(" and ")} of the CSS cost in the build; the rest is the build plugin, so a faster engine does not by itself give a faster build.`);
+    if (low.length > 0) points.push(`Generating the CSS is only part of the build's CSS cost: ${joinWords(low.map((item) => `${Math.round(item.share * 100)} % for ${name(item.subject)}`))}. The rest is the build plugin, so a faster engine does not by itself give a faster build.`);
   }
   if (build !== undefined) {
     const sensitive = ranked(build)
@@ -102,6 +135,8 @@ function takeaways(model: ReportModel, engine: CellTable | undefined, build: Cel
     const sizes = model.tables.filter((table) => table.series === "build" && table.cell.utilities === build.cell.utilities).map((table) => table.cell.files);
     if (sensitive.length > 0 && sizes.length > 1) points.push(`${sensitive.map((item) => `${name(item.subject)} gets ${item.ratio.toFixed(1)}× slower`).join("; ")} when the same classes are spread over ${Math.max(...sizes)} files instead of ${Math.min(...sizes)}; the other tools do not care how many files there are.`);
   }
+  const price = priceTakeaway(model);
+  if (price !== undefined) points.push(price);
   points.push("Every tool was given the same classes, and every output was checked before a run counted. The tools emit different colour and size values by design, so this is the time to a correct stylesheet, not to identical bytes.");
   const environment = model.record.environment;
   const versions = Object.values(model.record.subjects)
@@ -121,6 +156,7 @@ export function renderReadmeSummary(model: ReportModel, stem: string): string {
   lines.push(...pairTable(model, ["engine/incremental-10", "engine/incremental-100"], (table) => `**Adding new classes to an engine** that already holds those ${count(table.cell.utilities)}`));
   lines.push(...pairTable(model, ["dev/+10", "dev/+100"], (table) => `**Saving a new file in the Vite dev server** with ${count(table.cell.utilities)} classes already in ${table.cell.files} files, until the page's stylesheet has the new classes`));
   if (build !== undefined) lines.push(...buildTable(build));
+  lines.push(...rustTable(model));
   if (engine === undefined && build === undefined) lines.push("No measurements in this run.", "");
   lines.push("**In short**", "", ...takeaways(model, engine, build), "", `[Full report](docs/reports/${stem}.md) · [audit](docs/reports/${stem}.audit.md) · [raw samples](results/${stem}.json) · [method](docs/specs/v01.1-benchmark-protocol.md)`, "", README_END);
   return lines.join("\n");

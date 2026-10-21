@@ -1,4 +1,4 @@
-import { type ResourceUsage, type SubjectId, type SubjectVersions, subjectId } from "@bench/infrastructure";
+import { type CoverageResult, type NativeArtifact, type ResourceUsage, type SubjectId, type SubjectVersions, subjectId } from "@bench/infrastructure";
 
 export const CONTRACT_VERSION = 1;
 
@@ -15,6 +15,8 @@ export function incrementalSize(scenario: EngineScenario): number | undefined {
 
 export type SubjectTask =
   | { readonly kind: "describe" }
+  | { readonly kind: "native-load"; readonly path: string }
+  | { readonly kind: "coverage"; readonly entries: readonly string[] }
   | {
       readonly kind: "engine";
       readonly scenario: EngineScenario;
@@ -47,6 +49,17 @@ export interface EngineSample {
   readonly wallMs: number;
   readonly cssBytes: number;
   readonly cssSha256: string;
+  /** User plus system CPU time of the timed call. */
+  readonly cpuMs: number;
+  /** Resident set and V8 heap in use right after the timed call. */
+  readonly rssBytes: number;
+  readonly heapBytes: number;
+}
+
+/** How much CSS one output holds, counted once per process outside the timed region. */
+export interface OutputCounts {
+  readonly rules: number;
+  readonly declarations: number;
 }
 
 export interface DevSample {
@@ -58,9 +71,11 @@ export interface DevSample {
 
 export type TaskResult =
   | { readonly kind: "describe"; readonly versions: SubjectVersions }
-  | { readonly kind: "engine"; readonly samples: readonly EngineSample[]; readonly css: string | undefined }
-  | { readonly kind: "build"; readonly cssBytes: number; readonly cssGzipBytes: number; readonly cssSha256: string; readonly css: string | undefined }
+  | { readonly kind: "engine"; readonly samples: readonly EngineSample[]; readonly output: OutputCounts; readonly css: string | undefined }
+  | { readonly kind: "build"; readonly cssBytes: number; readonly cssGzipBytes: number; readonly cssSha256: string; readonly output: OutputCounts; readonly css: string | undefined }
   | { readonly kind: "dev"; readonly samples: readonly DevSample[] }
+  | { readonly kind: "native-load"; readonly wallMs: number }
+  | { readonly kind: "coverage"; readonly results: readonly CoverageResult[] }
   | { readonly kind: "error"; readonly message: string; readonly stack: string | undefined };
 
 export interface SubjectResponse {
@@ -97,6 +112,12 @@ function parseTask(value: unknown): SubjectTask {
   switch (value["kind"]) {
     case "describe":
       return { kind: "describe" };
+    case "native-load":
+      if (typeof value["path"] !== "string") throw new Error("request: native-load path is not a string");
+      return { kind: "native-load", path: value["path"] };
+    case "coverage":
+      if (!isStringArray(value["entries"])) throw new Error("request: coverage entries are not strings");
+      return { kind: "coverage", entries: value["entries"] };
     case "engine": {
       const scenario = ENGINE_SCENARIOS.find((entry) => entry === value["scenario"]);
       if (scenario === undefined) throw new Error(`request: engine scenario ${String(value["scenario"])} is not one of ${ENGINE_SCENARIOS.join(", ")}`);
@@ -128,9 +149,24 @@ export function parseSubjectRequest(value: unknown): SubjectRequest {
   return { version: CONTRACT_VERSION, sentAt: request["sentAt"] as number, subject: subjectId(request["subject"] as string), module: request["module"], task: parseTask(request["task"]) };
 }
 
+function isNumberRecord(value: unknown, keys: readonly string[]): value is Record<string, number> {
+  return isRecord(value) && keys.every((key) => typeof value[key] === "number");
+}
+
 function parseSample(value: unknown): EngineSample {
-  if (!isRecord(value) || typeof value["wallMs"] !== "number" || typeof value["cssBytes"] !== "number" || typeof value["cssSha256"] !== "string") throw new Error("response: engine sample shape");
-  return { wallMs: value["wallMs"], cssBytes: value["cssBytes"], cssSha256: value["cssSha256"] };
+  if (!isNumberRecord(value, ["wallMs", "cssBytes", "cpuMs", "rssBytes", "heapBytes"]) || typeof (value as Record<string, unknown>)["cssSha256"] !== "string") throw new Error("response: engine sample shape");
+  return { wallMs: value["wallMs"] as number, cssBytes: value["cssBytes"] as number, cssSha256: (value as Record<string, unknown>)["cssSha256"] as string, cpuMs: value["cpuMs"] as number, rssBytes: value["rssBytes"] as number, heapBytes: value["heapBytes"] as number };
+}
+
+function parseNative(value: unknown): NativeArtifact | undefined {
+  if (value === undefined) return undefined;
+  if (!isRecord(value) || typeof value["package"] !== "string" || typeof value["file"] !== "string" || typeof value["path"] !== "string" || typeof value["bytes"] !== "number" || typeof value["platformPackages"] !== "number") throw new Error("response: native artifact shape");
+  return { package: value["package"], file: value["file"], path: value["path"], bytes: value["bytes"], platformPackages: value["platformPackages"] };
+}
+
+function parseCounts(value: unknown): OutputCounts {
+  if (!isNumberRecord(value, ["rules", "declarations"])) throw new Error("response: output counts shape");
+  return { rules: value["rules"] as number, declarations: value["declarations"] as number };
 }
 
 function optionalCss(value: unknown): string | undefined {
@@ -144,22 +180,30 @@ function parseResult(value: unknown): TaskResult {
     case "describe": {
       const versions = value["versions"];
       if (!isRecord(versions) || !isStringRecord(versions["packages"]) || !isStringRecord(versions["local"])) throw new Error("response: describe versions shape");
-      return { kind: "describe", versions: { packages: versions["packages"], local: versions["local"] } };
+      const native = parseNative(versions["native"]);
+      return { kind: "describe", versions: { packages: versions["packages"], local: versions["local"], ...(native === undefined ? {} : { native }) } };
+    }
+    case "native-load":
+      if (typeof value["wallMs"] !== "number") throw new Error("response: native-load wallMs is not a number");
+      return { kind: "native-load", wallMs: value["wallMs"] };
+    case "coverage": {
+      const results = value["results"];
+      if (!Array.isArray(results) || !results.every((entry: unknown) => isRecord(entry) && typeof entry["entry"] === "string" && typeof entry["served"] === "boolean")) throw new Error("response: coverage results shape");
+      return { kind: "coverage", results: results.map((entry: Record<string, unknown>) => ({ entry: String(entry["entry"]), served: entry["served"] === true, reason: typeof entry["reason"] === "string" ? entry["reason"] : undefined })) };
     }
     case "engine":
       if (!Array.isArray(value["samples"])) throw new Error("response: engine samples are not an array");
-      return { kind: "engine", samples: value["samples"].map(parseSample), css: optionalCss(value["css"]) };
+      return { kind: "engine", samples: value["samples"].map(parseSample), output: parseCounts(value["output"]), css: optionalCss(value["css"]) };
     case "build":
       if (typeof value["cssBytes"] !== "number" || typeof value["cssGzipBytes"] !== "number" || typeof value["cssSha256"] !== "string") throw new Error("response: build result shape");
-      return { kind: "build", cssBytes: value["cssBytes"], cssGzipBytes: value["cssGzipBytes"], cssSha256: value["cssSha256"], css: optionalCss(value["css"]) };
+      return { kind: "build", cssBytes: value["cssBytes"], cssGzipBytes: value["cssGzipBytes"], cssSha256: value["cssSha256"], output: parseCounts(value["output"]), css: optionalCss(value["css"]) };
     case "dev":
       if (!Array.isArray(value["samples"])) throw new Error("response: dev samples are not an array");
       return {
         kind: "dev",
         samples: value["samples"].map((sample: unknown) => {
-          const parsed = parseSample(sample);
-          if (!isRecord(sample) || typeof sample["polls"] !== "number") throw new Error("response: dev sample shape");
-          return { ...parsed, polls: sample["polls"] };
+          if (!isNumberRecord(sample, ["wallMs", "polls", "cssBytes"]) || typeof (sample as Record<string, unknown>)["cssSha256"] !== "string") throw new Error("response: dev sample shape");
+          return { wallMs: sample["wallMs"] as number, polls: sample["polls"] as number, cssBytes: sample["cssBytes"] as number, cssSha256: (sample as Record<string, unknown>)["cssSha256"] as string };
         }),
       };
     case "error":

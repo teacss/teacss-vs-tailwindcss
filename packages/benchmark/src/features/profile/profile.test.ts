@@ -25,6 +25,7 @@ test("self time is summed per function, idle is excluded from the top but counte
     ],
   );
   assert.ok(Math.abs((summary.top[0]?.share ?? 0) - 400 / 1750) < 1e-9);
+  assert.ok(Math.abs((summary.gcShare ?? 0) - 300 / 1750) < 1e-9);
 });
 
 test("something that is not a cpuprofile is refused", () => {

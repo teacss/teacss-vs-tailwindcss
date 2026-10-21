@@ -59,7 +59,7 @@ test("the summary is two small tables, a few takeaways and the links, in plain w
   assert.match(text, /\*\*Building a Vite project with those classes in 30 files\*\* \(median of 30 runs; the project builds in 101 ms with no CSS tool\)/);
   assert.match(text, /\| Tailwind CSS v4 \| 30\.10 s \| 30\.00 s \|/);
   assert.match(text, /- TeaCSS \(Rust engine\) generates the CSS fastest; Tailwind CSS v4 finishes the whole build fastest\./);
-  assert.match(text, /- For TeaCSS \(Rust engine\), generating the CSS is only 2 % of the CSS cost in the build/);
+  assert.match(text, /- Generating the CSS is only part of the build's CSS cost: 2 % for TeaCSS \(Rust engine\)\. The rest is the build plugin/);
   assert.match(text, /- TeaCSS \(Rust engine\) gets 10\.0× slower when the same classes are spread over 30 files instead of 3; the other tools do not care/);
   assert.match(text, /- @teacss\/engine 0\.8\.5-alpha\.4, tailwindcss 4\.3\.3; one Apple M2 Max, Node v24\.14\.1\./);
   assert.match(text, /\[Full report\]\(docs\/reports\/2026-10-21T09-19-14-mac\.md\) · \[audit\]/);

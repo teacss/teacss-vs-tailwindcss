@@ -1,7 +1,7 @@
 import { createRequire } from "node:module";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { type DevServer, describePackages, resolvePackage, type SubjectClient, type SubjectFactory, subjectId, type Workspace } from "@bench/infrastructure";
+import { type DevServer, describePackages, nativeArtifact, resolvePackage, type SubjectClient, type SubjectFactory, subjectId, type Workspace } from "@bench/infrastructure";
 import { compile } from "@tailwindcss/node";
 import tailwindcss from "@tailwindcss/vite";
 import { build, createServer, type PluginOption } from "vite";
@@ -40,7 +40,12 @@ async function startDevServer(workspace: Workspace, plugins: PluginOption[]): Pr
 
 export const createSubject: SubjectFactory = (): SubjectClient => ({
   id: subjectId("tailwind-v4"),
-  describe: async () => describePackages(PACKAGES.map((name) => resolvePackage(name, HERE))),
+  describe: async () => {
+    const packages = PACKAGES.map((name) => resolvePackage(name, HERE));
+    const oxide = packages.find((entry) => entry.name === "@tailwindcss/oxide");
+    const native = oxide === undefined ? undefined : nativeArtifact(oxide);
+    return { ...describePackages(packages), ...(native === undefined ? {} : { native }) };
+  },
   engine: async ({ candidates }) => {
     const compiler = await compile(ENGINE_ENTRY, { base: dirname(require.resolve("tailwindcss/package.json")), onDependency: () => {} });
     return { css: compiler.build([...candidates]) };
@@ -58,4 +63,5 @@ export const createSubject: SubjectFactory = (): SubjectClient => ({
   build: async (workspace) => ({ css: await viteBuild(workspace) }),
   devServer: (workspace) => startDevServer(workspace, [tailwindcss()]),
   moduleHeader: "",
+  coverage: async () => [],
 });

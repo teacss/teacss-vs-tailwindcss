@@ -18,6 +18,7 @@ export const fakeSubject: SubjectClient = {
     throw new Error("the fake subject has no development server");
   },
   moduleHeader: "",
+  coverage: async (entries) => entries.map((entry) => ({ entry, served: !entry.includes("dynamic"), reason: entry.includes("dynamic") ? "rules" : undefined })),
 };
 
 export const createSubject: SubjectFactory = () => fakeSubject;
