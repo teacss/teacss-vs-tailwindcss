@@ -35,7 +35,7 @@ test("a subject process answers describe, engine and build and reports no native
   assert.deepEqual(describe.response.nativeModules, []);
   assert.ok(describe.response.usage.cpuUserMs > 0);
 
-  const cold = await invokeSubject(registry, fake, { kind: "engine", scenario: "cold", candidates: ["p:4", "m:2"], includeCss: true }, deps);
+  const cold = await invokeSubject(registry, fake, { kind: "engine", scenario: "cold", candidates: ["p:4", "m:2"], extra: [], includeCss: true }, deps);
   assert.equal(cold.response.result.kind === "engine" && cold.response.result.samples.length, 1);
 
   const build = await invokeSubject(registry, fake, { kind: "build", modules: ["src/main.js"], files: { "src/main.js": "x" }, includeCss: false }, deps);
@@ -45,7 +45,7 @@ test("a subject process answers describe, engine and build and reports no native
 
 test("a subject that throws fails the invocation with its message", async () => {
   const failing = new Map([[fake, { ...registration, module: import.meta.resolve("@bench/infrastructure/test-support/failing-subject") }]]);
-  await assert.rejects(invokeSubject(failing, fake, { kind: "engine", scenario: "cold", candidates: ["p:4"], includeCss: false }, deps), (error: unknown) => error instanceof SubjectProcessError && /planted engine failure/.test(error.message));
+  await assert.rejects(invokeSubject(failing, fake, { kind: "engine", scenario: "cold", candidates: ["p:4"], extra: [], includeCss: false }, deps), (error: unknown) => error instanceof SubjectProcessError && /planted engine failure/.test(error.message));
 });
 
 test("an unregistered subject is refused before any process starts", async () => {

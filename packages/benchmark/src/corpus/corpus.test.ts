@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { candidates, corpusProject, generateCorpus, pairSpace, profileCorpus } from "./index.ts";
+import { candidates, corpusProject, extraCases, generateCorpus, pairSpace, profileCorpus } from "./index.ts";
 
 test("the pair space holds more cases than the largest cell and every case names its properties", () => {
   const { cases } = pairSpace();
@@ -54,4 +54,15 @@ test("the profile counts families and conditions over the generated cases", () =
   );
   assert.ok((profile.families["spacing"] ?? 0) > 0 && (profile.families["color"] ?? 0) > 0);
   assert.ok((profile.conditionCounts["hover"] ?? 0) > 0);
+});
+
+test("extra cases are outside the corpus, distinct across groups and fixed by the seed", () => {
+  const corpus = generateCorpus({ seed: 5, utilities: 2_000, files: 3 });
+  const groups = extraCases(corpus, 100, 10);
+  const used = new Set(corpus.cases.map((entry) => entry.teacss));
+  const flat = groups.flat();
+  assert.equal(flat.length, 1_000);
+  assert.equal(new Set(flat.map((entry) => entry.teacss)).size, 1_000);
+  assert.ok(flat.every((entry) => !used.has(entry.teacss)));
+  assert.deepEqual(extraCases(corpus, 100, 10), groups);
 });

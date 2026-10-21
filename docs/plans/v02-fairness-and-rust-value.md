@@ -9,11 +9,13 @@
 
 ## 第 1 片（P1）：增量语料与 `engine/incremental`
 
-- [ ] `features/corpus`：`extraCandidates(corpus, k, round)`，从配对空间里语料之外的用例按种子取 K 个，每轮不同；测试：与语料不重叠、同种子同结果。
-- [ ] 合同：engine 任务增加 `scenario: "incremental-10" | "incremental-100"` 与 `extra: string[][]`（每轮一组）；`SubjectClient.engine` 增加可选的 `session` 语义：同一进程内保留生成器或编译器，三个被测包各自实现（teacss 复用 generator，tailwind 复用 compiler）。
-- [ ] `features/measure/engine-scenario.ts`：三次全量热身后十次计时调用，每次检查全部新选择器都在输出里，缺一个即作废。
-- [ ] 报告与 README：增量两行进「生成 CSS」表。
-- 验收：四个对象在 20000 × 300 上 `bench run --tier engine` 产出 incremental 样本；假对象单测覆盖「少一个选择器即作废」。
+完成于 2026-10-22。
+
+- [x] `corpus`：`extraCases(corpus, k, rounds)`，从配对空间里语料之外的用例按种子抽 K × 轮数个，组间不重复；测试覆盖不重叠、去重和同种子同结果。
+- [x] 合同：`EngineScenario` 增加 `incremental-10`、`incremental-100`，engine 任务增加 `extra`（每次计时调用一组）；`SubjectClient.engineSession()` 在同一进程里保留生成器或编译器，三个被测包各自实现。
+- [x] `features/measure/engine-scenario.ts`：三次全量热身后十次计时调用，每次「全量加一组」，缺任一新类整次作废；测量循环按「第几次调用」比对哈希。
+- [x] 报告加两个系列，README 摘要加「往运行中的构建里加类」一表。
+- 验收：单测覆盖会话复用、缺类作废、组大小不符被拒、各进程拿到相同的组；20000 × 300 冒烟运行三个引擎各产出 10 + 10 个增量样本，全部通过完整性检查。
 
 ## 第 2 片（P1）：dev 层级
 

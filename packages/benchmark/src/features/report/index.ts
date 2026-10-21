@@ -3,9 +3,11 @@ import { compare, type Summary, summarize, type Verdict } from "./statistics.ts"
 
 export { compare, mannWhitneyU, summarize } from "./statistics.ts";
 
-export type Series = "engine/cold" | "engine/warm" | "build";
-export const SERIES: readonly Series[] = ["engine/cold", "engine/warm", "build"];
+export type Series = "engine/cold" | "engine/warm" | "engine/incremental-10" | "engine/incremental-100" | "build";
+export const SERIES: readonly Series[] = ["engine/cold", "engine/warm", "engine/incremental-10", "engine/incremental-100", "build"];
 export const BASELINE = "vite-baseline";
+/** v01.1 series state their absence; later series appear only when measured, so older records render as before. */
+const ALWAYS_STATED: ReadonlySet<Series> = new Set(["engine/cold", "engine/warm", "build"]);
 /** Spec v01.1 §Subjects; a run that leaves one out says so in its header. */
 export const SPEC_SUBJECTS: readonly string[] = ["vite-baseline", "teacss-ts", "teacss-rs", "tailwind-v4"];
 
@@ -152,7 +154,7 @@ export function renderMarkdown(model: ReportModel): string {
     ...notMeasuredLines(record),
     "## Verdict",
     "",
-    ...SERIES.flatMap((series) => [`**${series}.** ${verdictParagraph(model, series)}`, ""]),
+    ...SERIES.filter((series) => ALWAYS_STATED.has(series) || model.tables.some((table) => table.series === series)).flatMap((series) => [`**${series}.** ${verdictParagraph(model, series)}`, ""]),
     "## Results",
     "",
     ...SERIES.flatMap((series) => model.tables.filter((table) => table.series === series).map(tableMarkdown)),

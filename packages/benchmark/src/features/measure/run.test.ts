@@ -15,8 +15,9 @@ function fakeMeasured(task: SubjectTask, hash = "same"): Measured {
   const usage = { cpuUserMs: 1, cpuSystemMs: 1, maxRssBytes: 1 };
   if (task.kind === "build") return { result: { kind: "build", cssBytes: 10, cssGzipBytes: 5, cssSha256: hash, css: undefined }, nativeModules: [], usage, wallMs: 7 };
   if (task.kind !== "engine") throw new Error("unexpected task");
-  const count = task.scenario === "warm" ? WARM_TIMED_ITERATIONS : 1;
-  return { result: { kind: "engine", samples: Array.from({ length: count }, () => ({ wallMs: 1, cssBytes: 10, cssSha256: hash })), css: undefined }, nativeModules: [], usage, wallMs: 3 };
+  const count = task.scenario === "cold" ? 1 : WARM_TIMED_ITERATIONS;
+  const perCall = task.extra.length > 0;
+  return { result: { kind: "engine", samples: Array.from({ length: count }, (_, call) => ({ wallMs: 1, cssBytes: 10, cssSha256: perCall ? `${hash}-${task.extra[call]?.join(",")}` : hash })), css: undefined }, nativeModules: [], usage, wallMs: 3 };
 }
 
 test("every subject and tier reaches its sample count, interleaved round by round, with the cell's corpus hash and load", async () => {
@@ -36,8 +37,30 @@ test("every subject and tier reaches its sample count, interleaved round by roun
   assert.equal(count("engine", "alpha", "warm"), WARM_TIMED_ITERATIONS);
   assert.equal(output.cells[0]?.loadShareBefore, 0.1);
   assert.equal(output.cells[0]?.corpusHash.length, 64);
-  assert.deepEqual(calls.slice(0, 4).sort(), ["alpha/build", "alpha/engine/cold", "alpha/engine/warm", "beta/build"]);
-  assert.notDeepEqual(calls.slice(0, 4), calls.slice(4, 8));
+  assert.equal(count("engine", "alpha", "incremental-10"), WARM_TIMED_ITERATIONS);
+  assert.equal(count("engine", "alpha", "incremental-100"), WARM_TIMED_ITERATIONS);
+  assert.deepEqual(calls.slice(0, 6).sort(), ["alpha/build", "alpha/engine/cold", "alpha/engine/incremental-10", "alpha/engine/incremental-100", "alpha/engine/warm", "beta/build"]);
+  assert.notDeepEqual(calls.slice(0, 6), calls.slice(6, 12));
+});
+
+test("incremental calls get distinct new classes per call and the same ones in every process", async () => {
+  const seen: string[][][] = [];
+  await measure(
+    { ...plan, tiers: ["engine"], subjects: [subjects[0] ?? subjects[1]!], samplesPerCell: 20 },
+    {
+      invoke: async (_subject, task) => {
+        if (task.kind === "engine" && task.scenario === "incremental-10") seen.push(task.extra.map((group) => [...group]));
+        return fakeMeasured(task);
+      },
+      loadShare: () => 0,
+      progress: () => {},
+    },
+  );
+  assert.equal(seen.length, 2);
+  assert.deepEqual(seen[0], seen[1]);
+  const flat = seen[0]?.flat() ?? [];
+  assert.equal(flat.length, 100);
+  assert.equal(new Set(flat).size, 100);
 });
 
 test("a subject error invalidates the run before anything is returned", async () => {

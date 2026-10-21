@@ -31,3 +31,8 @@ export function parseRules(css: string): ParsedRule[] {
 export function escapeClass(name: string): string {
   return name.replaceAll(/[^a-zA-Z0-9_-]/g, (character) => `\\${character}`);
 }
+
+/** Whether the stylesheet has a rule selecting this class, as both tools escape it. */
+export function containsClass(css: string, name: string): boolean {
+  return css.includes(`.${escapeClass(name)}`);
+}

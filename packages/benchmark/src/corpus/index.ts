@@ -88,3 +88,17 @@ export function profileCorpus(corpus: Corpus): CorpusProfile {
   }
   return { families, conditionCounts, conditionDepth };
 }
+
+/**
+ * `rounds` groups of `k` paired cases from the pair space that are not in the corpus, no case in
+ * two groups, chosen by the corpus seed so every process asks for the same groups in the same order.
+ */
+export function extraCases(corpus: Corpus, k: number, rounds: number): PairedCase[][] {
+  const used = new Set(corpus.cases.map((entry) => entry.teacss));
+  const spare = shuffled(
+    pairSpace().cases.filter((entry) => !used.has(entry.teacss)),
+    mulberry32(corpus.parameters.seed ^ 0x5eed),
+  );
+  if (spare.length < k * rounds) throw new Error(`the pair table has ${spare.length} cases outside the corpus, ${k * rounds} were asked for`);
+  return Array.from({ length: rounds }, (_, round) => spare.slice(round * k, (round + 1) * k).map(({ teacss, tailwind, properties, conditions }) => ({ teacss, tailwind, properties, conditions })));
+}

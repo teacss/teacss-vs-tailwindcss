@@ -57,6 +57,7 @@ test("the markdown is deterministic and states the verdicts in words", () => {
   assert.match(first, /slow: 2\.82x the median of fast \(p = < 0\.001, Cliff's delta -1\.00\)/);
   assert.match(first, /\| slow \| 401\.0 ms \| 2\.0 ms \| 402\.0 ms \| 400\.0 ms \| 300\.0 ms \| 1\.0 KB \| 0\.2 KB \| 1 MB \|/);
   assert.match(first, /No engine\/warm samples in this run/);
+  assert.ok(!first.includes("incremental"), "series added after v01.1 stay silent when unmeasured");
   assert.match(first, /\*\*Subset run\.\*\* Measured: fast\. Not measured: vite-baseline, teacss-ts, teacss-rs, tailwind-v4\./);
   assert.match(first, /\| fast\/engine \| generate \(core\.js:1\) 40\.0 ms \(40%\) \|/);
   assert.equal(renderSummary(buildReport(record())), renderSummary(buildReport(record())));

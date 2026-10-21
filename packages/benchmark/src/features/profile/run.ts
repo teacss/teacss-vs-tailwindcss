@@ -27,7 +27,7 @@ export async function profileSubjects(cell: Cell, seed: number, subjects: readon
         if (tier === "engine" && !subject.engineTier) continue;
         const name = `${subject.id}-${tier}.cpuprofile`;
         const project = corpusProject(corpus, subject.syntax);
-        const task: SubjectTask = tier === "engine" ? { kind: "engine", scenario: "warm", candidates: candidates(corpus, subject.syntax), includeCss: false } : { kind: "build", modules: project.modules, files: Object.fromEntries(project.files), includeCss: false };
+        const task: SubjectTask = tier === "engine" ? { kind: "engine", scenario: "warm", candidates: candidates(corpus, subject.syntax), extra: [], includeCss: false } : { kind: "build", modules: project.modules, files: Object.fromEntries(project.files), includeCss: false };
         await invoke(subject.id, task, ["--cpu-prof", "--cpu-prof-dir", dir, "--cpu-prof-name", name]);
         if (!readdirSync(dir).includes(name)) throw new Error(`${subject.id}/${tier}: no profile was written to ${dir}`);
         limiters[`${subject.id}/${tier}`] = summarizeProfile(JSON.parse(readFileSync(join(dir, name), "utf8")));

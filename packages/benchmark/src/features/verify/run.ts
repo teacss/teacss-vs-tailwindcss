@@ -46,7 +46,7 @@ export async function verifyCorpus(corpus: Corpus, subjects: readonly VerifySubj
     const tiers: ("engine" | "build")[] = subject.engineTier ? ["engine", "build"] : ["build"];
     for (const tier of tiers) {
       const project = corpusProject(corpus, subject.syntax);
-      const task: SubjectTask = tier === "engine" ? { kind: "engine", scenario: "cold", candidates: candidates(corpus, subject.syntax), includeCss: true } : { kind: "build", modules: project.modules, files: Object.fromEntries(project.files), includeCss: true };
+      const task: SubjectTask = tier === "engine" ? { kind: "engine", scenario: "cold", candidates: candidates(corpus, subject.syntax), extra: [], includeCss: true } : { kind: "build", modules: project.modules, files: Object.fromEntries(project.files), includeCss: true };
       const output = await invoke(subject.id, task);
       hashes.set(`${subject.id}/${tier}`, output.cssSha256);
       for (const problem of checkNativeModules(output.nativeModules, subject.natives)) findings.push({ subject: subject.id, tier, check: "native", detail: problem });

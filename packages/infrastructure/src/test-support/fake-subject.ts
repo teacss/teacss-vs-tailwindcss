@@ -1,10 +1,15 @@
 import type { SubjectClient, SubjectFactory } from "../subject-client.ts";
 import { subjectId } from "../subject-client.ts";
 
+function fakeCss(candidates: readonly string[]): string {
+  return candidates.map((candidate) => `.${candidate.replaceAll(/[^a-zA-Z0-9_-]/g, (character) => `\\${character}`)}{}`).join("");
+}
+
 export const fakeSubject: SubjectClient = {
   id: subjectId("fake"),
   describe: async () => ({ packages: { fake: "0.0.0" }, local: {} }),
-  engine: async ({ candidates }) => ({ css: candidates.map((candidate) => `.${candidate}{}`).join("") }),
+  engine: async ({ candidates }) => ({ css: fakeCss(candidates) }),
+  engineSession: async () => ({ generate: async (candidates) => ({ css: fakeCss(candidates) }) }),
   prepare: async (workspace, project) => {
     for (const [path, content] of project.files) workspace.write(path, content);
   },
