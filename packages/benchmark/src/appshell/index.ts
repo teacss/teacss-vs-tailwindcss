@@ -52,7 +52,7 @@ const USAGE = `bench <command>
 `;
 
 const SPEC_REVISION = 3;
-const SPEC_V02_REVISION = 3;
+const SPEC_V02_REVISION = 4;
 /** Spec v01.1 §Run protocol: refuse above this share of the logical cores. */
 const LOAD_SHARE_LIMIT = 0.2;
 
