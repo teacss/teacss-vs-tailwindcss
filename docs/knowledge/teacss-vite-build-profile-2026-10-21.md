@@ -135,3 +135,5 @@ teacss-ts 按计划 `docs/plans/vite-build-pipeline.md` 做完了五个 PR（#89
 对本文的修正：上面「`buildEnd` 里做了什么」一表把 326 ms 记在 lightningcss 名下，teacss-ts 的原生计时只有约 55 加 22 ms，差额很可能是 `preprocessCSS` 里的 JS 工作被归到了同一调用者。这一点两边都没有单独核实。剩下的大头是 `preprocessCSS`，去掉它需要 teacss-ts 单独立提案。
 
 同日稍后，teacss-ts 还合入了 #895（`9e09ddce`）：生成的样式表在 transformer 与 `cssMinify` 都是 lightningcss 且没有 `@import` 时，跳过 Vite 的 `preprocessCSS`，只做一次带 `targets` 的压缩。teacss-ts 测得 `build()` 内 ts 20000 × 300 从 1 438 降到 1 039 ms，rs 从 1 019 降到 626 ms（本仓库未复测）。构建层输出因此少了一条重复的 `-webkit-text-decoration:inherit;`（32 字节，lightningcss 每过一遍都会给 reset 里已有的前缀再补一份），引擎层输出不变，ts 与 rs 仍逐字节一致。第二份报告的构建层哈希会与第一份不同，原因就是这一处。
+
+Node 版本：teacss-ts 的这些本地数字（含 #895 的 1 680 ms）全部跑在 Node 24.14.1 上，与 `.node-version` 一致（teacss-ts #896 已注明）；第一份正式报告跑在 26.7.0 上。所以它们和下一次按 `.node-version` 的正式运行可以直接比，和第一份报告之间差一个 Node 版本。本文「方法」一节的剖析也是 24.14.1。
