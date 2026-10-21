@@ -212,7 +212,9 @@ function takeaways(model: ReportModel, engine: CellTable | undefined, build: Cel
 export function renderReadmeSummary(model: ReportModel, stem: string, beside?: ReportModel, cross?: ReportModel): string {
   const engine = largest(model, "engine/warm") ?? largest(model, "engine/cold");
   const build = largest(model, "build");
+  const local = Object.entries(model.record.subjects).flatMap(([, versions]) => Object.entries(versions.local ?? {}).map(([pkg]) => pkg));
   const lines = [README_START, "", `### Results from ${model.record.startedAt.slice(0, 10)}`, ""];
+  if (local.length > 0) lines.push(`**Local build, not for publication.** ${joinWords([...new Set(local)])} came from a local checkout rather than npm, so these numbers cannot be reproduced from the lockfile.`, "");
   if (engine !== undefined) lines.push(...engineTable(engine));
   lines.push(...pairTable(model, ["engine/incremental-10", "engine/incremental-100"], (table) => `**Adding new classes to an engine** that already holds those ${count(table.cell.utilities)}`));
   lines.push(...pairTable(model, ["dev/+10", "dev/+100"], (table) => `**Saving a new file in the Vite dev server** with ${count(table.cell.utilities)} classes already in ${table.cell.files} files, until the page's stylesheet has the new classes`));
