@@ -53,10 +53,10 @@
       "version": "0.0.0",
       "dependencies": {
         "@bench/infrastructure": "workspace:*",
-        "@teacss/core": "0.8.5",
-        "@teacss/engine": "0.8.5-alpha.3",
-        "@teacss/preset-standard": "0.8.5",
-        "@teacss/vite": "0.8.5",
+        "@teacss/core": "0.9.0-alpha.1",
+        "@teacss/engine": "0.8.5-alpha.4",
+        "@teacss/preset-standard": "0.9.0-alpha.1",
+        "@teacss/vite": "0.9.0-alpha.1",
         "vite": "8.3.4",
       },
     },
@@ -176,37 +176,37 @@
 
     "@tailwindcss/vite": ["@tailwindcss/vite@4.3.3", "", { "dependencies": { "@tailwindcss/node": "4.3.3", "@tailwindcss/oxide": "4.3.3", "tailwindcss": "4.3.3" }, "peerDependencies": { "vite": "^5.2.0 || ^6 || ^7 || ^8" } }, "sha512-yYU8cogLeSh/ms2jh8Fj7jaba/EWa7Ja6GoUqYZaraEuCI5YS6ms6ObZgjjedm+jm6XZjdNRWBpPP6Z86oOxcw=="],
 
-    "@teacss/config": ["@teacss/config@0.8.5", "", { "dependencies": { "@teacss/core": "0.8.5", "consola": "^3.4.2", "jiti": "^2.7.0", "picomatch": "4.0.7", "tinyglobby": "^0.2.17" } }, "sha512-07prRGpmDiCA5kWsd+0C6sMlGFVDJbPAWpHEfR4IfLG25isl+g6NbFQRECGoQzJumk9iGy1wIJlWNg1SIFfDlg=="],
+    "@teacss/config": ["@teacss/config@0.9.0-alpha.1", "", { "dependencies": { "@teacss/core": "0.9.0-alpha.1", "consola": "^3.4.2", "jiti": "^2.7.0", "picomatch": "4.0.7", "tinyglobby": "^0.2.17" } }, "sha512-YI9TEwTZ2Lj/ObIXdcp3s+Fv3oWsUDk3w3sRhng8J/Zia5MkHZBZbbU5Y9y3RFUHh0n+IFZGQr8XBry5fOBl4Q=="],
 
-    "@teacss/core": ["@teacss/core@0.8.5", "", { "dependencies": { "consola": "^3.4.2" }, "peerDependencies": { "@teacss/engine": ">=0.9.0" }, "optionalPeers": ["@teacss/engine"] }, "sha512-7T7m3D62PQtMgQFYVPhO30K6Ij+l+DYXRkUznvYpbgs3K3vsnikh/EXmaUVPPogQfVtHwAWC1EAl/gpiNrodkA=="],
+    "@teacss/core": ["@teacss/core@0.9.0-alpha.1", "", { "dependencies": { "consola": "^3.4.2" }, "peerDependencies": { "@teacss/engine": "0.8.5-alpha.4" }, "optionalPeers": ["@teacss/engine"] }, "sha512-HH9sAlc2p2QgBq7jxhh6k1zjBiAx+h/km090vzhRcIDKQCZtTgKpecbjaMze9+Zmk15i1KggvRTYtjNKwIRX4g=="],
 
-    "@teacss/directives": ["@teacss/directives@0.8.5", "", { "dependencies": { "@teacss/config": "0.8.5", "@teacss/core": "0.8.5", "@teacss/rule-helpers": "0.8.5", "@teacss/runtime": "0.8.5", "@types/css-tree": "^3.2.0", "css-tree": "^3.2.1" } }, "sha512-2EhxtA5AtvQFef65PAaD9CCSn6yu7usWdaiR/hB4Du83YI5fXESBbb70tnzpXqwUTnYRoHbqbC7gMYz8oY4vxg=="],
+    "@teacss/directives": ["@teacss/directives@0.9.0-alpha.1", "", { "dependencies": { "@teacss/config": "0.9.0-alpha.1", "@teacss/core": "0.9.0-alpha.1", "@teacss/rule-helpers": "0.9.0-alpha.1", "@teacss/runtime": "0.9.0-alpha.1", "@types/css-tree": "^3.2.0", "css-tree": "^3.2.1" } }, "sha512-seFf0RKqc2ADrzjH1yyGVMa83E1fd3sJwBRfZM2jVqw7S/hu8zKzbQH3odVx/LvjzKBbBwGo7L/n1y/UftUdpg=="],
 
-    "@teacss/engine": ["@teacss/engine@0.8.5-alpha.3", "", { "optionalDependencies": { "@teacss/engine-darwin-arm64": "0.8.5-alpha.3", "@teacss/engine-darwin-x64": "0.8.5-alpha.3", "@teacss/engine-linux-arm64-gnu": "0.8.5-alpha.3", "@teacss/engine-linux-arm64-musl": "0.8.5-alpha.3", "@teacss/engine-linux-x64-gnu": "0.8.5-alpha.3", "@teacss/engine-linux-x64-musl": "0.8.5-alpha.3", "@teacss/engine-win32-arm64-msvc": "0.8.5-alpha.3", "@teacss/engine-win32-x64-msvc": "0.8.5-alpha.3" }, "peerDependencies": { "@teacss/config": ">=0.8.5 <0.10.0", "@teacss/core": ">=0.8.5 <0.10.0" }, "optionalPeers": ["@teacss/config", "@teacss/core"] }, "sha512-gsJOHyMkQooU4z/Bxdjxg/TNkHUsJBhXJQy/gmOBBVSf2Ya2AOFHNdWz993fMVT/Oj+KqrtIUNku3xapJ3XhfA=="],
+    "@teacss/engine": ["@teacss/engine@0.8.5-alpha.4", "", { "optionalDependencies": { "@teacss/engine-darwin-arm64": "0.8.5-alpha.4", "@teacss/engine-darwin-x64": "0.8.5-alpha.4", "@teacss/engine-linux-arm64-gnu": "0.8.5-alpha.4", "@teacss/engine-linux-arm64-musl": "0.8.5-alpha.4", "@teacss/engine-linux-x64-gnu": "0.8.5-alpha.4", "@teacss/engine-linux-x64-musl": "0.8.5-alpha.4", "@teacss/engine-win32-arm64-msvc": "0.8.5-alpha.4", "@teacss/engine-win32-x64-msvc": "0.8.5-alpha.4" }, "peerDependencies": { "@teacss/config": ">=0.8.5 <0.10.0", "@teacss/core": ">=0.8.5 <0.10.0" }, "optionalPeers": ["@teacss/config", "@teacss/core"] }, "sha512-jwY6jxDBwUwl3MEKt2t4jFUKYkz4OY7i3Cv3dQmaeEcvlU4sjLMdQLhJmiDeDAXqdiAYUHPl9XdigIFPHs61Gw=="],
 
-    "@teacss/engine-darwin-arm64": ["@teacss/engine-darwin-arm64@0.8.5-alpha.3", "", { "os": "darwin", "cpu": "arm64" }, "sha512-qJJtUb4OqQg+MTJ7zoDtmj57AAw6Dv1wY/ws18g0GWhBe62TLWqiZdyK79OnriY2BKV7Jdoy9ffsCOiC/Bvm5A=="],
+    "@teacss/engine-darwin-arm64": ["@teacss/engine-darwin-arm64@0.8.5-alpha.4", "", { "os": "darwin", "cpu": "arm64" }, "sha512-xwfRzqDgpeuJlYM2l6EEgPn2SpczMQI9odCfyGygJ2iUTJ0LtyklMaFd57+9HBEWMpLVQQaEvkpNYsOYeIH/+A=="],
 
-    "@teacss/engine-darwin-x64": ["@teacss/engine-darwin-x64@0.8.5-alpha.3", "", { "os": "darwin", "cpu": "x64" }, "sha512-fA9dKppoYda55Q2/KDXhbmlqGgfWCneXINRIIpZAPsl5TxtTNZM5Ij9H2UfL61Oa0w356k+ioS6EEqUcs6aSSg=="],
+    "@teacss/engine-darwin-x64": ["@teacss/engine-darwin-x64@0.8.5-alpha.4", "", { "os": "darwin", "cpu": "x64" }, "sha512-07c9bXQX1ZgsmaQoCNW8aMTaV0VNWzUmd9R45fHbej93UqXCDuM2J4e4zT8JW1luWsM684sMMaaOAohtShVwgQ=="],
 
-    "@teacss/engine-linux-arm64-gnu": ["@teacss/engine-linux-arm64-gnu@0.8.5-alpha.3", "", { "os": "linux", "cpu": "arm64" }, "sha512-cLclJwiZDyfDrcwDMx692uBo+XYT9unUZd0ohCCWkp6xwwTlMGqJ9j03OPd/7tAJXnk0hDpiVxsn2QW0WvwzEQ=="],
+    "@teacss/engine-linux-arm64-gnu": ["@teacss/engine-linux-arm64-gnu@0.8.5-alpha.4", "", { "os": "linux", "cpu": "arm64" }, "sha512-zGLmFJEP+Cgr6TyS2XISErBn5oY9Nn/ktHy2m66AR2Uq+Rw4pS/fUed7vwFp3pxoBAOKMbK4nxUNQYdKulitSg=="],
 
-    "@teacss/engine-linux-arm64-musl": ["@teacss/engine-linux-arm64-musl@0.8.5-alpha.3", "", { "os": "linux", "cpu": "arm64" }, "sha512-UiQMODx8gE3Ysmu9EPdhl2xNQofRhxDo6VOpGFi2Td8XWix1RNrtPYArxqY2ciDwEpHrlOdqXDp6Xn4W0Au1fw=="],
+    "@teacss/engine-linux-arm64-musl": ["@teacss/engine-linux-arm64-musl@0.8.5-alpha.4", "", { "os": "linux", "cpu": "arm64" }, "sha512-0rA9qo2ZCI1HtiRCl7HPkbQLd1AK8XEkz3Es1zy008vkHQy2dl1fCBrou2S8bcSWnvJL8hrdje075tgI/n9EtQ=="],
 
-    "@teacss/engine-linux-x64-gnu": ["@teacss/engine-linux-x64-gnu@0.8.5-alpha.3", "", { "os": "linux", "cpu": "x64" }, "sha512-IjYWITImWdaNPnAgbKt+r1rcOW/wONvqobhNrn3KA2ANY1YKwcnqSItaTzI+svghhsYt8EfD7c3WMyubA1ieuw=="],
+    "@teacss/engine-linux-x64-gnu": ["@teacss/engine-linux-x64-gnu@0.8.5-alpha.4", "", { "os": "linux", "cpu": "x64" }, "sha512-K4IZhJiXUNhCLgRQQJ1PKFAQJe8YKHhBGIiFPHiiMOJWk1d9qnXiBU2x4ZyM8dj0NnQziQMvhbLR2PAWctJxAw=="],
 
-    "@teacss/engine-linux-x64-musl": ["@teacss/engine-linux-x64-musl@0.8.5-alpha.3", "", { "os": "linux", "cpu": "x64" }, "sha512-ZqU/DmmbP9ldur+fpsh/PMWN9+9WE8rgTQTwCG177ZQoM7Q9xZLBsHDNS6TB65Gskfd+wdQxet8CiyF9ICWaeQ=="],
+    "@teacss/engine-linux-x64-musl": ["@teacss/engine-linux-x64-musl@0.8.5-alpha.4", "", { "os": "linux", "cpu": "x64" }, "sha512-1ojwo2bkDcdMvfFL+I9i0+IcE4Ejmy+RZWDO751QY+SLO5q42FrHjfuWi02uxGCPq+W+N+5ysgc3M/Gh3SGmsQ=="],
 
-    "@teacss/engine-win32-arm64-msvc": ["@teacss/engine-win32-arm64-msvc@0.8.5-alpha.3", "", { "os": "win32", "cpu": "arm64" }, "sha512-Mar9+CoR5PtmUQCbQgSmRp5l3EXc8V3hS0gPotH8uyuJ82jlfrNEXebxoVvauT+bYvofKwMBrhIEdcNL8EpO8A=="],
+    "@teacss/engine-win32-arm64-msvc": ["@teacss/engine-win32-arm64-msvc@0.8.5-alpha.4", "", { "os": "win32", "cpu": "arm64" }, "sha512-+Jv6sWsmburmgJJCHuSvSLe0Nlts+ByI+MkUqzhQv1u9TtMAEJFN7m4U/1nTVLr3svKtzn5vPFLBCX6S2DrsmQ=="],
 
-    "@teacss/engine-win32-x64-msvc": ["@teacss/engine-win32-x64-msvc@0.8.5-alpha.3", "", { "os": "win32", "cpu": "x64" }, "sha512-PAHWbG4ZIUDAKSrFYUDqrtIYGnm+ZGnnguZMhPmwpUshlqGeQMFQ9GzDujwzGyopczUUniayhtH3hpp+EpT4/A=="],
+    "@teacss/engine-win32-x64-msvc": ["@teacss/engine-win32-x64-msvc@0.8.5-alpha.4", "", { "os": "win32", "cpu": "x64" }, "sha512-6WH5fDjp+QVualXfHuGgjCTmgVO2wmS8rmXkQuuJ2O+cuSkzqqyi6A3bwswBMDpZEbMGZ2xWimvQb8lsH7WPUg=="],
 
-    "@teacss/preset-standard": ["@teacss/preset-standard@0.8.5", "", { "dependencies": { "@teacss/core": "0.8.5", "@teacss/rule-helpers": "0.8.5" } }, "sha512-UTL1Z8nDjAnUndnzwtfFt68EdhMtyQ6uF0uH6QDyUo+JWoOwfGmMStqCleoPc4oH5WN8fytNHtApxSPvBQ04ag=="],
+    "@teacss/preset-standard": ["@teacss/preset-standard@0.9.0-alpha.1", "", { "dependencies": { "@teacss/core": "0.9.0-alpha.1", "@teacss/rule-helpers": "0.9.0-alpha.1" } }, "sha512-cxSyZ6IC+LXghJ0G9rr8x2W6KgF+bmVg75uRxHq2jQFSSyZaSsE/uzXu+4+A9y+VPzvFW0grQKdvFhwn9W9VKQ=="],
 
-    "@teacss/rule-helpers": ["@teacss/rule-helpers@0.8.5", "", { "dependencies": { "@teacss/core": "0.8.5" } }, "sha512-GxfP8f75KmWEvAQ2RI14g4B6Bbov+NMaRZ7WbbuZCQI32uYXsvc4qYHdzL1RbvMWluAFPjfHxXVQ1ar4p7mYZg=="],
+    "@teacss/rule-helpers": ["@teacss/rule-helpers@0.9.0-alpha.1", "", { "dependencies": { "@teacss/core": "0.9.0-alpha.1" } }, "sha512-mvxweVTJWrBsMQ9S9lgbd2FZeeUMarGySxGoudh662GKl91GADi8rHPwyjLlAcX1hZBz4Fw7t0mPmR+BOSoSBQ=="],
 
-    "@teacss/runtime": ["@teacss/runtime@0.8.5", "", { "dependencies": { "@jridgewell/remapping": "^2.3.5", "@teacss/config": "0.8.5", "@teacss/core": "0.8.5", "css-tree": "^3.2.1", "magic-string": "^1.2.3", "unplugin-utils": "^0.3.2" } }, "sha512-ygk4SxNcofcey6rDTQ0e++S2FmpgBcxe3O46LWOlgJove7sOAXX9zrcfSQK1uBn9oV2l7zFFOSniDIYxt31y+A=="],
+    "@teacss/runtime": ["@teacss/runtime@0.9.0-alpha.1", "", { "dependencies": { "@jridgewell/remapping": "^2.3.5", "@teacss/config": "0.9.0-alpha.1", "@teacss/core": "0.9.0-alpha.1", "css-tree": "^3.2.1", "magic-string": "^1.2.3", "unplugin-utils": "^0.3.2" } }, "sha512-2bNBT4X0NVkwIQT+ZYimfUQbkkjCcJ9WnTIpB5Tbjy66LjG2cejux6tzfqgI+RyVrlS4hIvduGaHYB65SQrj6g=="],
 
-    "@teacss/vite": ["@teacss/vite@0.8.5", "", { "dependencies": { "@jridgewell/remapping": "^2.3.5", "@teacss/config": "0.8.5", "@teacss/core": "0.8.5", "@teacss/directives": "0.8.5", "@teacss/runtime": "0.8.5", "lightningcss": "^1.33.0", "magic-string": "^1.2.3" }, "peerDependencies": { "vite": ">=8.0.0" } }, "sha512-je1+mTOJXDfSijZxcvjSoCAK+6Py85Vx4h5uyagUSBk9bZAOMqF3F16DX5SqgGT2ACteib/2RArdOqdbIltDFA=="],
+    "@teacss/vite": ["@teacss/vite@0.9.0-alpha.1", "", { "dependencies": { "@jridgewell/remapping": "^2.3.5", "@teacss/config": "0.9.0-alpha.1", "@teacss/core": "0.9.0-alpha.1", "@teacss/directives": "0.9.0-alpha.1", "@teacss/engine": "0.8.5-alpha.4", "@teacss/runtime": "0.9.0-alpha.1", "lightningcss": "^1.33.0", "magic-string": "^1.2.3" }, "peerDependencies": { "vite": ">=8.0.0" } }, "sha512-LSKEIFlEpOXCsxqtCgWb/4EPawjmBxazzk+cx3AtzvabPTqbXJcIfDjkUL1Swl7mf9bjbexz9BT4OjiglvV7tA=="],
 
     "@types/css-tree": ["@types/css-tree@3.2.0", "", {}, "sha512-J5KXmk6BFIepOT7280FdFyNs4c5fh0Uee0otjKEvzchrRs38Ii9qminqc4ds0L19X8Zd/rT+brR9jkBthygjWw=="],
 

@@ -89,7 +89,8 @@
 - [x] `.github/workflows/bench.yml`：手动触发（可传规模与样本数）与每周一次，先 `bench:verify`，再 `--allow-busy` 跑矩阵，报告与原始记录作为 artifact 上传，不自动提交。
 - [x] 根脚本 `bench`、`bench:verify`、`bench:report`。
 - [x] `--subjects` 同时作用于 `run` 与 `verify`，未知名字报错；子集运行的报告在结论前写明「Subset run」与未测对象。根脚本 `bench:ts-tailwind` 跑 vite-baseline、teacss-ts、tailwind-v4。
-- [ ] 第一份报告只含 teacss-ts 与 Tailwind v4（所有者 2026-10-21 决定：teacss-rs 等 teacss-rs 项目优化完成再测）。本机正式运行需要一分钟负载低于 2.4；当天 teacss-rs 会话持续运行 `cargo check`，负载在 5 到 24 之间。
+- [x] 被测 TeaCSS 换成 0.9.0-alpha.1（所有者 2026-10-21 决定）：`@teacss/core`、`@teacss/vite`、`@teacss/preset-standard` 0.9.0-alpha.1，引擎用 `@teacss/vite` 依赖的 `@teacss/engine` 0.8.5-alpha.4。规格升到修订 2。`bench:verify` 在 5000 × 30 与 20000 × 300 上四个对象全部通过，Rust 进程在严格模式下加载 `teacss-engine`，ts 与 rs 输出逐字节相同。第一份报告因此包含全部四个对象，取代下面「只含 ts 与 Tailwind」那一项。
+- [x] ~~第一份报告只含 teacss-ts 与 Tailwind v4~~，被上一项取代。本机正式运行需要一分钟负载低于 2.4；当天 teacss-rs 会话持续运行 `cargo check`，负载在 5 到 24 之间。
 - [ ] CI 交叉验证运行。
 - [ ] 按 benchmark-checklist 审核后发布 `docs/reports/<date>.md`，README 每层一个主数字。
 - [x] 本地构建模式（2026-10-21，按所有者要求先写代码、不跑测量、不加新单测）：`scripts/link-local.ts`（`bun run bench:link status|link --ts <dir>|unlink`）把 teacss 被测对象的 core、vite、preset-standard 接到已构建的 teacss-ts 检出，engine 跟随 core 解析；被测对象按真实路径报告版本，`node_modules/.bun` 以外的包进 `local`，报告首行标「Local build, not for publication」。`status` 已在本机跑过；`link`/`unlink` 未实际执行，因为它会改 `packages/subject-teacss/node_modules`，而 teacss-ts 检出正由另一会话修改。

@@ -36,7 +36,7 @@ const USAGE = `bench <command>
               <results.json>  --out <dir> (docs/reports)
 `;
 
-const SPEC_REVISION = 1;
+const SPEC_REVISION = 2;
 /** Spec v01.1 §Run protocol: refuse above this share of the logical cores. */
 const LOAD_SHARE_LIMIT = 0.2;
 
