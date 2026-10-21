@@ -98,7 +98,7 @@
 - [x] 剖析与改法（2026-10-21）：`docs/knowledge/teacss-vite-build-profile-2026-10-21.md`；teacss-ts 已按其计划合入五个 PR（#890 到 #894），本地链接实测 ts 20000 × 300 构建 3 723 → 1 600 ms。
 - [x] README 摘要（2026-10-21）：`bench report --readme README.md` 在标记之间生成面向开发者的结果与解读（谁最快、快多少、每千个类的成本、随规模与文件数的变化、引擎在构建成本里的占比、怎么读这些数字），全部由记录派生，同一记录两次生成相同。
 - [x] 运行门新增 Node 版本检查：第一次运行实际跑在 Node 26.7.0（审核已记），`bench run` 现在在运行版本与 `.node-version` 不符时拒绝，`--allow-node-mismatch` 覆盖。
-- [ ] 第二份报告：teacss-ts 发布 0.9.0-alpha.2 后，更新 `packages/subject-teacss/package.json` 与 `bun.lock`，`bench:verify` 通过后在安静机器上跑全矩阵。
+- [ ] 第二份报告（进行中，2026-10-22）：被测包已升到 0.9.0-alpha.2（引擎仍 0.8.5-alpha.4），规格修订 3；`bench:verify` 5000 × 30 通过；1000 × 300 与 20000 × 300 的构建层哈希与 teacss-ts 发布前给的预期一致（`ee274f23…`、`f4ea28ce…`），ts 与 rs 逐字节相同，Node 24.14.1。所有者 2026-10-22 决定不对 alpha.2 跑全矩阵，等下一个版本再跑；alpha.2 的升级与修订 3 已合入，届时只需再升版本。
 - [ ] teacss-rs 加入：未发布时用本地构建模式先排练（teacss-rs 的 `dev-link.mjs link` 接进 teacss-ts，再 `bench:link link`），只作内部参考；teacss-rs 优化完成并发布新的 `@teacss/engine` 后，更新 `packages/subject-teacss/package.json` 的引擎版本与 `bun.lock`，先跑四对象 `bench:verify`（强等价必须通过），再跑全矩阵，作为第二份报告；规格修订号与 `engineCompat` 变化写进报告。
 
 ## 第二阶段（另立提案）
