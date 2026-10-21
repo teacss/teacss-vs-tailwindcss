@@ -150,7 +150,37 @@ function notMeasuredLines(record: Omit<RunRecord, "samples">): string[] {
 }
 
 /** Deterministic: the same record renders the same text. */
-export function renderMarkdown(model: ReportModel): string {
+function communityLines(record: Omit<RunRecord, "samples">): string[] {
+  const community = record.community;
+  if (community === undefined) return [];
+  const share = community.found === 0 ? 0 : community.kept / community.found;
+  return [
+    "## Community corpus",
+    "",
+    `The classes in this run come from public Tailwind projects, not from the generator: ${community.found} distinct Tailwind utilities were found, ${community.kept} of them (${(share * 100).toFixed(0)} %) translate to TeaCSS through pair table ${record.pairTableVersion}, and each cell takes the most frequent of those.`,
+    "",
+    "| Repository | Directory | Commit |",
+    "| --- | --- | --- |",
+    ...community.repositories.map((repository) => `| ${repository.name} | \`${repository.dir}\` | ${repository.commit ?? "not a git checkout"} |`),
+    "",
+    `Most frequent untranslatable prefixes: ${community.untranslated.map(([prefix, count]) => `\`${prefix}\` (${count})`).join(", ") || "none"}.`,
+    "",
+  ];
+}
+
+/** The verdicts and tables of a second record, such as the same matrix on the community corpus. */
+function besideLines(beside: ReportModel): string[] {
+  const kind = beside.record.community === undefined ? "generated" : "community";
+  return [
+    `## Beside it: the ${kind} corpus, run ${beside.record.startedAt}`,
+    "",
+    ...SERIES.filter((series) => beside.tables.some((table) => table.series === series)).flatMap((series) => [`**${series}.** ${verdictParagraph(beside, series)}`, ""]),
+    ...SERIES.flatMap((series) => beside.tables.filter((table) => table.series === series).map(tableMarkdown)),
+    ...communityLines(beside.record),
+  ];
+}
+
+export function renderMarkdown(model: ReportModel, beside?: ReportModel): string {
   const { record } = model;
   const environment = record.environment;
   const lines = [
@@ -160,6 +190,7 @@ export function renderMarkdown(model: ReportModel): string {
     "",
     ...localLines(record),
     ...notMeasuredLines(record),
+    ...(record.community === undefined ? [] : [`**Community corpus.** The classes come from public Tailwind projects; see the Community corpus section.`, ""]),
     "## Verdict",
     "",
     ...SERIES.filter((series) => ALWAYS_STATED.has(series) || model.tables.some((table) => table.series === series)).flatMap((series) => [`**${series}.** ${verdictParagraph(model, series)}`, ""]),
@@ -168,6 +199,8 @@ export function renderMarkdown(model: ReportModel): string {
     ...SERIES.flatMap((series) => model.tables.filter((table) => table.series === series).map(tableMarkdown)),
     ...(model.work.length === 0 ? [] : ["## Work produced", "", "What each production build emits at the largest cell. The tools write different values, shorthands and wrappers for the same classes, so the last column is context for the size difference, not a ranking.", "", ...workTable(model.work, {}), ""]),
     ...model.rust.sections,
+    ...communityLines(record),
+    ...(beside === undefined ? [] : besideLines(beside)),
     "## Environment",
     "",
     "| Field | Value |",

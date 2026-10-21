@@ -17,6 +17,7 @@ export type SubjectTask =
   | { readonly kind: "describe" }
   | { readonly kind: "native-load"; readonly path: string }
   | { readonly kind: "coverage"; readonly entries: readonly string[] }
+  | { readonly kind: "extract"; readonly dirs: readonly string[] }
   | {
       readonly kind: "engine";
       readonly scenario: EngineScenario;
@@ -76,6 +77,7 @@ export type TaskResult =
   | { readonly kind: "dev"; readonly samples: readonly DevSample[] }
   | { readonly kind: "native-load"; readonly wallMs: number }
   | { readonly kind: "coverage"; readonly results: readonly CoverageResult[] }
+  | { readonly kind: "extract"; readonly found: readonly (readonly [string, number])[] }
   | { readonly kind: "error"; readonly message: string; readonly stack: string | undefined };
 
 export interface SubjectResponse {
@@ -118,6 +120,9 @@ function parseTask(value: unknown): SubjectTask {
     case "coverage":
       if (!isStringArray(value["entries"])) throw new Error("request: coverage entries are not strings");
       return { kind: "coverage", entries: value["entries"] };
+    case "extract":
+      if (!isStringArray(value["dirs"])) throw new Error("request: extract dirs are not strings");
+      return { kind: "extract", dirs: value["dirs"] };
     case "engine": {
       const scenario = ENGINE_SCENARIOS.find((entry) => entry === value["scenario"]);
       if (scenario === undefined) throw new Error(`request: engine scenario ${String(value["scenario"])} is not one of ${ENGINE_SCENARIOS.join(", ")}`);
@@ -182,6 +187,11 @@ function parseResult(value: unknown): TaskResult {
       if (!isRecord(versions) || !isStringRecord(versions["packages"]) || !isStringRecord(versions["local"])) throw new Error("response: describe versions shape");
       const native = parseNative(versions["native"]);
       return { kind: "describe", versions: { packages: versions["packages"], local: versions["local"], ...(native === undefined ? {} : { native }) } };
+    }
+    case "extract": {
+      const found = value["found"];
+      if (!Array.isArray(found) || !found.every((entry: unknown) => Array.isArray(entry) && typeof entry[0] === "string" && typeof entry[1] === "number")) throw new Error("response: extract found shape");
+      return { kind: "extract", found: found.map((entry: [string, number]) => [entry[0], entry[1]] as const) };
     }
     case "native-load":
       if (typeof value["wallMs"] !== "number") throw new Error("response: native-load wallMs is not a number");

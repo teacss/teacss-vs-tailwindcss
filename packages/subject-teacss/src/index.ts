@@ -104,6 +104,7 @@ export function teacssSubject(engine: "ts" | "rust"): SubjectClient {
     build: async (workspace) => ({ css: await viteBuild(workspace, engine) }),
     devServer: (workspace) => startDevServer(workspace, pluginTeacss(undefined, { engine })),
     moduleHeader: INCLUDE,
+    extract: async () => [],
     coverage: async (entries) => (engine === "rust" ? engineCoverage(resolved(), entries) : []),
   };
 }

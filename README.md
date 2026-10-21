@@ -87,6 +87,16 @@ bun run bench:ts-tailwind                            # the same without teacss-r
 bun run bench:report results/<file>.json --readme README.md   # report, JSON summary, and the README block
 ```
 
+To check that the generated corpus is not cherry-picked, run the same matrix on
+classes taken from real Tailwind projects. List checked-out projects in a JSON
+file, `[{ "name": "…", "dir": "path/to/src" }]`, then:
+
+```sh
+bun run bench:corpus --community projects.json     # coverage: how many of their utilities translate
+bun run bench --community projects.json --out results
+bun run bench:report results/<generated>.json --beside results/<community>.json --readme README.md
+```
+
 To measure unreleased TeaCSS builds, link a built teacss-ts checkout first:
 
 ```sh

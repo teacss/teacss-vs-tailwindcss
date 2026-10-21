@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { SubjectId } from "@bench/infrastructure";
 import type { SubjectTask } from "../../contract/index.ts";
-import { candidates, corpusProject, generateCorpus, type Syntax } from "../../corpus/index.ts";
+import { type Corpus, candidates, corpusProject, type Syntax } from "../../corpus/index.ts";
 import type { Cell } from "../../persistence/index.ts";
 import { type ProfileSummary, summarizeProfile } from "./index.ts";
 
@@ -17,8 +17,8 @@ export interface ProfileSubject {
 export type ProfileInvoke = (subject: SubjectId, task: SubjectTask, nodeArgs: readonly string[]) => Promise<void>;
 
 /** Spec v01.1 §Run protocol step 7: one uncounted `--cpu-prof` pass per subject and tier on one cell. */
-export async function profileSubjects(cell: Cell, seed: number, subjects: readonly ProfileSubject[], tiers: readonly ("engine" | "build")[], invoke: ProfileInvoke): Promise<Record<string, ProfileSummary>> {
-  const corpus = generateCorpus({ seed, utilities: cell.utilities, files: cell.files });
+export async function profileSubjects(cell: Cell, corpusFor: (cell: Cell) => Corpus, subjects: readonly ProfileSubject[], tiers: readonly ("engine" | "build")[], invoke: ProfileInvoke): Promise<Record<string, ProfileSummary>> {
+  const corpus = corpusFor(cell);
   const limiters: Record<string, ProfileSummary> = {};
   const dir = mkdtempSync(join(tmpdir(), "bench-profile-"));
   try {

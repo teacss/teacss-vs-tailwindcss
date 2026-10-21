@@ -81,6 +81,11 @@ export interface SubjectClient {
   devServer(workspace: Workspace): Promise<DevServer>;
   /** Text the tool needs at the top of a source module before it reads the classes in it. */
   readonly moduleHeader: string;
+  /**
+   * The utilities this tool recognises in the source files under `dirs`, with how often each occurs;
+   * empty for a tool that cannot scan another tool's syntax.
+   */
+  extract(dirs: readonly string[]): Promise<readonly (readonly [string, number])[]>;
   /** Whether the native engine can serve each entry stylesheet's configuration; empty for a subject without one. */
   coverage(entries: readonly string[]): Promise<readonly CoverageResult[]>;
 }
