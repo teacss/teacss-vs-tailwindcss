@@ -76,3 +76,8 @@ test("updateReadme replaces the marked block and appends one when there is none"
   assert.equal(updateReadme(`# T\n\n${README_START}\nold\n${README_END}\n\n## After\n`, summary), `# T\n\n${README_START}\nnew\n${README_END}\n\n## After\n`);
   assert.equal(updateReadme("# T\n", summary), `# T\n\n${summary}\n`);
 });
+
+test("a run on locally linked packages says so at the top of the README block", () => {
+  const linked = { ...record(), subjects: { "teacss-rs": { packages: {}, local: { "@teacss/core": "/x/core", "@teacss/vite": "/x/vite" } } } };
+  assert.match(renderReadmeSummary(buildReport(linked), "s"), /### Results from 2026-10-21\n\n\*\*Local build, not for publication\.\*\* @teacss\/core and @teacss\/vite came from a local checkout/);
+});
