@@ -1,8 +1,10 @@
+import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import { dirname } from "node:path";
+import { dirname, extname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type DevServer, describePackages, nativeArtifact, resolvePackage, type SubjectClient, type SubjectFactory, subjectId, type Workspace } from "@bench/infrastructure";
-import { compile } from "@tailwindcss/node";
+import { __unstable__loadDesignSystem, compile } from "@tailwindcss/node";
+import { Scanner } from "@tailwindcss/oxide";
 import tailwindcss from "@tailwindcss/vite";
 import { build, createServer, type PluginOption } from "vite";
 
@@ -63,5 +65,18 @@ export const createSubject: SubjectFactory = (): SubjectClient => ({
   build: async (workspace) => ({ css: await viteBuild(workspace) }),
   devServer: (workspace) => startDevServer(workspace, [tailwindcss()]),
   moduleHeader: "",
+  extract: async (dirs) => {
+    const scanner = new Scanner({ sources: dirs.map((dir) => ({ base: dir, pattern: "**/*", negated: false })) });
+    scanner.scan();
+    const counts = new Map<string, number>();
+    for (const file of scanner.files) {
+      const content = readFileSync(file, "utf8");
+      for (const { candidate } of scanner.getCandidatesWithPositions({ content, extension: extname(file).slice(1) })) counts.set(candidate, (counts.get(candidate) ?? 0) + 1);
+    }
+    const design = await __unstable__loadDesignSystem(ENGINE_ENTRY, { base: dirname(require.resolve("tailwindcss/package.json")) });
+    const names = [...counts.keys()];
+    const css = design.candidatesToCss(names);
+    return names.filter((_, index) => css[index] !== null).map((name) => [name, counts.get(name) ?? 0] as const);
+  },
   coverage: async () => [],
 });

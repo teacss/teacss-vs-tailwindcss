@@ -1,8 +1,10 @@
+import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { basename, join, relative } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { version as nodeVersion } from "node:process";
 import { type Invocation, parseInvocation, type SubjectId, type SubjectVersions, subjectId } from "@bench/infrastructure";
-import { DEFAULT_SEED, generateCorpus, PAIR_TABLE_VERSION, profileCorpus } from "../corpus/index.ts";
+import { buildCommunityPool, type CommunityPool, type CommunityRepository, communityCorpus } from "../corpus/community.ts";
+import { type Corpus, DEFAULT_SEED, generateCorpus, PAIR_TABLE_VERSION, profileCorpus } from "../corpus/index.ts";
 import { captureEnvironment, loadShare } from "../features/environment/index.ts";
 import { measure, type Tier } from "../features/measure/run.ts";
 import { installFresh, measurePrice, type PriceRecord, teacssEntries } from "../features/price/index.ts";
@@ -10,7 +12,7 @@ import { profileSubjects } from "../features/profile/run.ts";
 import { buildReport, renderMarkdown, renderSummary } from "../features/report/index.ts";
 import { renderReadmeSummary, updateReadme } from "../features/report/readme.ts";
 import { verifyCorpus } from "../features/verify/run.ts";
-import { type RunRecord, readRunRecord, writeRunRecord } from "../persistence/index.ts";
+import { type Cell, type RunRecord, readRunRecord, writeRunRecord } from "../persistence/index.ts";
 import { invokeSubject, productionRegistry, type SubjectRegistration, type SubjectRegistry } from "../subjects/index.ts";
 
 export interface AppDeps {
@@ -29,17 +31,20 @@ const USAGE = `bench <command>
   subjects    list the registered subjects and the versions each one reports
   corpus      generate a paired corpus and print its hash
               --utilities <n> (5000)  --files <n> (30)  --seed <n>  --profile
+              --community <list.json>  build it from real Tailwind projects instead
   verify      run the equivalence checks of spec v01.1 on one corpus
               --utilities <n> (5000)  --files <n> (30)  --seed <n>  --subjects <a,b>
   run         measure the scale matrix and write results/<time>-<host>.json
               --utilities <a,b,c> (1000,5000,20000)  --files <a,b,c> (3,30,300)
               --samples <n> (30)  --tier engine|dev|build|all (all)  --subjects <a,b>
               --seed <n>  --out <dir> (results)  --allow-busy  --no-profile  --no-price
-              --install-runs <n> (3)  --configs <dir>  --allow-node-mismatch
+              --install-runs <n> (3)  --configs <dir>  --community <list.json>
+              --allow-node-mismatch
   price       what each tool ships, loads and installs, and what the native engine can serve
               --subjects <a,b>  --install-runs <n> (3)  --configs <dir> (../teacss-ts/examples)
   report      render a results file as Markdown and a JSON summary
               <results.json>  --out <dir> (docs/reports)  --readme <README.md>
+              --beside <other.json>  add the same matrix on the other corpus
 `;
 
 const SPEC_REVISION = 3;
@@ -47,6 +52,14 @@ const SPEC_REVISION = 3;
 const LOAD_SHARE_LIMIT = 0.2;
 
 const SUBJECT_TIMEOUT_MS = 10 * 60_000;
+
+function gitCommit(dir: string): string | undefined {
+  try {
+    return execFileSync("git", ["rev-parse", "HEAD"], { cwd: dir, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+  } catch {
+    return undefined;
+  }
+}
 
 function integerOption(invocation: Invocation, name: string, fallback: number): number {
   const raw = invocation.options.get(name);
@@ -113,6 +126,14 @@ export async function createApp(deps: AppDeps): Promise<number> {
       return 0;
     },
     corpus: async (invocation) => {
+      if (typeof invocation.options.get("community") === "string") {
+        const pool = await communityPool(String(invocation.options.get("community")));
+        const corpus = communityCorpus(pool, integerOption(invocation, "utilities", 5_000), integerOption(invocation, "files", 30), integerOption(invocation, "seed", DEFAULT_SEED));
+        deps.stdout(`community corpus ${corpus.hash}\n${pool.repositories.map((repository) => `  ${repository.name} ${repository.dir} ${repository.commit ?? "(no git commit)"}`).join("\n")}\n`);
+        deps.stdout(`Tailwind utilities found: ${pool.found}; translatable: ${pool.kept.length} (${((pool.kept.length / Math.max(1, pool.found)) * 100).toFixed(0)} %); in this corpus: ${corpus.cases.length}\n`);
+        deps.stdout(`most frequent untranslatable prefixes: ${pool.untranslated.map(([prefix, count]) => `${prefix} (${count})`).join(", ") || "none"}\n`);
+        return 0;
+      }
       const corpus = corpusOf(invocation);
       deps.stdout(`corpus ${corpus.hash}\nseed ${corpus.parameters.seed} utilities ${corpus.parameters.utilities} files ${corpus.parameters.files} pair-table ${corpus.pairTableVersion}\n`);
       if (invocation.options.has("profile")) deps.stdout(`${JSON.stringify(profileCorpus(corpus), null, 2)}\n`);
@@ -150,7 +171,10 @@ export async function createApp(deps: AppDeps): Promise<number> {
     }
     const chosen = chosenSubjects(invocation, registry);
     const cells = integerList(invocation, "utilities", [1_000, 5_000, 20_000]).flatMap((utilities) => integerList(invocation, "files", [3, 30, 300]).map((files) => ({ utilities, files })));
-    const plan = { seed: integerOption(invocation, "seed", DEFAULT_SEED), cells, tiers: tiersOf(invocation), subjects: chosen.map(([id, registration]) => ({ id, syntax: registration.syntax, engineTier: registration.engineTier })), samplesPerCell: integerOption(invocation, "samples", 30) };
+    const seed = integerOption(invocation, "seed", DEFAULT_SEED);
+    const community = typeof invocation.options.get("community") === "string" ? await communityPool(String(invocation.options.get("community"))) : undefined;
+    const corpusFor = (cell: Cell): Corpus => (community === undefined ? generateCorpus({ seed, utilities: cell.utilities, files: cell.files }) : communityCorpus(community, cell.utilities, cell.files, seed));
+    const plan = { seed, corpusFor, cells, tiers: tiersOf(invocation), subjects: chosen.map(([id, registration]) => ({ id, syntax: registration.syntax, engineTier: registration.engineTier })), samplesPerCell: integerOption(invocation, "samples", 30) };
     const startedAt = new Date().toISOString();
     const subjects: Record<string, SubjectVersions> = {};
     for (const [id] of chosen) {
@@ -171,7 +195,7 @@ export async function createApp(deps: AppDeps): Promise<number> {
       ? {}
       : await profileSubjects(
           largest,
-          plan.seed,
+          corpusFor,
           plan.subjects,
           plan.tiers.filter((tier): tier is "engine" | "build" => tier !== "dev"),
           async (subject, task, nodeArgs) => {
@@ -200,6 +224,7 @@ export async function createApp(deps: AppDeps): Promise<number> {
       samples: output.samples,
       limiters,
       ...(price === undefined ? {} : { price }),
+      ...(community === undefined ? {} : { community: { ...community, kept: community.kept.length } }),
     };
     const path = writeRunRecord(typeof invocation.options.get("out") === "string" ? String(invocation.options.get("out")) : "results", record);
     deps.stdout(`run: ${output.samples.length} samples over ${output.cells.length} cell(s) written to ${path}\n`);
@@ -212,16 +237,33 @@ export async function createApp(deps: AppDeps): Promise<number> {
     const out = typeof invocation.options.get("out") === "string" ? String(invocation.options.get("out")) : "docs/reports";
     const stem = basename(file, ".json");
     mkdirSync(out, { recursive: true });
-    writeFileSync(join(out, `${stem}.md`), renderMarkdown(model));
+    const besideFile = invocation.options.get("beside");
+    const beside = typeof besideFile === "string" ? buildReport(readRunRecord(besideFile)) : undefined;
+    writeFileSync(join(out, `${stem}.md`), renderMarkdown(model, beside));
     writeFileSync(join(out, `${stem}.summary.json`), renderSummary(model));
     deps.stdout(`report: ${join(out, `${stem}.md`)} and ${join(out, `${stem}.summary.json`)}\n`);
     const readme = invocation.options.get("readme");
     if (typeof readme === "string") {
-      writeFileSync(readme, updateReadme(readFileSync(readme, "utf8"), renderReadmeSummary(model, stem)));
+      writeFileSync(readme, updateReadme(readFileSync(readme, "utf8"), renderReadmeSummary(model, stem, beside)));
       deps.stdout(`report: plain-language summary written between the markers in ${readme}\n`);
     }
     return 0;
   };
+  /** Reads the repository list, asks Tailwind which of its utilities each tree uses, and keeps the translatable ones. */
+  async function communityPool(listFile: string): Promise<CommunityPool> {
+    const parsed: unknown = JSON.parse(readFileSync(listFile, "utf8"));
+    if (!Array.isArray(parsed) || !parsed.every((entry: unknown) => typeof entry === "object" && entry !== null && "name" in entry && typeof entry.name === "string" && "dir" in entry && typeof entry.dir === "string")) throw new Error(`${listFile}: expected a list of { "name": string, "dir": string }`);
+    const repositories: CommunityRepository[] = parsed.map((entry: { name: string; dir: string }) => {
+      const dir = resolve(dirname(listFile), entry.dir);
+      return { name: entry.name, dir: relative(deps.cwd, dir) || ".", commit: gitCommit(dir) };
+    });
+    const tailwind = [...registry].find(([, registration]) => registration.syntax === "tailwind" && registration.engineTier);
+    if (tailwind === undefined) throw new Error("no Tailwind subject is registered to extract community classes");
+    const { response } = await invokeSubject(registry, tailwind[0], { kind: "extract", dirs: repositories.map((repository) => resolve(deps.cwd, repository.dir)) }, processDeps);
+    if (response.result.kind !== "extract") throw new Error(`${tailwind[0]}: expected an extract result`);
+    return buildCommunityPool(repositories, response.result.found);
+  }
+
   async function runPrice(invocation: Invocation, subjects: readonly SubjectId[]): Promise<PriceRecord> {
     const configs = typeof invocation.options.get("configs") === "string" ? String(invocation.options.get("configs")) : join(deps.cwd, "..", "teacss-ts", "examples");
     const entries = existsSync(configs) ? teacssEntries(configs) : [];

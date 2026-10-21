@@ -107,6 +107,32 @@ function buildTable(table: CellTable): string[] {
   return lines;
 }
 
+/**
+ * Whether the other corpus ranks a different tool fastest at generating and at building. A new
+ * leader only counts when its lead over the old one is measurable there; otherwise the two tie.
+ */
+function besideTakeaway(model: ReportModel, beside: ReportModel | undefined): string[] {
+  if (beside === undefined) return [];
+  const community = beside.record.community ?? model.record.community;
+  const source = community === undefined ? "the other corpus" : `classes taken from ${community.repositories.length} public Tailwind project${community.repositories.length === 1 ? "" : "s"} (${community.kept} of their ${community.found} utilities translate)`;
+  const changes: string[] = [];
+  const ties: string[] = [];
+  for (const series of ["engine/warm", "build"] as const) {
+    const here = largest(model, series);
+    const there = largest(beside, series);
+    const leaderHere = here === undefined ? undefined : ranked(here)[0]?.subject;
+    const leaderThere = there === undefined ? undefined : ranked(there)[0]?.subject;
+    if (there === undefined || leaderHere === undefined || leaderThere === undefined || leaderHere === leaderThere) continue;
+    const verdict = there.verdicts.find((entry) => entry.subject === leaderHere)?.verdict;
+    const task = series === "build" ? "building" : "generating the CSS";
+    if (verdict?.kind === "differs") changes.push(`${task} is fastest with ${name(leaderThere)}`);
+    else ties.push(`${task}, ${name(leaderThere)} and ${name(leaderHere)} are within noise of each other`);
+  }
+  if (changes.length > 0) return [`- On ${source}, the ranking changes: ${changes.join("; ")}.`];
+  if (ties.length > 0) return [`- On ${source}, no tool overtakes the leaders above; for ${ties.join("; for ")}.`];
+  return [`- On ${source}, the same tools come out fastest.`];
+}
+
 function joinWords(items: readonly string[]): string {
   return items.length <= 1 ? (items[0] ?? "") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
 }
@@ -155,7 +181,7 @@ function takeaways(model: ReportModel, engine: CellTable | undefined, build: Cel
 }
 
 /** Two small tables, a few takeaways and the links, all derived from the model. */
-export function renderReadmeSummary(model: ReportModel, stem: string): string {
+export function renderReadmeSummary(model: ReportModel, stem: string, beside?: ReportModel): string {
   const engine = largest(model, "engine/warm") ?? largest(model, "engine/cold");
   const build = largest(model, "build");
   const lines = [README_START, "", `### Results from ${model.record.startedAt.slice(0, 10)}`, ""];
@@ -165,7 +191,7 @@ export function renderReadmeSummary(model: ReportModel, stem: string): string {
   if (build !== undefined) lines.push(...buildTable(build));
   lines.push(...rustTable(model));
   if (engine === undefined && build === undefined) lines.push("No measurements in this run.", "");
-  lines.push("**In short**", "", ...takeaways(model, engine, build), "", `[Full report](docs/reports/${stem}.md) · [audit](docs/reports/${stem}.audit.md) · [raw samples](results/${stem}.json) · [method](docs/specs/v01.1-benchmark-protocol.md)`, "", README_END);
+  lines.push("**In short**", "", ...takeaways(model, engine, build), ...besideTakeaway(model, beside), "", `[Full report](docs/reports/${stem}.md) · [audit](docs/reports/${stem}.audit.md) · [raw samples](results/${stem}.json) · [method](docs/specs/v01.1-benchmark-protocol.md)`, "", README_END);
   return lines.join("\n");
 }
 

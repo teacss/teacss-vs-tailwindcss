@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { SubjectId, SubjectVersions } from "@bench/infrastructure";
 import type { DevSize, EngineScenario } from "../contract/index.ts";
+import type { CommunityPool } from "../corpus/community.ts";
 import type { EnvironmentRecord } from "../features/environment/index.ts";
 import type { PriceRecord } from "../features/price/index.ts";
 import type { ProfileSummary } from "../features/profile/index.ts";
@@ -55,6 +56,8 @@ export interface RunRecord {
   readonly limiters: Readonly<Record<string, ProfileSummary>>;
   /** Spec v02.1 price of Rust; absent when the run skipped it or predates it. */
   readonly price?: PriceRecord;
+  /** Spec v02.1 community corpus; absent for the generated corpus. `kept` holds only its size here. */
+  readonly community?: Omit<CommunityPool, "kept"> & { readonly kept: number };
 }
 
 export function recordFileName(record: RunRecord): string {

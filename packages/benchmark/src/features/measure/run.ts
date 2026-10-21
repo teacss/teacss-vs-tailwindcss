@@ -1,6 +1,6 @@
 import type { SubjectId } from "@bench/infrastructure";
 import { DEV_SIZES, type DevSize, type EngineScenario, incrementalSize, type SubjectTask, type TaskResult, type Tier } from "../../contract/index.ts";
-import { type Corpus, candidates, corpusProject, extraCases, generateCorpus, type Syntax } from "../../corpus/index.ts";
+import { type Corpus, candidates, corpusProject, extraCases, type Syntax } from "../../corpus/index.ts";
 import { mulberry32, shuffled } from "../../corpus/prng.ts";
 import type { Cell, CellRecord, Sample } from "../../persistence/index.ts";
 import { WARM_TIMED_ITERATIONS } from "./engine-scenario.ts";
@@ -15,6 +15,8 @@ export interface MeasureSubject {
 
 export interface RunPlan {
   readonly seed: number;
+  /** The corpus each cell measures: generated from the seed, or the most frequent community classes. */
+  readonly corpusFor: (cell: Cell) => Corpus;
   readonly cells: readonly Cell[];
   readonly tiers: readonly Tier[];
   readonly subjects: readonly MeasureSubject[];
@@ -156,8 +158,13 @@ export async function measure(plan: RunPlan, deps: MeasureDeps): Promise<Measure
   const cells: CellRecord[] = [];
   const samples: Sample[] = [];
   const jobs = jobsFor(plan);
-  for (const cell of plan.cells) {
-    const corpus = generateCorpus({ seed: plan.seed, utilities: cell.utilities, files: cell.files });
+  const measured = new Set<string>();
+  for (const requested of plan.cells) {
+    const corpus = plan.corpusFor(requested);
+    // A community corpus can hold fewer classes than asked for; samples are labelled with what was measured.
+    const cell: Cell = { utilities: corpus.parameters.utilities, files: corpus.parameters.files };
+    if (measured.has(`${cell.utilities}x${cell.files}`)) continue;
+    measured.add(`${cell.utilities}x${cell.files}`);
     const loadShareBefore = deps.loadShare();
     const collected = new Map<string, number>();
     const hashes = new Map<string, string>();

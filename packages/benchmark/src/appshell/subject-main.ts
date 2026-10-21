@@ -40,6 +40,8 @@ async function runTask(request: SubjectRequest, deps: SubjectMainDeps): Promise<
     }
     case "coverage":
       return { kind: "coverage", results: await (await loadSubject(request)).coverage(task.entries) };
+    case "extract":
+      return { kind: "extract", found: await (await loadSubject(request)).extract(task.dirs) };
     case "engine": {
       const { samples, css } = await runEngineScenario(task, () => loadSubject(request), deps.clock);
       return { kind: "engine", samples, output: countOutput(css), css: task.includeCss ? css : undefined };

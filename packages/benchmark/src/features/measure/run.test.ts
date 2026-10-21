@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { subjectId } from "@bench/infrastructure";
 import type { SubjectTask } from "../../contract/index.ts";
+import { generateCorpus } from "../../corpus/index.ts";
 import { WARM_TIMED_ITERATIONS } from "./engine-scenario.ts";
 import { type Measured, measure, RunInvalid, type RunPlan } from "./run.ts";
 
@@ -9,7 +10,7 @@ const subjects = [
   { id: subjectId("alpha"), syntax: "teacss" as const, engineTier: true },
   { id: subjectId("beta"), syntax: "tailwind" as const, engineTier: false },
 ];
-const plan: RunPlan = { seed: 1, cells: [{ utilities: 20, files: 2 }], tiers: ["engine", "build"], subjects, samplesPerCell: 4 };
+const plan: RunPlan = { seed: 1, corpusFor: (cell) => generateCorpus({ seed: 1, utilities: cell.utilities, files: cell.files }), cells: [{ utilities: 20, files: 2 }], tiers: ["engine", "build"], subjects, samplesPerCell: 4 };
 
 function fakeMeasured(task: SubjectTask, hash = "same"): Measured {
   const usage = { cpuUserMs: 1, cpuSystemMs: 1, maxRssBytes: 1 };
@@ -105,4 +106,25 @@ test("the dev tier runs one server process per size and cell, with a fresh group
   assert.ok(seen.every((entry) => entry.groups === 5 && entry.distinct === entry.size * 5));
   assert.equal(output.samples.filter((sample) => sample.tier === "dev" && sample.subject === "alpha").length, 10);
   assert.equal(output.samples.filter((sample) => sample.subject === "beta").length, 0);
+});
+
+test("cells are labelled with the corpus actually measured, and two requests for the same corpus run once", async () => {
+  const small = generateCorpus({ seed: 1, utilities: 12, files: 3 });
+  const output = await measure(
+    {
+      ...plan,
+      cells: [
+        { utilities: 1000, files: 3 },
+        { utilities: 5000, files: 3 },
+      ],
+      tiers: ["build"],
+      corpusFor: () => small,
+    },
+    { invoke: async (_subject, task) => fakeMeasured(task), loadShare: () => 0, progress: () => {} },
+  );
+  assert.deepEqual(
+    output.cells.map((entry) => entry.cell),
+    [{ utilities: 12, files: 3 }],
+  );
+  assert.ok(output.samples.every((sample) => sample.cell.utilities === 12));
 });

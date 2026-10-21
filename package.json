@@ -16,6 +16,7 @@
   },
   "scripts": {
     "bench": "node apps/bench/src/main.ts run",
+    "bench:corpus": "node apps/bench/src/main.ts corpus",
     "bench:link": "node scripts/link-local.ts",
     "bench:report": "node apps/bench/src/main.ts report",
     "bench:ts-tailwind": "node apps/bench/src/main.ts run --subjects vite-baseline,teacss-ts,tailwind-v4",
