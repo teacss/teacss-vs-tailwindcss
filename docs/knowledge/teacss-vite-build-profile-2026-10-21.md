@@ -74,3 +74,47 @@ Rust 引擎路径下，抽取由 `@teacss/engine` 的外观层接管，不经过
 - 尚未拆开的是：未归属的 347 ms 原生时间里，Rust 引擎和 rolldown 各占多少。要拆开，需要原生层面的剖析，比如 macOS 的 `sample` 或 Instruments。
 
 本文只做诊断，改法留给 teacss-ts，比如对同一个样式表只解析一次，或者在配置提交后不再按模块做强制快照比对。
+
+## 建议的改法（2026-10-21 补）
+
+按预期收益和风险排序。收益的依据是上面的测量；标「估算」的是推断。
+
+### 1. core：配置提交后不再按模块做强制快照比对
+
+`commitConfig` 之后 `_preparedConfigMutable` 一直是 `true`，`applyExtractorsCurrent` 因此在每个模块抽取前后各调一次 `ensureRuleIndexesCurrent(true)`，每次深比对整份配置和全部规则。核心已经有另一条路径：`_ruleObservation`（`observeRuleCollections`，用代理观察规则集合写入），非可变模式下 `isCurrent()` 是常数时间。
+
+改法有三种，任选其一：
+
+- 配置来自 CSS 入口、提交后不再变化时，提交完成即把 `_preparedConfigMutable` 置回 `false`，走观察路径。可变模式只为 `setConfig` 加带 getter 的配置保留。
+- 保留可变模式，但把强制比对从「每个模块两次」改成「每个构建阶段一次」。
+- 任何配置写入都递增一个修订号，修订号没变就跳过深比对。
+
+预期：300 个文件的 `transform` 从约 1 700 ms 降到 rs 的水平，约 40 ms（测量：rs 路径不走这段检查，就是这个数）。teacss-ts 在 1 000 × 300 的构建从 2.07 s 降到约 0.6 s（估算）。等价校验能保证输出逐字节不变。
+
+### 2. vite：easing 预检查误命中
+
+`visitEasingEdits` 用 `/bezier|\\/i` 决定要不要用 css-tree 解析整张表。反斜杠本意是抓转义的 easing 名，但每个转义选择器都带反斜杠，所以只要有 `p\:4` 这样的类名就必然命中。本次语料的成品 CSS 里 `bezier` 出现 0 次，反斜杠 67 340 个，解析完全是白做的。
+
+改法：预检查只看声明值，例如匹配 `bezier(` 或具体的转义 easing 标记；更稳的做法是让生成器在产出时记录是否匹配过 easing 规则，没有就跳过。
+
+预期：省 211 ms（测量，这份语料的全部 easing 解析时间）。一行改动，风险最低。
+
+### 3. vite：内联字体不要靠解析整张表来找
+
+`collectBundledAssets`（`buildEnd`）和 `rewriteBundledAssets`（`generateBundle`）各用 css-tree 以 `parseCustomProperty: true` 解析一遍 1 MB 的表，只为找几处 `url(data:font/woff2;teacss=v1-…)`。这个 URL 格式是 teacss 自己生成的。
+
+改法：生成器写入字体数据 URL 时同时记录摘要与偏移，`buildEnd` 和 `generateBundle` 直接用；或者至少解析一次、两处共用。退一步，按这个固定格式做字符串扫描也够。
+
+预期：省约 167 ms（测量，两次解析之和）。
+
+### 4. 更大的改动：不在插件里压缩整张表
+
+`buildEnd` 里的 lightningcss 压缩占 326 ms，是单个最大的项。它存在是因为插件在 `generateBundle` 里替换占位符，Vite 自己的 CSS 压缩已经跑过，所以插件必须自己压缩一遍。对照：Tailwind 的 Vite 插件对 2.7 MB 的表只用 197 ms。1.06 MB 用 326 ms，每字节慢 4 倍以上，原因还没查，值得先看 `targets` 转换是否触发了大量前缀和降级。
+
+改法有两层：先查 `targets`，这是小改动；根本办法是让 CSS 在 Vite 渲染之前就进入它的资源管线，由 Vite 统一压缩，去掉占位符替换。后者改动大，要重新考虑 `augmentChunkHash` 的时序。
+
+预期：前者未知，后者最多省 326 ms（估算）。
+
+### 合计
+
+第 1 到第 3 项风险低、互不依赖，可以分别做。做完后 teacss-rs 的构建增量从 1 490 ms 降到约 1 100 ms（估算），teacss-ts 的 300 文件构建降一个量级（估算）。第 4 项决定能否追平 Tailwind。每项做完都用 `bun run bench:verify` 确认输出不变，再用 `bun run bench` 看数字。
