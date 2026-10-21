@@ -135,6 +135,13 @@ function takeaways(model: ReportModel, engine: CellTable | undefined, build: Cel
     const sizes = model.tables.filter((table) => table.series === "build" && table.cell.utilities === build.cell.utilities).map((table) => table.cell.files);
     if (sensitive.length > 0 && sizes.length > 1) points.push(`${sensitive.map((item) => `${name(item.subject)} gets ${item.ratio.toFixed(1)}× slower`).join("; ")} when the same classes are spread over ${Math.max(...sizes)} files instead of ${Math.min(...sizes)}; the other tools do not care how many files there are.`);
   }
+  const produced = [...model.work].filter((row) => NAMES[row.subject] !== undefined);
+  const most = produced[0];
+  const least = produced[produced.length - 1];
+  if (most !== undefined && least !== undefined && most !== least && most.bytes / least.bytes >= 1.2) {
+    const tool = (subject: string): string => (subject.startsWith("teacss-") ? "TeaCSS" : name(subject));
+    points.push(`For the same classes, ${tool(most.subject)} emits ${(most.bytes / least.bytes).toFixed(1)}× the CSS of ${tool(least.subject)}: ${most.rules.toLocaleString("en-US")} rules against ${least.rules.toLocaleString("en-US")}. Part of its build time goes to producing that extra output.`);
+  }
   const price = priceTakeaway(model);
   if (price !== undefined) points.push(price);
   points.push("Every tool was given the same classes, and every output was checked before a run counted. The tools emit different colour and size values by design, so this is the time to a correct stylesheet, not to identical bytes.");
