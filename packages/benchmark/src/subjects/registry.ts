@@ -1,8 +1,7 @@
 import type { SubjectId } from "@bench/infrastructure";
 import { subjectId } from "@bench/infrastructure";
-import type { Tier } from "../contract/index.ts";
+import type { NativeExpectation, Tier } from "../contract/index.ts";
 import type { Syntax } from "../corpus/index.ts";
-import type { NativeExpectation } from "../features/verify/index.ts";
 
 /** `main` is spec v01.1's production setup; `default-config` and `postcss` are spec v02.1 §Configurations. */
 export type SubjectGroup = "main" | "default-config" | "postcss";

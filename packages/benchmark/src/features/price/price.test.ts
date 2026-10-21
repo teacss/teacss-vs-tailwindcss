@@ -21,11 +21,12 @@ test("each package set installs once, native files load five times, and coverage
       progress: () => {},
     },
   );
-  assert.deepEqual(installs, ["@teacss/core", "@teacss/core", "tailwindcss", "tailwindcss"]);
+  assert.deepEqual(installs, ["@teacss/core", "tailwindcss", "@teacss/core", "tailwindcss"]);
   assert.equal(loads.length, 2 * NATIVE_LOAD_RUNS);
   assert.ok(loads.every((entry) => entry.endsWith(":/x.node")));
   assert.deepEqual(price.subjects["teacss-ts"]?.nativeLoadMs, []);
-  assert.equal(price.subjects["teacss-ts"]?.install, price.subjects["teacss-rs"]?.install);
+  assert.deepEqual(price.subjects["teacss-ts"]?.install, price.subjects["teacss-rs"]?.install);
+  assert.deepEqual(price.subjects["teacss-rs"]?.install?.installMs, [3000, 3000]);
   assert.deepEqual(
     price.subjects["teacss-rs"]?.coverage.map((result) => result.served),
     [true, false],

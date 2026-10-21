@@ -17,15 +17,29 @@ function leader(table: CellTable): string | undefined {
   return table.rows.filter((row) => row.subject !== BASELINE).sort((left, right) => left.wall.median - right.wall.median)[0]?.subject;
 }
 
-/** Refuses two records that did not run the same protocol on the same corpora. */
-export function assertComparable(local: Pick<RunRecord, "specRevision" | "cells">, other: Pick<RunRecord, "specRevision" | "cells">): void {
-  if (local.specRevision !== other.specRevision) throw new Error(`the records ran different spec revisions (${local.specRevision} and ${other.specRevision})`);
+type Protocol = Pick<RunRecord, "specRevision" | "v02Revision" | "cells" | "community">;
+
+/** Refuses two records that ran different revisions of either spec. */
+export function assertSameProtocol(local: Protocol, other: Protocol): void {
+  if (local.specRevision !== other.specRevision || local.v02Revision !== other.v02Revision) {
+    throw new Error(`the records ran different protocols (v01.1 revision ${local.specRevision} and ${other.specRevision}, v02.1 revision ${local.v02Revision ?? "none"} and ${other.v02Revision ?? "none"})`);
+  }
+}
+
+/** Refuses a second machine's record unless it ran the same protocol on the same corpora, sharing at least one cell. */
+export function assertComparable(local: Protocol, other: Protocol): void {
+  assertSameProtocol(local, other);
+  if ((local.community === undefined) !== (other.community === undefined)) throw new Error("one record measured the community corpus and the other the generated one");
   const hashes = new Map(other.cells.map((entry) => [`${entry.cell.utilities}x${entry.cell.files}`, entry.corpusHash]));
+  let shared = 0;
   for (const entry of local.cells) {
     const key = `${entry.cell.utilities}x${entry.cell.files}`;
     const hash = hashes.get(key);
-    if (hash !== undefined && hash !== entry.corpusHash) throw new Error(`cell ${key} measured different corpora (${entry.corpusHash.slice(0, 12)} and ${hash.slice(0, 12)})`);
+    if (hash === undefined) continue;
+    if (hash !== entry.corpusHash) throw new Error(`cell ${key} measured different corpora (${entry.corpusHash.slice(0, 12)} and ${hash.slice(0, 12)})`);
+    shared++;
   }
+  if (shared === 0) throw new Error("the records share no cell, so there is nothing to compare");
 }
 
 /**

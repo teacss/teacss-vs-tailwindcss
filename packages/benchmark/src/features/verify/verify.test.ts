@@ -59,3 +59,12 @@ test("native module expectations name what was missing or forbidden", () => {
 test("countOutput counts style rules and their declarations, inside at-rules too", () => {
   assert.deepEqual(countOutput(".a{color:red;margin:0}@media (width>=1px){.b{padding:0}}"), { rules: 2, declarations: 3 });
 });
+
+test("containsClass needs the class to end at a selector boundary", async () => {
+  const { containsClass } = await import("../../css/index.ts");
+  assert.equal(containsClass(".p-10{padding:1px}", "p-1"), false);
+  assert.equal(containsClass(".p-10{padding:1px}.p-1:hover{padding:0}", "p-1"), true);
+  assert.equal(containsClass(".a .p\\:4\\@hover{x:y}", "p:4@hover"), true);
+  assert.equal(containsClass(":is(.p-1){x:y}", "p-1"), true);
+  assert.equal(containsClass(".p-1", "p-1"), true);
+});
