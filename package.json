@@ -1,61 +1,37 @@
 {
   "name": "teacss-vs-tailwindcss",
-  "type": "module",
   "version": "0.0.0",
-  "packageManager": "pnpm@10.15.1",
-  "description": "teacss-vs-tailwindcss",
-  "author": "billgo",
+  "private": true,
+  "description": "A reproducible performance comparison of the TeaCSS TypeScript engine, the TeaCSS Rust engine and Tailwind CSS v4.",
   "license": "MIT",
-  "scripts": {
-    "script:init": "repoctl init",
-    "script:sync": "repoctl check",
-
-    "commitlint": "commitlint --edit"
+  "author": "Billgo <hi@billgo.me>",
+  "type": "module",
+  "packageManager": "bun@1.4.3",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=24.0.0"
   },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org"
+  "scripts": {
+    "bench": "node apps/bench/src/main.ts run",
+    "bench:link": "node scripts/link-local.ts",
+    "bench:report": "node apps/bench/src/main.ts report",
+    "bench:ts-tailwind": "node apps/bench/src/main.ts run --subjects vite-baseline,teacss-ts,tailwind-v4",
+    "bench:verify": "node apps/bench/src/main.ts verify",
+    "check": "bun run lint:check && bun run typecheck && bun run test && bun run check:layout && bun run check:dependencies",
+    "check:dependencies": "node scripts/check-dependencies.ts",
+    "check:layout": "node scripts/check-layout.ts",
+    "lint": "biome check --write .",
+    "lint:check": "biome ci .",
+    "test": "node --test \"scripts/**/*.test.ts\" \"apps/**/*.test.ts\" \"packages/**/*.test.ts\"",
+    "typecheck": "node scripts/typecheck.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.12",
-    "@changesets/changelog-github": "^0.5.1",
-    "@changesets/cli": "^2.29.6",
-    "@commitlint/cli": "^21.2.3",
-    "@commitlint/config-conventional": "^21.2.3",
-    "@commitlint/prompt-cli": "^21.2.3",
-    "@commitlint/types": "^21.2.3",
-    "@devjskit/biome-config": "^0.3.2",
-    "@devjskit/rimraf": "^1.0.0",
-    "@icebreakers/monorepo": "^5.7.1",
-    "@tsconfig/recommended": "^1.0.3",
-    "@types/fs-extra": "^11.0.4",
-    "@types/klaw": "^3.0.6",
-    "@types/lodash": "^4.14.202",
-    "@types/lodash-es": "^4.17.12",
-    "@types/node": "^24.3.1",
-    "@vitest/coverage-v8": "~3.2.4",
-    "ci-info": "^4.3.0",
-    "cross-env": "^10.0.0",
-    "defu": "^6.1.4",
-    "del": "^8.0.0",
-    "es-toolkit": "^1.39.10",
-    "execa": "^9.6.0",
-    "fs-extra": "^11.3.1",
-    "husky": "^9.1.7",
-    "klaw": "^4.1.0",
-    "lodash": "^4.17.21",
-    "lodash-es": "^4.17.21",
-    "only-allow": "^1.2.1",
-    "pathe": "^2.0.3",
-    "pkg-types": "^2.3.0",
-    "tslib": "^2.8.1",
-    "tsup": "^8.5.0",
-    "tsx": "^4.20.5",
-    "turbo": "^2.5.6",
-    "type-fest": "^4.41.0",
-    "typescript": "^5.9.2",
-    "unbuild": "^3.6.1",
-    "vitest": "~3.2.4",
-    "yaml": "^2.8.1"
+    "@biomejs/biome": "2.5.15",
+    "@devjskit/biome-config": "0.3.2",
+    "@types/node": "24.19.2",
+    "typescript": "6.0.3"
   }
 }

@@ -1,8 +1,30 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "extends": ["@devjskit/biome-config"],
-  "files": {
-    "includes": ["**/*.ts", "**/*.js", "**/*.mjs", "**/*.cjs", "**/*.json"],
-    "ignoreUnknown": true
-  }
+  "overrides": [
+    {
+      "includes": ["packages/benchmark/src/features/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@bench/subject-*", "@bench/subject-*/**"],
+                    "message": "A feature sees the SubjectClient interface from @bench/infrastructure; only the composition root (appshell) picks an implementation."
+                  },
+                  {
+                    "group": ["**/appshell", "**/appshell/**"],
+                    "message": "A feature never imports the composition root."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

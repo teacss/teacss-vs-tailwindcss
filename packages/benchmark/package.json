@@ -1,0 +1,19 @@
+{
+  "name": "@bench/benchmark",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@bench/infrastructure": "workspace:*",
+    "@bench/subject-tailwind-v4": "workspace:*",
+    "@bench/subject-teacss": "workspace:*",
+    "@bench/subject-vite-baseline": "workspace:*",
+    "css-tree": "3.2.1"
+  },
+  "devDependencies": {
+    "@types/css-tree": "3.2.0"
+  }
+}

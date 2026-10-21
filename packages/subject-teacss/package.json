@@ -1,0 +1,19 @@
+{
+  "name": "@bench/subject-teacss",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./ts": "./src/ts.ts",
+    "./rs": "./src/rs.ts"
+  },
+  "dependencies": {
+    "@bench/infrastructure": "workspace:*",
+    "@teacss/core": "0.9.0-alpha.1",
+    "@teacss/engine": "0.8.5-alpha.4",
+    "@teacss/preset-standard": "0.9.0-alpha.1",
+    "@teacss/vite": "0.9.0-alpha.1",
+    "vite": "8.3.4"
+  }
+}
