@@ -118,3 +118,18 @@ Rust 引擎路径下，抽取由 `@teacss/engine` 的外观层接管，不经过
 ### 合计
 
 第 1 到第 3 项风险低、互不依赖，可以分别做。做完后 teacss-rs 的构建增量从 1 490 ms 降到约 1 100 ms（估算），teacss-ts 的 300 文件构建降一个量级（估算）。第 4 项决定能否追平 Tailwind。每项做完都用 `bun run bench:verify` 确认输出不变，再用 `bun run bench` 看数字。
+
+## 后续（2026-10-21，teacss-ts 已实施）
+
+teacss-ts 按计划 `docs/plans/vite-build-pipeline.md` 做完了五个 PR（#890 到 #894，master `cb2252e1`），本仓库核实了合并状态与计划状态；下面的数字是 teacss-ts 会话用本地链接构建测的，本仓库未独立复测，发布 0.9.0-alpha.2 后以第二份正式报告为准。
+
+| 项 | 改法 | 结果（`vite build()` 内，3 次中位数） |
+| --- | --- | --- |
+| 建议 2，#890 | 预检查改为 `needsEasingEdits`，只认明文 `bezier` 或转义拼写后跟未转义 `(` | 转义选择器不再触发整表解析 |
+| 建议 1，#891 | 抽取只读 `extractors` 与 `envMode`，`applyExtractorsCurrent` 改走非强制路径；生成时照旧强制比对 | ts 1000 × 300 的 `transform` 1 857 → 14 ms |
+| 建议 3，#892 | `collectBundledAssets` 改为扫描 `url(` 记号，1 MB 约 7 ms，两处各扫一次 | 与 css-tree 结果逐项一致 |
+| 建议 4，#893 | 只调查 | lightningcss 压缩本身约 22 ms，去掉 `targets` 19 ms；大头是压缩前 Vite 的 `preprocessCSS`，同一张表约 410 到 440 ms |
+
+合计：ts 20000 × 300 的 `build()` 3 723 → 1 600 ms，rs 1 396 → 1 155 ms；每个任务输出哈希与 §基线相同。
+
+对本文的修正：上面「`buildEnd` 里做了什么」一表把 326 ms 记在 lightningcss 名下，teacss-ts 的原生计时只有约 55 加 22 ms，差额很可能是 `preprocessCSS` 里的 JS 工作被归到了同一调用者。这一点两边都没有单独核实。剩下的大头是 `preprocessCSS`，去掉它需要 teacss-ts 单独立提案。

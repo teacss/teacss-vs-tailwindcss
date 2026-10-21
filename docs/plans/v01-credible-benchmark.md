@@ -95,6 +95,8 @@
 - [ ] CI 交叉验证运行。
 - [x] 报告 `docs/reports/2026-10-21T09-19-14-mac.md` 与手写审核 `.audit.md`（审核单独成文件，报告保持可逐字节重生成）；README Status 给出引擎与构建两层的主数字；规格 v01.1 标为 accepted。
 - [x] 本地构建模式（2026-10-21，按所有者要求先写代码、不跑测量、不加新单测）：`scripts/link-local.ts`（`bun run bench:link status|link --ts <dir>|unlink`）把 teacss 被测对象的 core、vite、preset-standard 接到已构建的 teacss-ts 检出，engine 跟随 core 解析；被测对象按真实路径报告版本，`node_modules/.bun` 以外的包进 `local`，报告首行标「Local build, not for publication」。`status` 已在本机跑过；`link`/`unlink` 未实际执行，因为它会改 `packages/subject-teacss/node_modules`，而 teacss-ts 检出正由另一会话修改。
+- [x] 剖析与改法（2026-10-21）：`docs/knowledge/teacss-vite-build-profile-2026-10-21.md`；teacss-ts 已按其计划合入五个 PR（#890 到 #894），本地链接实测 ts 20000 × 300 构建 3 723 → 1 600 ms。
+- [ ] 第二份报告：teacss-ts 发布 0.9.0-alpha.2 后，更新 `packages/subject-teacss/package.json` 与 `bun.lock`，`bench:verify` 通过后在安静机器上跑全矩阵。
 - [ ] teacss-rs 加入：未发布时用本地构建模式先排练（teacss-rs 的 `dev-link.mjs link` 接进 teacss-ts，再 `bench:link link`），只作内部参考；teacss-rs 优化完成并发布新的 `@teacss/engine` 后，更新 `packages/subject-teacss/package.json` 的引擎版本与 `bun.lock`，先跑四对象 `bench:verify`（强等价必须通过），再跑全矩阵，作为第二份报告；规格修订号与 `engineCompat` 变化写进报告。
 
 ## 第二阶段（另立提案）
