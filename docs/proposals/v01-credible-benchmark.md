@@ -1,12 +1,14 @@
 ---
-status: draft
+status: accepted
 priority: P0
 ---
 # TeaCSS（TS 引擎 / Rust 引擎）与 Tailwind CSS v4 的可信性能对比
 
 ## Status
 
-2026-10-21 起草。方向待用户确认（见「待决事项」）。计划第 1 片已落地：上游 fork 的 `bench/`（测的是 UnoCSS 而非 TeaCSS）已删除，仓库骨架、Biome 与两个架构检查脚本就位；尚无被测对象与结果。
+2026-10-21 用户让工作继续推进，提案接受。三个偏好项按默认值执行并等用户改口：报告正文英文；规模上限 20 000 utility；dev 增量层级放第二阶段。第 4 项由探针回答：pnpm 下已发布的 `@teacss/core@0.8.5` 加 `@teacss/engine@0.8.5-alpha.3` 能走 Rust 路径且输出与 TS 逐字节相同，npm 拒绝安装这对包（[ADR-0003](../adrs/ADR-0003-published-packages.md)）。
+
+已落地：计划第 1 片（骨架与检查）、第 0 片（[规格 v01.1](../specs/v01.1-benchmark-protocol.md) draft、[ADR-0001 至 0003](../adrs/index.md)）。尚无被测对象与结果。
 
 ## Problem
 
@@ -104,7 +106,7 @@ Node 24（`.node-version`），pnpm workspace（沿用现有声明，精确锁�
 
 ## Open questions
 
-待决事项，确认后提案转 accepted，再写规格：
+2026-10-21 起按以下默认执行；用户可在第一次正式运行前改口：
 
 1. 报告语言：面向 Tailwind 社区建议英文正文，仓库内提案与计划保持中文。
 2. 规模上限：20k utility / 300 文件是否足够，或需要加 50k。

@@ -24,7 +24,7 @@ four layers, one dependency direction, one process per native runtime.
 | `packages/infrastructure` | foundation | config, logging, clock, processes, workspace, the `SubjectClient` interface and its fakes |
 | `packages/subject-*` | isolation | one measured runtime each behind the `SubjectClient` interface |
 | `results/` | data | raw samples committed with each report |
-| `docs/` | documentation | proposals, specs, plans, knowledge, reports |
+| `docs/` | documentation | proposals, specs, plans, ADRs, knowledge, reports |
 
 A shell depends on exactly one product. The product depends on the foundation
 and the isolation units, and only its composition root picks an

@@ -1,15 +1,18 @@
 # 执行计划：可信性能对比（v01）
 
-对应提案：[v01](../proposals/v01-credible-benchmark.md)。规格：`docs/specs/v01-benchmark-protocol.md`（第 0 片产出）。
+对应提案：[v01](../proposals/v01-credible-benchmark.md)。规格：[v01.1](../specs/v01.1-benchmark-protocol.md)。
 
 每片独立可验收；下一片只在上一片的验收通过并合入 `master` 后开始。每片一个 PR。
 
 ## 第 0 片：方向确认、规格与决策记录
 
-- [ ] 用户确认提案的四个待决事项；提案改为 accepted。
-- [ ] 写 `docs/specs/v01-benchmark-protocol.md`：三个层级的精确定义（计时起止点、什么算一次样本、热身次数）、规模矩阵、轮替规则、作废规则、统计方法、报告模板、环境记录字段、负载阈值。这份规格就是预注册文档。
-- [ ] 写 `docs/knowledge/adr-0001-retire-forked-harness.md`：删除 `bench/`，记录保留的思路与上游致谢；`docs/knowledge/adr-0002-paired-corpus-equivalence.md`：强等价与结构等价的定义与理由。
-- 验收：规格被用户接受并合入；之后对规格的任何改动都必须在报告里标注。
+完成于 2026-10-21（规格仍为 draft，第一次正式运行前必须接受）。
+
+- [x] 用户让工作继续推进；提案 accepted，三个偏好项按默认值记录在提案 Status 里。
+- [x] `docs/specs/v01.1-benchmark-protocol.md`（英文，随报告公开）：被测对象与包版本、两个层级的计时起止、语料形状、规模矩阵、运行协议、两级等价、统计规则、环境记录、报告结构、验收表。
+- [x] `docs/adrs/ADR-0001`（删除 fork 的 harness）、`ADR-0002`（成对语料与两级等价）、`ADR-0003`（只用已发布包，pnpm 安装）。ADR 放在 `docs/adrs/`，不是 `docs/knowledge/`。
+- [x] 第 4 项待决事项用探针回答，证据在 `docs/knowledge/engine-probe-2026-10-21.md`。
+- [ ] 规格接受：用户确认后把 `status` 改为 accepted。此前第 2 到第 6 片可以推进，第 7 片的正式运行不能。
 
 ## 第 1 片：仓库骨架与检查
 

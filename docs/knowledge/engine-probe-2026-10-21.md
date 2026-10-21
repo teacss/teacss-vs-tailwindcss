@@ -1,0 +1,40 @@
+# 探针：已发布包能否走 Rust 路径（2026-10-21）
+
+一次性实验，代码已丢弃；结论进了 [ADR-0003](../adrs/ADR-0003-published-packages.md) 与规格 v01.1。机器：Apple M2 Max，Node 24.14.1，pnpm 10.30.1。
+
+## 安装
+
+`npm install vite@8.3.4 @teacss/vite@0.8.5 @teacss/engine@0.8.5-alpha.3 …`：
+
+```
+npm error code ETARGET
+npm error notarget No matching version found for @teacss/engine@>=0.9.0.
+```
+
+`pnpm add -D` 同一组包：安装成功，警告 `unmet peer @teacss/engine@>=0.9.0: found 0.8.5-alpha.3`，并装入 `@teacss/engine-darwin-arm64@0.8.5-alpha.3`。
+
+## 进程内（engine 层级）
+
+`createGenerator({ presets: [presetStandard()], engine })` 加 `generate(4 个 token, { preflights: false, minify: true })`，`TEACSS_ENGINE_STRICT=1 TEACSS_ENGINE_STATS=1`：
+
+| engine | `process.report.getReport().sharedObjects` 里的 `.node` | stats | 输出 |
+| --- | --- | --- | --- |
+| `ts` | 无 | `rust=0 ts=1` | 205 字节 |
+| `rust` | `teacss-engine.darwin-arm64.node` | `rust=1 ts=0` | 205 字节，与 ts 相同 |
+
+`process.moduleLoadList` 与 `require.cache` 都看不到原生模块；`sharedObjects` 是可用的证据。
+
+## Vite 构建（build 层级）
+
+根目录 `index.css`（`@presets "standard"; @source "./src/**/*.js"; @teacss;`），`src/main.js` 带 `// @teacss-include` 并导入 `virtual:teacss.css`，`pluginTeacss()`，`TEACSS_ENGINE=<engine> TEACSS_ENGINE_STRICT=1 TEACSS_ENGINE_STATS=1 vite build`：
+
+| engine | stats | CSS |
+| --- | --- | --- |
+| `ts` | `rust=0 ts=1` | 5 858 字节 |
+| `rust` | `rust=2 ts=0` | 5 858 字节，`cmp` 逐字节相同 |
+
+入口放在 `src/entry.css` 时两边都只产出 2 字节：teacss 只发现根目录 `index.css`。插件配置 `TeacssVitePluginConfig` 继承 `UserConfig`，所以 `pluginTeacss({ engine })` 也可用；显式 `"ts"` 优先于环境变量。
+
+## Tailwind v4 进程内
+
+`compile('@import "tailwindcss" source(none); @source "./*.js";', { base })`，`new Scanner({ sources: compiler.sources }).scan()`，`compiler.build(candidates)`：compile 21 ms、scan 2 ms、build 4 ms（单次，仅作可行性）。`sharedObjects` 出现 `tailwindcss-oxide.darwin-arm64.node` 与 `lightningcss.darwin-arm64.node`。Scanner 会把 `class`、`hi`、`innerHTML` 这类词也当候选，所以 engine 层级直接传候选字符串、不扫描文件，扫描留给 build 层级。

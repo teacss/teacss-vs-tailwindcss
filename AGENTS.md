@@ -8,8 +8,8 @@ v4. `CLAUDE.md` points here.
 - Start with [README.md](README.md) for the layout and the commands.
 - The direction is the accepted [proposal](docs/proposals/v01-credible-benchmark.md);
   the order of work is the [plan](docs/plans/v01-credible-benchmark.md).
-  Measurement rules live in `docs/specs/` once written; a number that does not
-  follow them is not reported.
+  The measurement rules are [spec v01.1](docs/specs/v01.1-benchmark-protocol.md);
+  a number that does not follow them is not reported.
 
 ## Change rules
 
@@ -32,7 +32,8 @@ v4. `CLAUDE.md` points here.
 | `docs/proposals/` | Direction and scope, with an index |
 | `docs/specs/` | The measurement protocol and other testable contracts |
 | `docs/plans/` | Implementation slices and their acceptance |
-| `docs/knowledge/` | Decision records and background |
+| `docs/adrs/` | Architecture decision records, with an index |
+| `docs/knowledge/` | Evidence and background, with an index |
 | `docs/reports/` | Generated reports, one per published run |
 
 Add, remove or rename a document and update its index in the same change.
