@@ -195,6 +195,12 @@ export async function createApp(deps: AppDeps): Promise<number> {
       if (response.result.kind !== "describe") throw new Error(`${id}: expected a describe result`);
       subjects[id] = response.result.versions;
     }
+    // The price installs each subject from the registry, which a locally linked build is not on; decided before the timing so it cannot fail after it.
+    const linked = Object.entries(subjects)
+      .filter(([, versions]) => Object.keys(versions.local).length > 0)
+      .map(([id]) => id);
+    const pricing = !invocation.options.has("no-price") && linked.length === 0;
+    if (!invocation.options.has("no-price") && !pricing) deps.stdout(`run: no price section; ${linked.join(", ")} ${linked.length === 1 ? "uses" : "use"} locally linked packages, which cannot be installed from the registry\n`);
     const output = await measure(plan, {
       invoke: async (subject, task) => {
         const { response, process } = await invokeSubject(registry, subject, task, processDeps);
@@ -216,7 +222,7 @@ export async function createApp(deps: AppDeps): Promise<number> {
             await invokeSubject(registry, subject, task, { ...processDeps, nodeArgs });
           },
         );
-    const price = invocation.options.has("no-price")
+    const price = !pricing
       ? undefined
       : await runPrice(
           invocation,
