@@ -153,6 +153,10 @@ function limiterLines(limiters: Readonly<Record<string, { readonly totalMs: numb
   ];
 }
 
+function packagesRan(record: Omit<RunRecord, "samples">): string {
+  return localLines(record).length === 0 ? "Every subject ran its published package" : "Every subject ran its published package, except the locally linked ones named at the top, which ran the local build";
+}
+
 function localLines(record: Omit<RunRecord, "samples">): string[] {
   const linked = Object.entries(record.subjects).flatMap(([subject, versions]) => Object.entries(versions.local ?? {}).map(([name, dir]) => `${subject}: ${name} from ${dir}`));
   if (linked.length === 0) return [];
@@ -278,8 +282,8 @@ export function renderMarkdown(model: ReportModel, beside?: ReportModel, cross?:
     "",
     "1. **Why not double?** The Limiter section names the frames where each subject spends its time; a change that does not touch them cannot move the number much.",
     record.v02Revision === undefined
-      ? "2. **Was it tuned?** Every subject ran its published package with its documented production configuration (spec v01.1 §Subjects); the Rust engine ran with `TEACSS_ENGINE_STRICT=1`, so a fallback would have failed the run."
-      : "2. **Was it tuned?** Every subject ran its published package. The `main` subjects use each tool's tuned production entry, the `-default` subjects the entry its setup guide gives, and the `-postcss` subjects its PostCSS integration (spec v02.1 §Configurations); every TeaCSS Rust subject ran with `TEACSS_ENGINE_STRICT=1`, so a fallback would have failed the run.",
+      ? `2. **Was it tuned?** ${packagesRan(record)} with its documented production configuration (spec v01.1 §Subjects); the Rust engine ran with \`TEACSS_ENGINE_STRICT=1\`, so a fallback would have failed the run.`
+      : `2. **Was it tuned?** ${packagesRan(record)}. The \`main\` subjects use each tool's tuned production entry, the \`-default\` subjects the entry its setup guide gives, and the \`-postcss\` subjects its PostCSS integration (spec v02.1 §Configurations); every TeaCSS Rust subject ran with \`TEACSS_ENGINE_STRICT=1\`, so a fallback would have failed the run.`,
     "3. **Did it break limits?** The CSS sizes in the tables bound the work; a median below the time to write that many bytes would be suspect.",
     "4. **Did it error?** A run with any subject error, timeout or fallback writes no record; this record exists, so every sample succeeded.",
     "5. **Does it reproduce?** Each cell holds the stated number of samples per subject, interleaved per round; the tables give the IQR and the p95, and a pair closer than the larger IQR or with p >= 0.01 is reported as no measurable difference.",
