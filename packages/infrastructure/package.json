@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./test-support": "./src/test-support/index.ts",
+    "./test-support/fake-subject": "./src/test-support/fake-subject.ts",
+    "./test-support/failing-subject": "./src/test-support/failing-subject.ts"
   }
 }
