@@ -1,4 +1,5 @@
 import type { Cell, RunRecord, Sample } from "../../persistence/index.ts";
+import { crossLines } from "./cross.ts";
 import { type RustFindings, rustFindings } from "./rust.ts";
 import { compare, type Summary, summarize, type Verdict } from "./statistics.ts";
 import { type WorkRow, workRows, workTable } from "./work.ts";
@@ -180,7 +181,7 @@ function besideLines(beside: ReportModel): string[] {
   ];
 }
 
-export function renderMarkdown(model: ReportModel, beside?: ReportModel): string {
+export function renderMarkdown(model: ReportModel, beside?: ReportModel, cross?: ReportModel): string {
   const { record } = model;
   const environment = record.environment;
   const lines = [
@@ -201,6 +202,7 @@ export function renderMarkdown(model: ReportModel, beside?: ReportModel): string
     ...model.rust.sections,
     ...communityLines(record),
     ...(beside === undefined ? [] : besideLines(beside)),
+    ...(cross === undefined ? [] : crossLines(model, cross, (other) => SERIES.flatMap((series) => other.tables.filter((table) => table.series === series).map(tableMarkdown)))),
     "## Environment",
     "",
     "| Field | Value |",

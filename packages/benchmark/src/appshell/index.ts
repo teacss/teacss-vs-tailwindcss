@@ -9,6 +9,7 @@ import { captureEnvironment, loadShare } from "../features/environment/index.ts"
 import { measure, type Tier } from "../features/measure/run.ts";
 import { installFresh, measurePrice, type PriceRecord, teacssEntries } from "../features/price/index.ts";
 import { profileSubjects } from "../features/profile/run.ts";
+import { assertComparable } from "../features/report/cross.ts";
 import { buildReport, renderMarkdown, renderSummary } from "../features/report/index.ts";
 import { renderReadmeSummary, updateReadme } from "../features/report/readme.ts";
 import { verifyCorpus } from "../features/verify/run.ts";
@@ -45,6 +46,7 @@ const USAGE = `bench <command>
   report      render a results file as Markdown and a JSON summary
               <results.json>  --out <dir> (docs/reports)  --readme <README.md>
               --beside <other.json>  add the same matrix on the other corpus
+              --cross <ci.json>  add the same run from a second machine as a cross-check
 `;
 
 const SPEC_REVISION = 3;
@@ -239,12 +241,16 @@ export async function createApp(deps: AppDeps): Promise<number> {
     mkdirSync(out, { recursive: true });
     const besideFile = invocation.options.get("beside");
     const beside = typeof besideFile === "string" ? buildReport(readRunRecord(besideFile)) : undefined;
-    writeFileSync(join(out, `${stem}.md`), renderMarkdown(model, beside));
+    const crossFile = invocation.options.get("cross");
+    const crossRecord = typeof crossFile === "string" ? readRunRecord(crossFile) : undefined;
+    if (crossRecord !== undefined) assertComparable(readRunRecord(file), crossRecord);
+    const cross = crossRecord === undefined ? undefined : buildReport(crossRecord);
+    writeFileSync(join(out, `${stem}.md`), renderMarkdown(model, beside, cross));
     writeFileSync(join(out, `${stem}.summary.json`), renderSummary(model));
     deps.stdout(`report: ${join(out, `${stem}.md`)} and ${join(out, `${stem}.summary.json`)}\n`);
     const readme = invocation.options.get("readme");
     if (typeof readme === "string") {
-      writeFileSync(readme, updateReadme(readFileSync(readme, "utf8"), renderReadmeSummary(model, stem, beside)));
+      writeFileSync(readme, updateReadme(readFileSync(readme, "utf8"), renderReadmeSummary(model, stem, beside, cross)));
       deps.stdout(`report: plain-language summary written between the markers in ${readme}\n`);
     }
     return 0;
