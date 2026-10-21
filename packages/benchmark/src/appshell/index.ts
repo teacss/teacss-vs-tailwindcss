@@ -1,11 +1,13 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
+import { version as nodeVersion } from "node:process";
 import { type Invocation, parseInvocation, type SubjectId, type SubjectVersions, subjectId } from "@bench/infrastructure";
 import { DEFAULT_SEED, generateCorpus, PAIR_TABLE_VERSION, profileCorpus } from "../features/corpus/index.ts";
 import { captureEnvironment, loadShare } from "../features/environment/index.ts";
 import { measure, type Tier } from "../features/measure/run.ts";
 import { profileSubjects } from "../features/profile/run.ts";
 import { buildReport, renderMarkdown, renderSummary } from "../features/report/index.ts";
+import { renderReadmeSummary, updateReadme } from "../features/report/readme.ts";
 import { verifyCorpus } from "../features/verify/run.ts";
 import { type RunRecord, readRunRecord, writeRunRecord } from "../persistence/index.ts";
 import { invokeSubject, productionRegistry, type SubjectRegistration, type SubjectRegistry } from "../subjects/index.ts";
@@ -31,9 +33,9 @@ const USAGE = `bench <command>
   run         measure the scale matrix and write results/<time>-<host>.json
               --utilities <a,b,c> (1000,5000,20000)  --files <a,b,c> (3,30,300)
               --samples <n> (30)  --tier engine|build|all (all)  --subjects <a,b>
-              --seed <n>  --out <dir> (results)  --allow-busy  --no-profile
+              --seed <n>  --out <dir> (results)  --allow-busy  --no-profile  --allow-node-mismatch
   report      render a results file as Markdown and a JSON summary
-              <results.json>  --out <dir> (docs/reports)
+              <results.json>  --out <dir> (docs/reports)  --readme <README.md>
 `;
 
 const SPEC_REVISION = 2;
@@ -131,6 +133,11 @@ export async function createApp(deps: AppDeps): Promise<number> {
     },
   };
   commands["run"] = async (invocation) => {
+    const pinned = existsSync(join(deps.cwd, ".node-version")) ? `v${readFileSync(join(deps.cwd, ".node-version"), "utf8").trim()}` : undefined;
+    if (pinned !== undefined && pinned !== nodeVersion && !invocation.options.has("allow-node-mismatch")) {
+      deps.stdout(`run: refused, this is Node ${nodeVersion} but .node-version pins ${pinned}; every subject process inherits this binary. Switch Node or pass --allow-node-mismatch to record the run anyway\n`);
+      return 3;
+    }
     const allowBusy = invocation.options.has("allow-busy");
     const share = loadShare();
     if (share > LOAD_SHARE_LIMIT && !allowBusy) {
@@ -191,6 +198,11 @@ export async function createApp(deps: AppDeps): Promise<number> {
     writeFileSync(join(out, `${stem}.md`), renderMarkdown(model));
     writeFileSync(join(out, `${stem}.summary.json`), renderSummary(model));
     deps.stdout(`report: ${join(out, `${stem}.md`)} and ${join(out, `${stem}.summary.json`)}\n`);
+    const readme = invocation.options.get("readme");
+    if (typeof readme === "string") {
+      writeFileSync(readme, updateReadme(readFileSync(readme, "utf8"), renderReadmeSummary(model, stem)));
+      deps.stdout(`report: plain-language summary written between the markers in ${readme}\n`);
+    }
     return 0;
   };
   const command = commands[invocation.command ?? "help"];
