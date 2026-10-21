@@ -5,15 +5,15 @@ export const README_START = "<!-- bench:summary:start -->";
 export const README_END = "<!-- bench:summary:end -->";
 
 const NAMES: Readonly<Record<string, string>> = {
-  "teacss-rs": "TeaCSS with its Rust engine",
-  "teacss-ts": "TeaCSS with its TypeScript engine",
+  "teacss-rs": "TeaCSS (Rust engine)",
+  "teacss-ts": "TeaCSS (TypeScript engine)",
   "tailwind-v4": "Tailwind CSS v4",
-  [BASELINE]: "a Vite build with no CSS tool",
 };
+const KEY_PACKAGES = ["@teacss/core", "@teacss/engine", "tailwindcss", "vite"];
 
 const name = (subject: string): string => NAMES[subject] ?? subject;
 const seconds = (ms: number): string => (ms >= 1000 ? `${(ms / 1000).toFixed(2)} s` : `${ms.toFixed(0)} ms`);
-const times = (ratio: number): string => `${ratio.toFixed(1)}×`;
+const count = (value: number): string => value.toLocaleString("en-US");
 
 function largest(model: ReportModel, series: Series): CellTable | undefined {
   return model.tables.filter((table) => table.series === series).reduce<CellTable | undefined>((best, table) => (best === undefined || table.cell.utilities * table.cell.files >= best.cell.utilities * best.cell.files ? table : best), undefined);
@@ -27,143 +27,85 @@ function ranked(table: CellTable): SubjectRow[] {
   return table.rows.filter((entry) => entry.subject !== BASELINE).sort((left, right) => left.wall.median - right.wall.median);
 }
 
-/** How a subject's time grew with the utility count, along the file count that has the most sizes. */
-function growth(model: ReportModel, series: Series, subject: string): { from: number; to: number; ratio: number } | undefined {
-  const tables = model.tables.filter((table) => table.series === series);
-  const byFiles = new Map<number, CellTable[]>();
-  for (const table of tables) byFiles.set(table.cell.files, [...(byFiles.get(table.cell.files) ?? []), table]);
-  const same = [...byFiles.values()].sort((left, right) => right.length - left.length || (right[0]?.cell.files ?? 0) - (left[0]?.cell.files ?? 0))[0]?.sort((left, right) => left.cell.utilities - right.cell.utilities) ?? [];
-  const first = same[0];
-  const last = same[same.length - 1];
-  if (first === undefined || last === undefined || first === last) return undefined;
-  const a = row(first, subject)?.wall.median;
-  const b = row(last, subject)?.wall.median;
-  if (a === undefined || b === undefined) return undefined;
-  return { from: first.cell.utilities, to: last.cell.utilities, ratio: b / a };
+/** "1.4× slower", "about the same" for a tie, or nothing for the fastest. */
+function comparison(table: CellTable, entry: SubjectRow, fastest: SubjectRow): string {
+  if (entry === fastest) return "";
+  const verdict = table.verdicts.find((item) => item.subject === entry.subject)?.verdict;
+  if (verdict?.kind === "no-measurable-difference") return " (about the same)";
+  return ` (${(entry.wall.median / fastest.wall.median).toFixed(1)}× slower)`;
 }
 
-/** How a subject's build time changes with the file count at the largest utility count. */
-function fileSensitivity(model: ReportModel, subject: string): { utilities: number; fewFiles: number; manyFiles: number; ratio: number } | undefined {
+function fileSensitivity(model: ReportModel, subject: string): number | undefined {
   const tables = model.tables.filter((table) => table.series === "build");
   const utilities = Math.max(...tables.map((table) => table.cell.utilities));
   const same = tables.filter((table) => table.cell.utilities === utilities).sort((left, right) => left.cell.files - right.cell.files);
-  const few = same[0];
-  const many = same[same.length - 1];
-  if (few === undefined || many === undefined || few === many) return undefined;
-  const a = row(few, subject)?.deltaMs;
-  const b = row(many, subject)?.deltaMs;
-  if (a === undefined || b === undefined || a <= 0) return undefined;
-  return { utilities, fewFiles: few.cell.files, manyFiles: many.cell.files, ratio: b / a };
+  const few = row(same[0] ?? tables[0] ?? ({} as CellTable), subject)?.deltaMs;
+  const many = row(same[same.length - 1] ?? tables[0] ?? ({} as CellTable), subject)?.deltaMs;
+  if (same.length < 2 || few === undefined || many === undefined || few <= 0) return undefined;
+  return many / few;
 }
 
-/** One sentence for the subjects that were slower in every sample, one for those too close to rank. */
-function separationSentences(table: CellTable, order: readonly SubjectRow[]): string {
-  const separated: string[] = [];
-  const tied: string[] = [];
-  for (const entry of order.slice(1)) {
-    const verdict = table.verdicts.find((item) => item.subject === entry.subject)?.verdict;
-    if (verdict?.kind === "differs") separated.push(name(entry.subject));
-    else if (verdict?.kind === "no-measurable-difference") tied.push(name(entry.subject));
-  }
-  const sentences: string[] = [];
-  if (separated.length > 0) sentences.push(`Every sample of ${list(separated)} was slower than every sample of ${name(table.fastest)}.`);
-  if (tied.length > 0) sentences.push(`${list(tied)} ${tied.length > 1 ? "were" : "was"} within the run-to-run noise of ${name(table.fastest)}, so this run cannot rank them.`);
-  return sentences.join(" ");
-}
-
-function list(items: readonly string[]): string {
-  if (items.length <= 1) return items[0] ?? "";
-  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
-}
-
-function engineSection(model: ReportModel): string[] {
-  const table = largest(model, "engine/warm") ?? largest(model, "engine/cold");
-  if (table === undefined) return ["No engine measurements in this run.", ""];
-  const scenario = table.series === "engine/warm" ? "in a warm process (the tool is already loaded; this is what a rebuild costs)" : "in a cold process (the tool is loaded from disk first; this is what a first build costs)";
+function engineTable(table: CellTable): string[] {
   const order = ranked(table);
   const fastest = order[0];
   if (fastest === undefined) return [];
-  const lines = [`**Generating the CSS.** Each tool was handed the same ${table.cell.utilities.toLocaleString("en-US")} utility classes and asked for the stylesheet, ${scenario}. Median of ${fastest.wall.n} runs:`, ""];
-  lines.push("| Tool | Time | Per 1,000 classes | Compared with the fastest |", "| --- | --- | --- | --- |");
-  for (const entry of order) {
-    const ratio = entry.wall.median / fastest.wall.median;
-    lines.push(`| ${name(entry.subject)} | ${seconds(entry.wall.median)} | ${seconds((entry.wall.median / table.cell.utilities) * 1000)} | ${entry === fastest ? "fastest" : `${times(ratio)} slower`} |`);
-  }
-  lines.push("");
-  lines.push(`${name(fastest.subject)} generated the stylesheet fastest. ${separationSentences(table, order)}`.trim(), "");
-  const grow = growth(model, table.series, fastest.subject);
-  if (grow !== undefined)
-    lines.push(
-      `Going from ${grow.from.toLocaleString("en-US")} to ${grow.to.toLocaleString("en-US")} classes (${times(grow.to / grow.from)} the work) made ${name(fastest.subject)} ${times(grow.ratio)} slower, so its cost grows ${grow.ratio < (grow.to / grow.from) * 0.8 ? "more slowly than" : grow.ratio > (grow.to / grow.from) * 1.2 ? "faster than" : "about in step with"} the number of classes.`,
-      "",
-    );
-  return lines;
+  return [`**Generating the CSS for ${count(table.cell.utilities)} classes** (median of ${fastest.wall.n} runs)`, "", "| | Time |", "| --- | --- |", ...order.map((entry) => `| ${name(entry.subject)} | ${seconds(entry.wall.median)}${comparison(table, entry, fastest)} |`), ""];
 }
 
-function buildSection(model: ReportModel): string[] {
-  const table = largest(model, "build");
-  if (table === undefined) return ["No build measurements in this run.", ""];
+function buildTable(table: CellTable): string[] {
+  const order = ranked(table);
+  const fastest = order[0];
+  if (fastest === undefined) return [];
   const baseline = row(table, BASELINE);
-  const order = ranked(table);
-  const fastest = order[0];
-  if (fastest === undefined) return [];
-  const lines = [
-    `**A production build.** The same ${table.cell.utilities.toLocaleString("en-US")} classes spread over ${table.cell.files} source files, built with \`vite build\`. ${baseline === undefined ? "" : `The same project with no CSS tool at all takes ${seconds(baseline.wall.median)}; the "CSS cost" column is what each tool adds on top.`} Median of ${fastest.wall.n} runs:`,
-    "",
-  ];
-  lines.push("| Tool | Build time | CSS cost | Stylesheet (gzip) | Compared with the fastest |", "| --- | --- | --- | --- | --- |");
-  for (const entry of order) {
-    const ratio = entry.wall.median / fastest.wall.median;
-    lines.push(
-      `| ${name(entry.subject)} | ${seconds(entry.wall.median)} | ${entry.deltaMs === undefined ? "" : seconds(entry.deltaMs)} | ${(entry.cssBytes / 1024).toFixed(0)} KB (${entry.cssGzipBytes === undefined ? "?" : (entry.cssGzipBytes / 1024).toFixed(0)} KB) | ${entry === fastest ? "fastest" : `${times(ratio)} slower`} |`,
-    );
-  }
-  lines.push("", `${name(fastest.subject)} finished the build fastest. ${separationSentences(table, order)}`.trim(), "");
-  const engine = largest(model, "engine/warm");
-  const shares: string[] = [];
-  for (const entry of order) {
-    const engineRow = engine === undefined ? undefined : row(engine, entry.subject);
-    if (engineRow === undefined || entry.deltaMs === undefined || entry.deltaMs <= 0 || engine?.cell.utilities !== table.cell.utilities) continue;
-    shares.push(`${Math.round((engineRow.wall.median / entry.deltaMs) * 100)} % for ${name(entry.subject)}`);
-  }
-  if (shares.length > 0) lines.push(`Generating the CSS is only part of that cost: ${list(shares)}. The rest is each build plugin's own work around its engine, so a faster engine does not by itself make a faster build.`, "");
-  const sensitivities = order.map((entry) => ({ entry, s: fileSensitivity(model, entry.subject) })).filter((item): item is { entry: SubjectRow; s: NonNullable<ReturnType<typeof fileSensitivity>> } => item.s !== undefined);
-  if (sensitivities.length > 0) {
-    const first = sensitivities[0]?.s;
-    if (first !== undefined) {
-      lines.push(
-        `Splitting the same ${first.utilities.toLocaleString("en-US")} classes over ${first.manyFiles} files instead of ${first.fewFiles} changed each tool's CSS cost by: ${sensitivities.map(({ entry, s }) => `${name(entry.subject)} ${times(s.ratio)}`).join(", ")}. A figure near 1× means the tool does not care how many files the classes live in.`,
-        "",
-      );
-    }
-  }
+  const lines = [`**Building a Vite project with those classes in ${table.cell.files} files** (median of ${fastest.wall.n} runs${baseline === undefined ? "" : `; the project builds in ${seconds(baseline.wall.median)} with no CSS tool`})`, "", "| | Build | of which CSS |", "| --- | --- | --- |"];
+  for (const entry of order) lines.push(`| ${name(entry.subject)} | ${seconds(entry.wall.median)}${comparison(table, entry, fastest)} | ${entry.deltaMs === undefined ? "" : seconds(entry.deltaMs)} |`);
+  lines.push("");
   return lines;
 }
 
-function closingSection(model: ReportModel, stem: string): string[] {
-  const record = model.record;
-  const subjects = Object.entries(record.subjects).map(
-    ([subject, versions]) =>
-      `${name(subject)} (${Object.entries(versions.packages)
-        .map(([pkg, version]) => `${pkg}@${version}`)
-        .join(", ")})`,
-  );
-  return [
-    "**How to read these numbers.**",
-    "",
-    `- Every tool processed the same classes: each TeaCSS class is paired with a Tailwind class that sets the same CSS properties under the same conditions, and the harness checks the output of every run before it counts a sample. The two tools still emit different values (their colour palettes and breakpoints differ), so this compares the time to produce a correct stylesheet, not byte-identical files.`,
-    "- Only differences that held across all samples are reported as rankings; two tools closer than their own run-to-run spread are reported as a tie.",
-    `- One machine: ${record.environment.cpu} with ${record.environment.cores} cores, Node ${record.environment.node}${record.allowBusy ? ", recorded while the machine was busy" : ""}. Your numbers will differ; the ratios are the part worth carrying over.`,
-    `- Versions: ${subjects.join("; ")}.`,
-    `- Full tables, statistics and the checklist audit: [report](docs/reports/${stem}.md), [audit](docs/reports/${stem}.audit.md), [raw samples](results/${stem}.json). Method: [spec v01.1](docs/specs/v01.1-benchmark-protocol.md).`,
-    "",
-    `_Generated by \`bench report --readme\` from the run of ${record.startedAt.slice(0, 10)}._`,
-  ];
+function takeaways(model: ReportModel, engine: CellTable | undefined, build: CellTable | undefined): string[] {
+  const points: string[] = [];
+  const engineFastest = engine === undefined ? undefined : ranked(engine)[0];
+  const buildFastest = build === undefined ? undefined : ranked(build)[0];
+  if (engineFastest !== undefined && buildFastest !== undefined) {
+    points.push(engineFastest.subject === buildFastest.subject ? `${name(engineFastest.subject)} is fastest both at generating the CSS and at finishing the build.` : `${name(engineFastest.subject)} generates the CSS fastest; ${name(buildFastest.subject)} finishes the whole build fastest.`);
+  }
+  if (engine !== undefined && build !== undefined && engine.cell.utilities === build.cell.utilities) {
+    const shares = ranked(build)
+      .map((entry) => {
+        const engineRow = row(engine, entry.subject);
+        return engineRow === undefined || entry.deltaMs === undefined || entry.deltaMs <= 0 ? undefined : { subject: entry.subject, share: engineRow.wall.median / entry.deltaMs };
+      })
+      .filter((item): item is { subject: string; share: number } => item !== undefined);
+    const low = shares.filter((item) => item.share < 0.25);
+    if (low.length > 0) points.push(`For ${low.map((item) => name(item.subject)).join(" and ")}, generating the CSS is only ${low.map((item) => `${Math.round(item.share * 100)} %`).join(" and ")} of the CSS cost in the build; the rest is the build plugin, so a faster engine does not by itself give a faster build.`);
+  }
+  if (build !== undefined) {
+    const sensitive = ranked(build)
+      .map((entry) => ({ subject: entry.subject, ratio: fileSensitivity(model, entry.subject) }))
+      .filter((item): item is { subject: string; ratio: number } => item.ratio !== undefined && item.ratio >= 1.3);
+    const sizes = model.tables.filter((table) => table.series === "build" && table.cell.utilities === build.cell.utilities).map((table) => table.cell.files);
+    if (sensitive.length > 0 && sizes.length > 1) points.push(`${sensitive.map((item) => `${name(item.subject)} gets ${item.ratio.toFixed(1)}× slower`).join("; ")} when the same classes are spread over ${Math.max(...sizes)} files instead of ${Math.min(...sizes)}; the other tools do not care how many files there are.`);
+  }
+  points.push("Every tool was given the same classes, and every output was checked before a run counted. The tools emit different colour and size values by design, so this is the time to a correct stylesheet, not to identical bytes.");
+  const environment = model.record.environment;
+  const versions = Object.values(model.record.subjects)
+    .flatMap((entry) => Object.entries(entry.packages))
+    .filter(([pkg]) => KEY_PACKAGES.includes(pkg))
+    .map(([pkg, version]) => `${pkg} ${version}`);
+  points.push(`${[...new Set(versions)].join(", ")}; one ${environment.cpu}, Node ${environment.node}${model.record.allowBusy ? ", recorded on a busy machine" : ""}. Milliseconds will differ on your machine; the ratios carry over.`);
+  return points.map((point) => `- ${point}`);
 }
 
-/** Plain-language results and interpretation for the README, derived from the model only. */
+/** Two small tables, a few takeaways and the links, all derived from the model. */
 export function renderReadmeSummary(model: ReportModel, stem: string): string {
-  const lines = [README_START, "", `### Results of the run on ${model.record.startedAt.slice(0, 10)}`, "", ...engineSection(model), ...buildSection(model), ...closingSection(model, stem), "", README_END];
+  const engine = largest(model, "engine/warm") ?? largest(model, "engine/cold");
+  const build = largest(model, "build");
+  const lines = [README_START, "", `### Results from ${model.record.startedAt.slice(0, 10)}`, ""];
+  if (engine !== undefined) lines.push(...engineTable(engine));
+  if (build !== undefined) lines.push(...buildTable(build));
+  if (engine === undefined && build === undefined) lines.push("No measurements in this run.", "");
+  lines.push("**In short**", "", ...takeaways(model, engine, build), "", `[Full report](docs/reports/${stem}.md) · [audit](docs/reports/${stem}.audit.md) · [raw samples](results/${stem}.json) · [method](docs/specs/v01.1-benchmark-protocol.md)`, "", README_END);
   return lines.join("\n");
 }
 

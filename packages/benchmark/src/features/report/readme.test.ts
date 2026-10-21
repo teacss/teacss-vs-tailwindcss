@@ -41,17 +41,19 @@ function record(): RunRecord {
   };
 }
 
-test("the summary says who was fastest, by how much, and how the cost grows, in plain words", () => {
+test("the summary is two small tables, a few takeaways and the links, in plain words", () => {
   const text = renderReadmeSummary(buildReport(record()), "2026-10-21T09-19-14-mac");
-  assert.match(text, /### Results of the run on 2026-10-21/);
-  assert.match(text, /\| TeaCSS with its Rust engine \| 10\.00 s \| 1\.00 s \| fastest \|/);
-  assert.match(text, /\| Tailwind CSS v4 \| 15\.00 s \| 1\.50 s \| 1\.5× slower \|/);
-  assert.match(text, /Every sample of Tailwind CSS v4 was slower than every sample of TeaCSS with its Rust engine\./);
-  assert.match(text, /Going from 1,000 to 10,000 classes \(10\.0× the work\) made TeaCSS with its Rust engine 10\.0× slower, so its cost grows about in step with the number of classes/);
-  assert.match(text, /Tailwind CSS v4 finished the build fastest\. Every sample of TeaCSS with its Rust engine was slower than every sample of Tailwind CSS v4\./);
-  assert.match(text, /Generating the CSS is only part of that cost: 50 % for Tailwind CSS v4 and 2 % for TeaCSS with its Rust engine\./);
-  assert.match(text, /over 30 files instead of 3 changed each tool's CSS cost by: Tailwind CSS v4 1\.0×, TeaCSS with its Rust engine 10\.0×/);
-  assert.match(text, /\[report\]\(docs\/reports\/2026-10-21T09-19-14-mac\.md\)/);
+  assert.match(text, /### Results from 2026-10-21/);
+  assert.match(text, /\*\*Generating the CSS for 10,000 classes\*\* \(median of 30 runs\)/);
+  assert.match(text, /\| TeaCSS \(Rust engine\) \| 10\.00 s \|\n\| Tailwind CSS v4 \| 15\.00 s \(1\.5× slower\) \|/);
+  assert.match(text, /\*\*Building a Vite project with those classes in 30 files\*\* \(median of 30 runs; the project builds in 101 ms with no CSS tool\)/);
+  assert.match(text, /\| Tailwind CSS v4 \| 30\.10 s \| 30\.00 s \|/);
+  assert.match(text, /- TeaCSS \(Rust engine\) generates the CSS fastest; Tailwind CSS v4 finishes the whole build fastest\./);
+  assert.match(text, /- For TeaCSS \(Rust engine\), generating the CSS is only 2 % of the CSS cost in the build/);
+  assert.match(text, /- TeaCSS \(Rust engine\) gets 10\.0× slower when the same classes are spread over 30 files instead of 3; the other tools do not care/);
+  assert.match(text, /- @teacss\/engine 0\.8\.5-alpha\.4, tailwindcss 4\.3\.3; one Apple M2 Max, Node v24\.14\.1\./);
+  assert.match(text, /\[Full report\]\(docs\/reports\/2026-10-21T09-19-14-mac\.md\) · \[audit\]/);
+  assert.ok(!text.includes("Per 1,000"));
   assert.equal(text, renderReadmeSummary(buildReport(record()), "2026-10-21T09-19-14-mac"));
 });
 
