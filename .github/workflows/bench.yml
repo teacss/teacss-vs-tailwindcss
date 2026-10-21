@@ -1,0 +1,36 @@
+name: bench
+
+on:
+  workflow_dispatch:
+    inputs:
+      utilities:
+        description: comma-separated utility counts
+        default: "1000,5000,20000"
+      files:
+        description: comma-separated file counts
+        default: "3,30,300"
+      samples:
+        description: samples per subject and cell
+        default: "30"
+  schedule:
+    - cron: "0 3 * * 1"
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm bench:verify
+      - run: node apps/bench/src/main.ts run --utilities "${{ github.event.inputs.utilities || '1000,5000,20000' }}" --files "${{ github.event.inputs.files || '3,30,300' }}" --samples "${{ github.event.inputs.samples || '30' }}" --allow-busy --out results-ci
+      - run: for file in results-ci/*.json; do node apps/bench/src/main.ts report "$file" --out results-ci; done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bench-results
+          path: results-ci

@@ -74,19 +74,23 @@
 
 ## 第 6 片：统计与报告
 
-- [ ] `packages/benchmark/features/report`：纯函数统计（中位数、四分位距、p95、最小值、Mann-Whitney 秩和检验、Cliff's delta 效应量）；build 层减去 `vite-baseline` 的增量；相对最快者的倍数；「无可测差异」判定规则按规格。
-- [ ] 报告模板（Markdown）：结论一句话、每层级每规模一张表、环境块、版本块、语料哈希与配对表版本、限制因素段落（来自一次不计入统计的 `node --cpu-prof`，列前三个自耗时帧）、benchmark-checklist 七问逐条作答、已知限制（结构等价而非值等价、作者利益关系、CI 噪声）。
-- [ ] 同时产出 JSON 摘要供外部工具读取。
-- 验收：对同一份 `results/*.json` 两次生成的报告逐字节相同；对两份人工构造的接近样本集，报告输出「无可测差异」；统计函数有针对已知分布的单元测试。
-- 验证命令：`node apps/bench/src/main.ts report results/<file>.json --out docs/reports/`。
+完成于 2026-10-21。
+
+- [x] `features/report/statistics.ts`：中位数、四分位距、p95、最小值；Mann-Whitney U（正态近似、结校正）；Cliff's delta；`compare` 按规格判「differs」或「no measurable difference」（p < 0.01 且中位数差距大于较大的 IQR）。
+- [x] `features/report/index.ts`：按层级 × 规模格 × 对象建表，build 层给出相对基线的增量；每格以最低中位数者为基准对其余对象判定；Markdown 含结论段、表格、环境、版本、语料与负载、限制因素、七问作答、已知限制；JSON 摘要。同一记录两次渲染逐字节相同。
+- [x] `bench report <results.json> --out docs/reports`。
+- 验收：统计函数对已知分布有单元测试；合成记录里分离的两组判 differs、交错的两组判无差异；报告在真实的排练记录上能渲染。
 
 ## 第 7 片：CI 与第一份报告
 
-- [ ] `.github/workflows/bench.yml`：`workflow_dispatch` 与每周一次，ubuntu-latest，`pnpm bench`，上传 `results/` 与报告为 artifact；不自动提交，由人工审阅后合入。
-- [ ] 本机（M2 Max，负载低于阈值，关闭其他程序）跑一次全矩阵；CI 跑一次作为第二台机器的交叉验证。
-- [ ] 按 benchmark-checklist 逐问审核：限制因素、调优、极限算术（字节/秒对磁盘、CSS 行数对核数）、错误计数、可复现性、相关性（engine 占 build 的比例）、工作确实发生（输出哈希与等价校验）。
-- [ ] 发布 `docs/reports/<date>.md`，README 每层一个主数字并链接报告与原始数据。
-- 验收：报告的每个数字都能从提交的 `results/*.json` 重新生成；README 的复现命令在干净 clone 上一次跑通。
+进行中（2026-10-21）。
+
+- [x] `features/profile`：解析 V8 `.cpuprofile`，按函数汇总自耗时；`bench run` 在测量结束后对最大的格每个对象每个层级跑一次不计数的 `--cpu-prof` 子进程（`--no-profile` 跳过），结果写入记录的 `limiters`，报告的 Limiter 段渲染前三帧。
+- [x] `.github/workflows/bench.yml`：手动触发（可传规模与样本数）与每周一次，先 `bench:verify`，再 `--allow-busy` 跑矩阵，报告与原始记录作为 artifact 上传，不自动提交。
+- [x] 根脚本 `bench`、`bench:verify`、`bench:report`。
+- [ ] 本机正式运行：需要一分钟负载低于核数 20%（M2 Max 为 2.4）。2026-10-21 本机负载 6 到 8，负载门拒绝；排练记录只证明管线。
+- [ ] CI 交叉验证运行。
+- [ ] 按 benchmark-checklist 审核后发布 `docs/reports/<date>.md`，README 每层一个主数字。
 
 ## 第二阶段（另立提案）
 

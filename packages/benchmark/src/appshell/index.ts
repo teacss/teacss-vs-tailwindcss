@@ -1,9 +1,13 @@
+import { mkdirSync, writeFileSync } from "node:fs";
+import { basename, join } from "node:path";
 import { type Invocation, parseInvocation, subjectId } from "@bench/infrastructure";
 import { DEFAULT_SEED, generateCorpus, PAIR_TABLE_VERSION, profileCorpus } from "../features/corpus/index.ts";
 import { captureEnvironment, loadShare } from "../features/environment/index.ts";
 import { measure, type Tier } from "../features/measure/run.ts";
+import { profileSubjects } from "../features/profile/run.ts";
+import { buildReport, renderMarkdown, renderSummary } from "../features/report/index.ts";
 import { verifyCorpus } from "../features/verify/run.ts";
-import { type RunRecord, writeRunRecord } from "../persistence/index.ts";
+import { type RunRecord, readRunRecord, writeRunRecord } from "../persistence/index.ts";
 import { invokeSubject, productionRegistry, type SubjectRegistry } from "../subjects/index.ts";
 
 export interface AppDeps {
@@ -27,7 +31,9 @@ const USAGE = `bench <command>
   run         measure the scale matrix and write results/<time>-<host>.json
               --utilities <a,b,c> (1000,5000,20000)  --files <a,b,c> (3,30,300)
               --samples <n> (30)  --tier engine|build|all (all)  --subjects <a,b>
-              --seed <n>  --out <dir> (results)  --allow-busy
+              --seed <n>  --out <dir> (results)  --allow-busy  --no-profile
+  report      render a results file as Markdown and a JSON summary
+              <results.json>  --out <dir> (docs/reports)
 `;
 
 const SPEC_REVISION = 1;
@@ -141,6 +147,13 @@ export async function createApp(deps: AppDeps): Promise<number> {
       loadShare,
       progress: (message) => deps.stdout(`  ${message}\n`),
     });
+    const largest = plan.cells.reduce((best, cell) => (cell.utilities * cell.files >= best.utilities * best.files ? cell : best));
+    const limiters = invocation.options.has("no-profile")
+      ? {}
+      : await profileSubjects(largest, plan.seed, plan.subjects, plan.tiers, async (subject, task, nodeArgs) => {
+          deps.stdout(`  profiling ${subject} ${task.kind} on ${largest.utilities}x${largest.files} (not counted)\n`);
+          await invokeSubject(registry, subject, task, { ...processDeps, nodeArgs });
+        });
     const record: RunRecord = {
       version: 1,
       specRevision: SPEC_REVISION,
@@ -154,9 +167,22 @@ export async function createApp(deps: AppDeps): Promise<number> {
       subjects,
       cells: output.cells,
       samples: output.samples,
+      limiters,
     };
     const path = writeRunRecord(typeof invocation.options.get("out") === "string" ? String(invocation.options.get("out")) : "results", record);
     deps.stdout(`run: ${output.samples.length} samples over ${output.cells.length} cell(s) written to ${path}\n`);
+    return 0;
+  };
+  commands["report"] = async (invocation) => {
+    const [file] = invocation.positionals;
+    if (file === undefined) throw new Error("report needs the results file to render");
+    const model = buildReport(readRunRecord(file));
+    const out = typeof invocation.options.get("out") === "string" ? String(invocation.options.get("out")) : "docs/reports";
+    const stem = basename(file, ".json");
+    mkdirSync(out, { recursive: true });
+    writeFileSync(join(out, `${stem}.md`), renderMarkdown(model));
+    writeFileSync(join(out, `${stem}.summary.json`), renderSummary(model));
+    deps.stdout(`report: ${join(out, `${stem}.md`)} and ${join(out, `${stem}.summary.json`)}\n`);
     return 0;
   };
   const command = commands[invocation.command ?? "help"];

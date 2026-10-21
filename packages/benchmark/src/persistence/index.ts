@@ -3,6 +3,7 @@ import { join } from "node:path";
 import type { SubjectId, SubjectVersions } from "@bench/infrastructure";
 import type { EngineScenario } from "../contract/index.ts";
 import type { EnvironmentRecord } from "../features/environment/index.ts";
+import type { ProfileSummary } from "../features/profile/index.ts";
 
 export const RECORD_VERSION = 1;
 
@@ -43,6 +44,8 @@ export interface RunRecord {
   readonly subjects: Readonly<Record<string, SubjectVersions>>;
   readonly cells: readonly CellRecord[];
   readonly samples: readonly Sample[];
+  /** One uncounted `--cpu-prof` pass per subject and tier on the largest cell, keyed `subject/tier`. */
+  readonly limiters: Readonly<Record<string, ProfileSummary>>;
 }
 
 export function recordFileName(record: RunRecord): string {

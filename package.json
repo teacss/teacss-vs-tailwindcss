@@ -11,6 +11,9 @@
     "node": ">=24.0.0"
   },
   "scripts": {
+    "bench": "node apps/bench/src/main.ts run",
+    "bench:report": "node apps/bench/src/main.ts report",
+    "bench:verify": "node apps/bench/src/main.ts verify",
     "check": "pnpm lint:check && pnpm typecheck && pnpm test && pnpm check:layout && pnpm check:dependencies",
     "check:dependencies": "node scripts/check-dependencies.ts",
     "check:layout": "node scripts/check-layout.ts",

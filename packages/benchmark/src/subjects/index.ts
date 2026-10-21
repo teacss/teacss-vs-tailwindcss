@@ -10,6 +10,7 @@ export interface SubjectProcessDeps {
   readonly cwd: string;
   readonly env: Readonly<Record<string, string>>;
   readonly timeoutMs: number;
+  readonly nodeArgs?: readonly string[];
 }
 
 export class SubjectProcessError extends Error {
@@ -32,7 +33,7 @@ export async function invokeSubject(registry: SubjectRegistry, subject: SubjectI
   const registration = registry.get(subject);
   if (registration === undefined) throw new Error(`${subject}: not a registered subject (${[...registry.keys()].join(", ") || "none registered"})`);
   const request: SubjectRequest = { version: CONTRACT_VERSION, sentAt: Date.now(), subject, module: registration.module, task };
-  const process = await runProcess(deps.subjectEntry, { args: [], cwd: deps.cwd, env: { ...deps.env, ...registration.env }, stdin: JSON.stringify(request), timeoutMs: deps.timeoutMs });
+  const process = await runProcess(deps.subjectEntry, { nodeArgs: deps.nodeArgs ?? [], args: [], cwd: deps.cwd, env: { ...deps.env, ...registration.env }, stdin: JSON.stringify(request), timeoutMs: deps.timeoutMs });
   if (process.signal !== null) throw new SubjectProcessError(subject, `killed by ${process.signal} after ${deps.timeoutMs} ms`, process);
   let parsed: unknown;
   try {

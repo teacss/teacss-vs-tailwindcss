@@ -7,10 +7,11 @@ and Tailwind CSS v4 (Oxide).
 
 ## Status
 
-No results yet. The direction is recorded in the
-[proposal](docs/proposals/v01-credible-benchmark.md) and the work is sliced in
-the [plan](docs/plans/v01-credible-benchmark.md). The repository currently
-holds the workspace skeleton and the checks that keep its structure honest.
+No published results yet. The method is [spec v01.1](docs/specs/v01.1-benchmark-protocol.md),
+the direction is the [proposal](docs/proposals/v01-credible-benchmark.md) and the
+work is sliced in the [plan](docs/plans/v01-credible-benchmark.md). The pipeline
+runs end to end on all four subjects; the first published run waits for a quiet
+machine (the run refuses to start above 20 % one-minute load).
 
 ## Layout
 
@@ -44,6 +45,20 @@ pnpm check
 `pnpm check` runs Biome, the per-package type checks, the tests and both
 structure checks. Each script can run on its own: `pnpm lint:check`,
 `pnpm typecheck`, `pnpm test`, `pnpm check:layout`, `pnpm check:dependencies`.
+
+## Measure
+
+```sh
+pnpm bench:verify --utilities 5000 --files 30   # equivalence checks on one corpus
+pnpm bench                                        # the full matrix, 30 samples per cell, into results/
+pnpm bench:report results/<file>.json             # Markdown and JSON summary into docs/reports/
+```
+
+`pnpm bench` refuses to start when the one-minute load exceeds 20 % of the
+logical cores; `--allow-busy` records the run anyway and the report says so.
+`node apps/bench/src/main.ts --help` lists every option. Use pnpm: npm refuses
+to install the published `@teacss/core` 0.8.5 beside `@teacss/engine`
+0.8.5-alpha.3 ([ADR-0003](docs/adrs/ADR-0003-published-packages.md)).
 
 ## Credits
 
