@@ -80,3 +80,18 @@ visitor 一项就是 379 ms，和 433 ms 减去 load 之外的杂项相符。CPU
 4. **开发态不出 sourcemap**，除非 `css.devSourcemap`。TeaCSS 也一样。
 
 一句话：差距不在引擎，也不在插件的失效逻辑，而在开发态每次 transform 都让 lightningcss 带着 JS visitor 走一遍整张样式表。把 visitor 限制在构建态，dev 层就从 530 ms 回到 190 ms 左右，低于 Tailwind 的 332 ms。
+
+## 后续：teacss-ts d01a30dc 的复测
+
+teacss-ts 在 `d01a30dc`（#900）里让 visitor 工厂对 TeaCSS 自己的样式表只交出用户的 visitor，不再挂 Rule 和 Declaration 回调；作者写的 CSS 文件在开发态仍然走修复。构建最后的 minify 也不再带这个 visitor。本地链接到这个提交，同一协议、同一个格、每个被测 30 个样本，修订 3 的计时：
+
+| 层 | Tailwind v4 | teacss-rs | teacss-ts |
+| --- | --- | --- | --- |
+| dev +10 | 337 → 336 ms | 530 → **179 ms** | 633 → 274 ms |
+| dev +100 | 392 → 409 ms | 572 → **204 ms** | 682 → 312 ms |
+| build | 1 032 → 1 104 ms | 1 126 → **803 ms** | 1 594 → 1 311 ms |
+
+构建哈希仍是 `f4ea28ce…`，dev 层 60 轮的输出 ts 和 rs 逐轮相同。这次复测机器不安静（开始时负载 14.7，格前后的负载份额 110% 和 48%），所以 Tailwind 和基线比正式运行慢了 7%，TeaCSS 的降幅远大于这个噪声。不作为正式记录。
+
+剩下的 179 ms 里引擎重新生成约 90 ms，Vite 的 transform 约 44 ms，其余是文件事件和请求往返。未做的两项（字体 `url()` 走 postcss 快速路径、去掉 20 ms 去抖）各值约 20 ms，现在最大的一块是对全部 token 的重新生成。
+
