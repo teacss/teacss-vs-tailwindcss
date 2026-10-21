@@ -3,6 +3,7 @@ import { join } from "node:path";
 import type { SubjectId, SubjectVersions } from "@bench/infrastructure";
 import type { DevSize, EngineScenario } from "../contract/index.ts";
 import type { EnvironmentRecord } from "../features/environment/index.ts";
+import type { PriceRecord } from "../features/price/index.ts";
 import type { ProfileSummary } from "../features/profile/index.ts";
 
 export const RECORD_VERSION = 1;
@@ -20,10 +21,13 @@ interface SampleBase {
   readonly cssBytes: number;
   readonly cssSha256: string;
   readonly nativeModules: readonly string[];
+  /** Absent in records written before spec v02.1. */
+  readonly rules?: number;
+  readonly declarations?: number;
 }
 
 export type Sample =
-  | (SampleBase & { readonly tier: "engine"; readonly scenario: EngineScenario })
+  | (SampleBase & { readonly tier: "engine"; readonly scenario: EngineScenario; readonly cpuMs?: number; readonly rssBytes?: number; readonly heapBytes?: number })
   | (SampleBase & { readonly tier: "dev"; readonly size: DevSize; readonly polls: number })
   | (SampleBase & { readonly tier: "build"; readonly cpuUserMs: number; readonly cpuSystemMs: number; readonly maxRssBytes: number; readonly cssGzipBytes: number });
 
@@ -49,6 +53,8 @@ export interface RunRecord {
   readonly samples: readonly Sample[];
   /** One uncounted `--cpu-prof` pass per subject and tier on the largest cell, keyed `subject/tier`. */
   readonly limiters: Readonly<Record<string, ProfileSummary>>;
+  /** Spec v02.1 price of Rust; absent when the run skipped it or predates it. */
+  readonly price?: PriceRecord;
 }
 
 export function recordFileName(record: RunRecord): string {

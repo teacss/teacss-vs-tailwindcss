@@ -30,3 +30,16 @@ test("a dev request round-trips and an unknown size is refused", () => {
   assert.deepEqual(parseSubjectRequest(JSON.parse(JSON.stringify(request))), request);
   assert.throws(() => parseSubjectRequest({ ...request, task: { ...request.task, size: 7 } }), /dev size 7 is not one of 10, 100/);
 });
+
+test("native-load and coverage requests round-trip, and a describe response keeps its native artifact", () => {
+  for (const task of [
+    { kind: "native-load", path: "/x.node" },
+    { kind: "coverage", entries: ["/a.css"] },
+  ]) {
+    const request = { version: 1, sentAt: 1, subject: "fake", module: "m", task };
+    assert.deepEqual(parseSubjectRequest(JSON.parse(JSON.stringify(request))), request);
+  }
+  const native = { package: "@x/n", file: "n.node", path: "/n.node", bytes: 1, platformPackages: 2 };
+  const response = parseSubjectResponse({ version: 1, sentAt: 0, subject: "fake", nativeModules: [], usage, result: { kind: "describe", versions: { packages: {}, local: {}, native } } });
+  assert.deepEqual(response.result, { kind: "describe", versions: { packages: {}, local: {}, native } });
+});

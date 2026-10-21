@@ -14,6 +14,26 @@ export interface SubjectVersions {
   readonly packages: Readonly<Record<string, string>>;
   /** Packages resolved outside the lockfile's store, by package name to their real directory. Empty for a reproducible run. */
   readonly local: Readonly<Record<string, string>>;
+  /** The native binary the subject loads, if any; absent before spec v02.1. */
+  readonly native?: NativeArtifact;
+}
+
+export interface NativeArtifact {
+  /** The platform package installed for this machine, such as `@teacss/engine-darwin-arm64`. */
+  readonly package: string;
+  readonly file: string;
+  /** Absolute path of the `.node` file, so a fresh process can load it without importing the tool. */
+  readonly path: string;
+  readonly bytes: number;
+  /** Platform packages the tool publishes, from its `optionalDependencies`. */
+  readonly platformPackages: number;
+}
+
+export interface CoverageResult {
+  readonly entry: string;
+  readonly served: boolean;
+  /** Why the native engine cannot serve the configuration, as the engine reports it. */
+  readonly reason: string | undefined;
 }
 
 export interface EngineInput {
@@ -61,6 +81,8 @@ export interface SubjectClient {
   devServer(workspace: Workspace): Promise<DevServer>;
   /** Text the tool needs at the top of a source module before it reads the classes in it. */
   readonly moduleHeader: string;
+  /** Whether the native engine can serve each entry stylesheet's configuration; empty for a subject without one. */
+  coverage(entries: readonly string[]): Promise<readonly CoverageResult[]>;
 }
 
 /** What a subject module exports; the subject process imports one module and calls this once. */

@@ -13,12 +13,17 @@ const plan: RunPlan = { seed: 1, cells: [{ utilities: 20, files: 2 }], tiers: ["
 
 function fakeMeasured(task: SubjectTask, hash = "same"): Measured {
   const usage = { cpuUserMs: 1, cpuSystemMs: 1, maxRssBytes: 1 };
-  if (task.kind === "build") return { result: { kind: "build", cssBytes: 10, cssGzipBytes: 5, cssSha256: hash, css: undefined }, nativeModules: [], usage, wallMs: 7 };
+  if (task.kind === "build") return { result: { kind: "build", cssBytes: 10, cssGzipBytes: 5, cssSha256: hash, output: { rules: 1, declarations: 2 }, css: undefined }, nativeModules: [], usage, wallMs: 7 };
   if (task.kind === "dev") return { result: { kind: "dev", samples: task.extra.map((group) => ({ wallMs: 5, polls: 2, cssBytes: 10, cssSha256: group.join(",") })) }, nativeModules: [], usage, wallMs: 9 };
   if (task.kind !== "engine") throw new Error("unexpected task");
   const count = task.scenario === "cold" ? 1 : WARM_TIMED_ITERATIONS;
   const perCall = task.extra.length > 0;
-  return { result: { kind: "engine", samples: Array.from({ length: count }, (_, call) => ({ wallMs: 1, cssBytes: 10, cssSha256: perCall ? `${hash}-${task.extra[call]?.join(",")}` : hash })), css: undefined }, nativeModules: [], usage, wallMs: 3 };
+  return {
+    result: { kind: "engine", samples: Array.from({ length: count }, (_, call) => ({ wallMs: 1, cssBytes: 10, cssSha256: perCall ? `${hash}-${task.extra[call]?.join(",")}` : hash, cpuMs: 1, rssBytes: 1, heapBytes: 1 })), output: { rules: 1, declarations: 2 }, css: undefined },
+    nativeModules: [],
+    usage,
+    wallMs: 3,
+  };
 }
 
 test("every subject and tier reaches its sample count, interleaved round by round, with the cell's corpus hash and load", async () => {

@@ -41,4 +41,5 @@ export const createSubject: SubjectFactory = (): SubjectClient => ({
     throw new Error("vite-baseline has no dev tier");
   },
   moduleHeader: "",
+  coverage: async () => [],
 });

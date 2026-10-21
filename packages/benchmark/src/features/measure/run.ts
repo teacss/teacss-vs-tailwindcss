@@ -122,12 +122,29 @@ function toSamples(job: Job, cell: Cell, index: number, measured: Measured): Sam
         cssGzipBytes: result.cssGzipBytes,
         cssSha256: result.cssSha256,
         nativeModules: measured.nativeModules,
+        rules: result.output.rules,
+        declarations: result.output.declarations,
       },
     ];
   }
   if (result.kind !== "engine") throw new RunInvalid(`${job.subject.id}: expected an engine result, got ${result.kind}`);
   if (result.samples.length !== job.samples) throw new RunInvalid(`${job.subject.id}: expected ${job.samples} engine sample(s), got ${result.samples.length}`);
-  return result.samples.map((sample, offset) => ({ tier: "engine", scenario: job.scenario ?? "cold", subject: job.subject.id, cell, index: index + offset, wallMs: sample.wallMs, cssBytes: sample.cssBytes, cssSha256: sample.cssSha256, nativeModules: measured.nativeModules }));
+  return result.samples.map((sample, offset) => ({
+    tier: "engine",
+    scenario: job.scenario ?? "cold",
+    subject: job.subject.id,
+    cell,
+    index: index + offset,
+    wallMs: sample.wallMs,
+    cpuMs: sample.cpuMs,
+    rssBytes: sample.rssBytes,
+    heapBytes: sample.heapBytes,
+    cssBytes: sample.cssBytes,
+    cssSha256: sample.cssSha256,
+    nativeModules: measured.nativeModules,
+    rules: result.output.rules,
+    declarations: result.output.declarations,
+  }));
 }
 
 /**
