@@ -91,8 +91,9 @@
 - [x] `--subjects` 同时作用于 `run` 与 `verify`，未知名字报错；子集运行的报告在结论前写明「Subset run」与未测对象。根脚本 `bench:ts-tailwind` 跑 vite-baseline、teacss-ts、tailwind-v4。
 - [x] 被测 TeaCSS 换成 0.9.0-alpha.1（所有者 2026-10-21 决定）：`@teacss/core`、`@teacss/vite`、`@teacss/preset-standard` 0.9.0-alpha.1，引擎用 `@teacss/vite` 依赖的 `@teacss/engine` 0.8.5-alpha.4。规格升到修订 2。`bench:verify` 在 5000 × 30 与 20000 × 300 上四个对象全部通过，Rust 进程在严格模式下加载 `teacss-engine`，ts 与 rs 输出逐字节相同。第一份报告因此包含全部四个对象，取代下面「只含 ts 与 Tailwind」那一项。
 - [x] ~~第一份报告只含 teacss-ts 与 Tailwind v4~~，被上一项取代。本机正式运行需要一分钟负载低于 2.4；当天 teacss-rs 会话持续运行 `cargo check`，负载在 5 到 24 之间。
+- [x] 本机正式运行（2026-10-21 17:19–17:43，四个对象全矩阵，2 700 个样本，开跑负载 13%）：`results/2026-10-21T09-19-14-mac.json`。
 - [ ] CI 交叉验证运行。
-- [ ] 按 benchmark-checklist 审核后发布 `docs/reports/<date>.md`，README 每层一个主数字。
+- [x] 报告 `docs/reports/2026-10-21T09-19-14-mac.md` 与手写审核 `.audit.md`（审核单独成文件，报告保持可逐字节重生成）；README Status 给出引擎与构建两层的主数字；规格 v01.1 标为 accepted。
 - [x] 本地构建模式（2026-10-21，按所有者要求先写代码、不跑测量、不加新单测）：`scripts/link-local.ts`（`bun run bench:link status|link --ts <dir>|unlink`）把 teacss 被测对象的 core、vite、preset-standard 接到已构建的 teacss-ts 检出，engine 跟随 core 解析；被测对象按真实路径报告版本，`node_modules/.bun` 以外的包进 `local`，报告首行标「Local build, not for publication」。`status` 已在本机跑过；`link`/`unlink` 未实际执行，因为它会改 `packages/subject-teacss/node_modules`，而 teacss-ts 检出正由另一会话修改。
 - [ ] teacss-rs 加入：未发布时用本地构建模式先排练（teacss-rs 的 `dev-link.mjs link` 接进 teacss-ts，再 `bench:link link`），只作内部参考；teacss-rs 优化完成并发布新的 `@teacss/engine` 后，更新 `packages/subject-teacss/package.json` 的引擎版本与 `bun.lock`，先跑四对象 `bench:verify`（强等价必须通过），再跑全矩阵，作为第二份报告；规格修订号与 `engineCompat` 变化写进报告。
 

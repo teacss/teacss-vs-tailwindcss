@@ -7,11 +7,21 @@ and Tailwind CSS v4 (Oxide).
 
 ## Status
 
-No published results yet. The method is [spec v01.1](docs/specs/v01.1-benchmark-protocol.md),
-the direction is the [proposal](docs/proposals/v01-credible-benchmark.md) and the
-work is sliced in the [plan](docs/plans/v01-credible-benchmark.md). The pipeline
-runs end to end on all four subjects; the first published run waits for a quiet
-machine (the run refuses to start above 20 % one-minute load).
+First run, 2026-10-21, TeaCSS 0.9.0-alpha.1 (Rust engine 0.8.5-alpha.4) against
+Tailwind CSS v4.3.3 on Vite 8.3.4, Apple M2 Max. Medians at 20 000 utilities in
+300 files, 30 interleaved samples each:
+
+| Tier | teacss-rs | Tailwind v4 | teacss-ts |
+| --- | --- | --- | --- |
+| Engine, warm process | **155 ms** | 222 ms (1.43x) | 446 ms (2.87x) |
+| Vite build | 1 748 ms (2.13x) | **819 ms** | 3 750 ms (4.58x) |
+
+The Rust engine generates CSS faster than Tailwind's compiler, but a TeaCSS Vite
+build is still slower, because the build waits on the `@teacss/vite` pipeline
+rather than on the engine. Read the [report](docs/reports/2026-10-21T09-19-14-mac.md),
+its [audit](docs/reports/2026-10-21T09-19-14-mac.audit.md) and the
+[raw samples](results/2026-10-21T09-19-14-mac.json). The method is
+[spec v01.1](docs/specs/v01.1-benchmark-protocol.md).
 
 ## Layout
 

@@ -1,0 +1,2220 @@
+{
+  "startedAt": "2026-10-21T09:19:14.627Z",
+  "specRevision": 2,
+  "tables": [
+    {
+      "series": "engine/cold",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "rows": [
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 101.054167,
+            "q1": 102.83239599999999,
+            "median": 104.8533125,
+            "q3": 106.35240625,
+            "iqr": 3.5200102500000128,
+            "p95": 110.32377964999999,
+            "max": 111.07925
+          },
+          "cssBytes": 91861
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 150.460208,
+            "q1": 153.50177075,
+            "median": 154.89779199999998,
+            "q3": 156.75264525,
+            "iqr": 3.250874500000009,
+            "p95": 159.231775,
+            "max": 160.804625
+          },
+          "cssBytes": 91861
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 114.834833,
+            "q1": 118.88053175,
+            "median": 120.22758350000001,
+            "q3": 121.0403645,
+            "iqr": 2.1598327499999925,
+            "p95": 126.50163909999999,
+            "max": 128.689458
+          },
+          "cssBytes": 207017
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.1466264692400634,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.4772808632059191,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/cold",
+      "cell": {
+        "utilities": 1000,
+        "files": 30
+      },
+      "rows": [
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 119.582375,
+            "q1": 120.46163575,
+            "median": 121.70847900000001,
+            "q3": 124.936469,
+            "iqr": 4.474833250000003,
+            "p95": 128.0586295,
+            "max": 134.58175
+          },
+          "cssBytes": 207017
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 153.532083,
+            "q1": 154.68673925,
+            "median": 156.3203755,
+            "q3": 158.80987525,
+            "iqr": 4.123136000000017,
+            "p95": 164.55326685,
+            "max": 167.036125
+          },
+          "cssBytes": 91861
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 103.728333,
+            "q1": 105.19242775000001,
+            "median": 106.1318745,
+            "q3": 107.97524999999999,
+            "iqr": 2.782822249999981,
+            "p95": 111.1653792,
+            "max": 113.364292
+          },
+          "cssBytes": 91861
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.1467665069837245,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.4728881048831377,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/cold",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "rows": [
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 104.473875,
+            "q1": 105.72393725,
+            "median": 106.35193749999999,
+            "q3": 107.11825025,
+            "iqr": 1.3943129999999968,
+            "p95": 110.5746102,
+            "max": 112.389
+          },
+          "cssBytes": 91861
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 119.628,
+            "q1": 121.15688574999999,
+            "median": 122.6370415,
+            "q3": 124.66665675,
+            "iqr": 3.509771000000015,
+            "p95": 130.33577904999999,
+            "max": 131.863208
+          },
+          "cssBytes": 207017
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 154.032917,
+            "q1": 156.14550025,
+            "median": 157.4151245,
+            "q3": 158.92101050000002,
+            "iqr": 2.775510250000025,
+            "p95": 162.2118606,
+            "max": 170.539291
+          },
+          "cssBytes": 91861
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.153124657460989,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.4801340549155486,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/cold",
+      "cell": {
+        "utilities": 5000,
+        "files": 3
+      },
+      "rows": [
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 268.206917,
+            "q1": 272.104719,
+            "median": 274.8603125,
+            "q3": 279.00821874999997,
+            "iqr": 6.90349974999998,
+            "p95": 281.84597065,
+            "max": 282.821791
+          },
+          "cssBytes": 379015
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 169.241708,
+            "q1": 171.31031275,
+            "median": 172.585396,
+            "q3": 176.09124975,
+            "iqr": 4.780936999999994,
+            "p95": 180.18050015,
+            "max": 181.101041
+          },
+          "cssBytes": 1003742
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 134.467708,
+            "q1": 136.48001050000002,
+            "median": 137.1880835,
+            "q3": 138.25880225,
+            "iqr": 1.7787917499999821,
+            "p95": 142.2007705,
+            "max": 143.669625
+          },
+          "cssBytes": 379015
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.258020314862114,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.0035290638053125,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/cold",
+      "cell": {
+        "utilities": 5000,
+        "files": 30
+      },
+      "rows": [
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 135.689125,
+            "q1": 136.40445875,
+            "median": 137.71800000000002,
+            "q3": 138.35693725,
+            "iqr": 1.9524784999999838,
+            "p95": 141.7061731,
+            "max": 144.402042
+          },
+          "cssBytes": 379015
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 268.910458,
+            "q1": 271.6824685,
+            "median": 273.5960205,
+            "q3": 275.8243125,
+            "iqr": 4.141843999999992,
+            "p95": 279.0005205,
+            "max": 281.329167
+          },
+          "cssBytes": 379015
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 167.939542,
+            "q1": 170.99096875,
+            "median": 172.890354,
+            "q3": 174.51893775000002,
+            "iqr": 3.527969000000013,
+            "p95": 179.70202935,
+            "max": 185.433667
+          },
+          "cssBytes": 1003742
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.255394022567856,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.986639513353374,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/cold",
+      "cell": {
+        "utilities": 5000,
+        "files": 300
+      },
+      "rows": [
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 133.9595,
+            "q1": 136.79219775,
+            "median": 137.325167,
+            "q3": 138.88829225,
+            "iqr": 2.0960944999999924,
+            "p95": 141.3945122,
+            "max": 142.674583
+          },
+          "cssBytes": 379015
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 167.207958,
+            "q1": 170.8335515,
+            "median": 172.4656045,
+            "q3": 174.30604200000002,
+            "iqr": 3.4724905000000206,
+            "p95": 180.62084115,
+            "max": 181.932875
+          },
+          "cssBytes": 1003742
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 267.972209,
+            "q1": 271.30789599999997,
+            "median": 273.7094585,
+            "q3": 274.51572899999996,
+            "iqr": 3.2078329999999937,
+            "p95": 281.3638288,
+            "max": 283.101834
+          },
+          "cssBytes": 379015
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.2558921883561227,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.9931485573944359,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/cold",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "rows": [
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 658.376667,
+            "q1": 664.090698,
+            "median": 669.768146,
+            "q3": 672.7510104999999,
+            "iqr": 8.660312499999918,
+            "p95": 681.4866789499999,
+            "max": 686.57975
+          },
+          "cssBytes": 1075927
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 253.260875,
+            "q1": 257.11509375,
+            "median": 259.33214599999997,
+            "q3": 262.17830200000003,
+            "iqr": 5.063208250000002,
+            "p95": 265.70831265,
+            "max": 269.648833
+          },
+          "cssBytes": 1075927
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 374.271167,
+            "q1": 378.6923125,
+            "median": 381.2315625,
+            "q3": 386.65542750000003,
+            "iqr": 7.963115000000016,
+            "p95": 398.3177856,
+            "max": 402.837333
+          },
+          "cssBytes": 3947561
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.4700513159675934,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.58266534377115,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/cold",
+      "cell": {
+        "utilities": 20000,
+        "files": 30
+      },
+      "rows": [
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 362.454292,
+            "q1": 378.677031,
+            "median": 383.07975,
+            "q3": 390.43325,
+            "iqr": 11.756218999999987,
+            "p95": 400.11501905,
+            "max": 408.409833
+          },
+          "cssBytes": 3947561
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 656.553583,
+            "q1": 663.3638755,
+            "median": 668.0788955,
+            "q3": 672.3643539999999,
+            "iqr": 9.000478499999986,
+            "p95": 682.5672418500001,
+            "max": 690.082625
+          },
+          "cssBytes": 1075927
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 254.0165,
+            "q1": 256.45054175,
+            "median": 259.1345625,
+            "q3": 260.49907299999995,
+            "iqr": 4.0485312499999395,
+            "p95": 266.09490229999994,
+            "max": 271.925041
+          },
+          "cssBytes": 1075927
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.478304346221666,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.5781157444021,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/cold",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "rows": [
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 368.813,
+            "q1": 379.0309795,
+            "median": 381.68124950000004,
+            "q3": 386.98676025,
+            "iqr": 7.955780749999974,
+            "p95": 395.40461684999997,
+            "max": 424.186917
+          },
+          "cssBytes": 3947561
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 254.143542,
+            "q1": 255.51249975,
+            "median": 257.30125,
+            "q3": 259.579375,
+            "iqr": 4.066875250000038,
+            "p95": 262.8198689,
+            "max": 263.314584
+          },
+          "cssBytes": 1075927
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 659.282666,
+            "q1": 664.93310375,
+            "median": 666.8113335,
+            "q3": 670.190364,
+            "iqr": 5.2572602500000585,
+            "p95": 676.268967,
+            "max": 680.3865
+          },
+          "cssBytes": 1075927
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.4834022357062007,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.5915588575648196,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/warm",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "rows": [
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 8.701917,
+            "q1": 10.9387285,
+            "median": 11.940479,
+            "q3": 13.671937,
+            "iqr": 2.7332085,
+            "p95": 18.663048099999994,
+            "max": 21.440125
+          },
+          "cssBytes": 207017
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 33.249542,
+            "q1": 35.6239685,
+            "median": 36.476979,
+            "q3": 37.28786475,
+            "iqr": 1.6638962500000005,
+            "p95": 41.32610189999999,
+            "max": 44.041333
+          },
+          "cssBytes": 91861
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 10.25075,
+            "q1": 10.5245105,
+            "median": 10.767729,
+            "q3": 11.169927,
+            "iqr": 0.6454164999999996,
+            "p95": 11.895437499999998,
+            "max": 13.926375
+          },
+          "cssBytes": 91861
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "no-measurable-difference",
+            "p": 0.0018114980637283994
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 3.3876204536722647,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/warm",
+      "cell": {
+        "utilities": 1000,
+        "files": 30
+      },
+      "rows": [
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 35.831542,
+            "q1": 37.38385425,
+            "median": 38.569396,
+            "q3": 39.554583750000006,
+            "iqr": 2.1707295000000073,
+            "p95": 41.38012104999999,
+            "max": 44.2055
+          },
+          "cssBytes": 91861
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 10.775917,
+            "q1": 11.13514575,
+            "median": 11.4074165,
+            "q3": 12.131958000000001,
+            "iqr": 0.9968122500000014,
+            "p95": 12.790291999999999,
+            "max": 14.220709
+          },
+          "cssBytes": 91861
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 9.861875,
+            "q1": 11.1525935,
+            "median": 13.0164375,
+            "q3": 13.8896775,
+            "iqr": 2.7370839999999994,
+            "p95": 19.691366449999997,
+            "max": 22.640917
+          },
+          "cssBytes": 207017
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "no-measurable-difference",
+            "p": 0.012999481723188494
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 3.3810807205996203,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/warm",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "rows": [
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 35.990292,
+            "q1": 37.59021875,
+            "median": 38.27431249999999,
+            "q3": 38.98110475,
+            "iqr": 1.3908860000000018,
+            "p95": 40.79181875,
+            "max": 43.020958
+          },
+          "cssBytes": 91861
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 10.281292,
+            "q1": 11.2762085,
+            "median": 13.279396,
+            "q3": 13.812364500000001,
+            "iqr": 2.536156000000002,
+            "p95": 19.672718749999998,
+            "max": 20.2855
+          },
+          "cssBytes": 207017
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 10.771334,
+            "q1": 11.0646355,
+            "median": 11.283042,
+            "q3": 11.93559375,
+            "iqr": 0.870958250000001,
+            "p95": 12.3950625,
+            "max": 12.503458
+          },
+          "cssBytes": 91861
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "no-measurable-difference",
+            "p": 0.001085563101423059
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 3.392197999440221,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/warm",
+      "cell": {
+        "utilities": 5000,
+        "files": 3
+      },
+      "rows": [
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 38.896958,
+            "q1": 39.801687,
+            "median": 40.473,
+            "q3": 40.883187,
+            "iqr": 1.0814999999999984,
+            "p95": 41.6478038,
+            "max": 45.538958
+          },
+          "cssBytes": 379015
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 46.817584,
+            "q1": 47.98366675,
+            "median": 49.238521000000006,
+            "q3": 53.949646,
+            "iqr": 5.965979250000004,
+            "p95": 60.181442,
+            "max": 81.620709
+          },
+          "cssBytes": 1003742
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 111.530625,
+            "q1": 115.49569825,
+            "median": 119.482354,
+            "q3": 123.11691675,
+            "iqr": 7.621218499999998,
+            "p95": 141.68991265,
+            "max": 143.719208
+          },
+          "cssBytes": 379015
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.2165770019519186,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.9521496800336027,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/warm",
+      "cell": {
+        "utilities": 5000,
+        "files": 30
+      },
+      "rows": [
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 39.459417,
+            "q1": 40.29007275,
+            "median": 40.7825835,
+            "q3": 41.28990625,
+            "iqr": 0.9998335000000012,
+            "p95": 42.32588355,
+            "max": 44.769
+          },
+          "cssBytes": 379015
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 46.49225,
+            "q1": 47.9542395,
+            "median": 49.0226045,
+            "q3": 52.12546925,
+            "iqr": 4.171229750000002,
+            "p95": 57.64293505,
+            "max": 58.437417
+          },
+          "cssBytes": 1003742
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 110.267125,
+            "q1": 114.8443025,
+            "median": 119.03687500000001,
+            "q3": 123.426177,
+            "iqr": 8.581874499999998,
+            "p95": 130.62565465,
+            "max": 133.538792
+          },
+          "cssBytes": 379015
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.2020475480666888,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.9188164354521584,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/warm",
+      "cell": {
+        "utilities": 5000,
+        "files": 300
+      },
+      "rows": [
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 108.589208,
+            "q1": 114.637979,
+            "median": 118.82083349999999,
+            "q3": 122.2139895,
+            "iqr": 7.576010499999995,
+            "p95": 134.25087324999998,
+            "max": 138.622625
+          },
+          "cssBytes": 379015
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 38.513917,
+            "q1": 39.71676,
+            "median": 40.201667,
+            "q3": 40.74411475,
+            "iqr": 1.0273547500000006,
+            "p95": 42.69886614999999,
+            "max": 45.566917
+          },
+          "cssBytes": 379015
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 47.02225,
+            "q1": 47.9648435,
+            "median": 49.9002915,
+            "q3": 55.1879685,
+            "iqr": 7.223124999999996,
+            "p95": 71.08962759999993,
+            "max": 82.326667
+          },
+          "cssBytes": 1003742
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.2412493118755499,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.955619564233493,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/warm",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "rows": [
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 413.827291,
+            "q1": 433.5300935,
+            "median": 449.8302915,
+            "q3": 461.08887525,
+            "iqr": 27.55878174999998,
+            "p95": 485.5957375,
+            "max": 519.536083
+          },
+          "cssBytes": 1075927
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 150.555541,
+            "q1": 152.58169825,
+            "median": 154.7990415,
+            "q3": 156.330125,
+            "iqr": 3.7484267500000215,
+            "p95": 158.82868125,
+            "max": 159.61825
+          },
+          "cssBytes": 1075927
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 202.142042,
+            "q1": 208.202396,
+            "median": 215.372062,
+            "q3": 246.9504265,
+            "iqr": 38.7480305,
+            "p95": 278.5721106,
+            "max": 287.09275
+          },
+          "cssBytes": 3947561
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.391301004922566,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.9058984289641097,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/warm",
+      "cell": {
+        "utilities": 20000,
+        "files": 30
+      },
+      "rows": [
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 207.992375,
+            "q1": 221.0148745,
+            "median": 227.8118545,
+            "q3": 245.9048955,
+            "iqr": 24.89002100000002,
+            "p95": 282.47737905,
+            "max": 287.937416
+          },
+          "cssBytes": 3947561
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 412.815416,
+            "q1": 428.7412395,
+            "median": 442.623646,
+            "q3": 458.3273955,
+            "iqr": 29.586156000000017,
+            "p95": 494.07201265,
+            "max": 495.908167
+          },
+          "cssBytes": 1075927
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 151.328458,
+            "q1": 152.495052,
+            "median": 155.058833,
+            "q3": 156.29058325,
+            "iqr": 3.7955312500000105,
+            "p95": 158.82362865,
+            "max": 159.506791
+          },
+          "cssBytes": 1075927
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.4691962405005332,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.8545529295967293,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "engine/warm",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "rows": [
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 208.688084,
+            "q1": 217.96339575,
+            "median": 221.8451665,
+            "q3": 257.73320875,
+            "iqr": 39.76981300000003,
+            "p95": 285.4409583,
+            "max": 293.499125
+          },
+          "cssBytes": 3947561
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 149.915625,
+            "q1": 152.187052,
+            "median": 155.0745625,
+            "q3": 157.605021,
+            "iqr": 5.417968999999999,
+            "p95": 159.2741984,
+            "max": 161.814167
+          },
+          "cssBytes": 1075927
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 417.871458,
+            "q1": 434.5604685,
+            "median": 445.5630415,
+            "q3": 457.0752605,
+            "iqr": 22.514792,
+            "p95": 478.28539374999997,
+            "max": 496.412792
+          },
+          "cssBytes": 1075927
+        }
+      ],
+      "fastest": "teacss-rs",
+      "verdicts": [
+        {
+          "subject": "tailwind-v4",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.4305709648544067,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.873218110803956,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "build",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "rows": [
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 463.99275,
+            "q1": 479.27250025,
+            "median": 483.65185399999996,
+            "q3": 490.66197950000003,
+            "iqr": 11.389479250000022,
+            "p95": 500.778167,
+            "max": 506.666792
+          },
+          "cssBytes": 103476,
+          "cssGzipBytes": 12841,
+          "deltaMs": 279.56637449999994,
+          "maxRssBytes": 301383680
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 279.203708,
+            "q1": 282.81210425,
+            "median": 288.7326045,
+            "q3": 292.621,
+            "iqr": 9.808895749999976,
+            "p95": 297.2113314,
+            "max": 298.848
+          },
+          "cssBytes": 152409,
+          "cssGzipBytes": 17231,
+          "deltaMs": 84.64712499999999,
+          "maxRssBytes": 217956352
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 556.14475,
+            "q1": 569.269177,
+            "median": 584.5191875,
+            "q3": 587.84405225,
+            "iqr": 18.57487524999999,
+            "p95": 599.2459709,
+            "max": 615.7785
+          },
+          "cssBytes": 103476,
+          "cssGzipBytes": 12841,
+          "deltaMs": 380.433708,
+          "maxRssBytes": 306135040
+        },
+        {
+          "subject": "vite-baseline",
+          "wall": {
+            "n": 30,
+            "min": 194.782792,
+            "q1": 199.95350025,
+            "median": 204.0854795,
+            "q3": 204.9919485,
+            "iqr": 5.038448250000016,
+            "p95": 208.67536685,
+            "max": 212.442
+          },
+          "cssBytes": 0,
+          "cssGzipBytes": 0,
+          "deltaMs": 0
+        }
+      ],
+      "fastest": "tailwind-v4",
+      "verdicts": [
+        {
+          "subject": "teacss-rs",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.6750856898809292,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.0244308345855693,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "build",
+      "cell": {
+        "utilities": 1000,
+        "files": 30
+      },
+      "rows": [
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 291.918958,
+            "q1": 295.19415625,
+            "median": 298.83579199999997,
+            "q3": 302.82312525,
+            "iqr": 7.628968999999984,
+            "p95": 309.70920259999997,
+            "max": 312.474958
+          },
+          "cssBytes": 152409,
+          "cssGzipBytes": 17231,
+          "deltaMs": 87.85247999999996,
+          "maxRssBytes": 225918976
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 721.939542,
+            "q1": 732.8522290000001,
+            "median": 737.397229,
+            "q3": 743.91269825,
+            "iqr": 11.06046924999987,
+            "p95": 750.6832686,
+            "max": 776.889042
+          },
+          "cssBytes": 103476,
+          "cssGzipBytes": 12841,
+          "deltaMs": 526.4139170000001,
+          "maxRssBytes": 326156288
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 489.233541,
+            "q1": 498.49219800000003,
+            "median": 500.178021,
+            "q3": 503.17982325,
+            "iqr": 4.687625249999996,
+            "p95": 507.93233735,
+            "max": 510.331625
+          },
+          "cssBytes": 103476,
+          "cssGzipBytes": 12841,
+          "deltaMs": 289.194709,
+          "maxRssBytes": 313425920
+        },
+        {
+          "subject": "vite-baseline",
+          "wall": {
+            "n": 30,
+            "min": 207.362042,
+            "q1": 209.402084,
+            "median": 210.983312,
+            "q3": 214.57892675,
+            "iqr": 5.176842749999992,
+            "p95": 221.81996644999998,
+            "max": 223.635875
+          },
+          "cssBytes": 0,
+          "cssGzipBytes": 0,
+          "deltaMs": 0
+        }
+      ],
+      "fastest": "tailwind-v4",
+      "verdicts": [
+        {
+          "subject": "teacss-rs",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.6737554014279523,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.4675666327144645,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "build",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "rows": [
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 2170.474625,
+            "q1": 2197.7110727500003,
+            "median": 2208.872958,
+            "q3": 2214.4339170000003,
+            "iqr": 16.72284424999998,
+            "p95": 2322.6092962000002,
+            "max": 2326.429959
+          },
+          "cssBytes": 103476,
+          "cssGzipBytes": 12841,
+          "deltaMs": 1952.686062,
+          "maxRssBytes": 381452288
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 340.348791,
+            "q1": 345.68826025,
+            "median": 348.364438,
+            "q3": 350.5099265,
+            "iqr": 4.821666250000021,
+            "p95": 354.12415365,
+            "max": 355.562917
+          },
+          "cssBytes": 152409,
+          "cssGzipBytes": 17231,
+          "deltaMs": 92.17754200000002,
+          "maxRssBytes": 244563968
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 548.352666,
+            "q1": 563.2717082500001,
+            "median": 565.959354,
+            "q3": 572.89800025,
+            "iqr": 9.626291999999921,
+            "p95": 577.4919751499999,
+            "max": 582.80475
+          },
+          "cssBytes": 103476,
+          "cssGzipBytes": 12841,
+          "deltaMs": 309.772458,
+          "maxRssBytes": 333578240
+        },
+        {
+          "subject": "vite-baseline",
+          "wall": {
+            "n": 30,
+            "min": 251.086416,
+            "q1": 254.356562,
+            "median": 256.186896,
+            "q3": 259.612,
+            "iqr": 5.2554380000000265,
+            "p95": 264.03137105,
+            "max": 269.51475
+          },
+          "cssBytes": 0,
+          "cssGzipBytes": 0,
+          "deltaMs": 0
+        }
+      ],
+      "fastest": "tailwind-v4",
+      "verdicts": [
+        {
+          "subject": "teacss-rs",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 1.6246186242465999,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 6.340695883544806,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "build",
+      "cell": {
+        "utilities": 5000,
+        "files": 3
+      },
+      "rows": [
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 383.960917,
+            "q1": 395.09560425,
+            "median": 398.169709,
+            "q3": 401.84515625,
+            "iqr": 6.749551999999994,
+            "p95": 405.0975413,
+            "max": 412.069125
+          },
+          "cssBytes": 720684,
+          "cssGzipBytes": 66949,
+          "deltaMs": 189.972397,
+          "maxRssBytes": 311853056
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 928.662542,
+            "q1": 940.96223975,
+            "median": 943.956729,
+            "q3": 954.4909375,
+            "iqr": 13.528697749999992,
+            "p95": 970.3623352,
+            "max": 982.672875
+          },
+          "cssBytes": 388499,
+          "cssGzipBytes": 38180,
+          "deltaMs": 735.759417,
+          "maxRssBytes": 487833600
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 1105.765083,
+            "q1": 1122.09675,
+            "median": 1134.1500415,
+            "q3": 1140.295771,
+            "iqr": 18.19902100000013,
+            "p95": 1159.4049253,
+            "max": 1169.859958
+          },
+          "cssBytes": 388499,
+          "cssGzipBytes": 38180,
+          "deltaMs": 925.9527295,
+          "maxRssBytes": 525090816
+        },
+        {
+          "subject": "vite-baseline",
+          "wall": {
+            "n": 30,
+            "min": 203.857459,
+            "q1": 206.7941665,
+            "median": 208.197312,
+            "q3": 210.89373949999998,
+            "iqr": 4.099572999999992,
+            "p95": 214.1713769,
+            "max": 225.292208
+          },
+          "cssBytes": 0,
+          "cssGzipBytes": 0,
+          "deltaMs": 0
+        }
+      ],
+      "fastest": "tailwind-v4",
+      "verdicts": [
+        {
+          "subject": "teacss-rs",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.370739681254859,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.848408645520546,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "build",
+      "cell": {
+        "utilities": 5000,
+        "files": 30
+      },
+      "rows": [
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 923.707667,
+            "q1": 950.3131775,
+            "median": 956.782292,
+            "q3": 961.01294825,
+            "iqr": 10.69977074999997,
+            "p95": 977.6675624999999,
+            "max": 980.259458
+          },
+          "cssBytes": 388499,
+          "cssGzipBytes": 38180,
+          "deltaMs": 743.621709,
+          "maxRssBytes": 483573760
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 395.940542,
+            "q1": 399.51347899999996,
+            "median": 402.183667,
+            "q3": 404.8994375,
+            "iqr": 5.385958500000015,
+            "p95": 410.65403315,
+            "max": 415.491208
+          },
+          "cssBytes": 720684,
+          "cssGzipBytes": 66949,
+          "deltaMs": 189.023084,
+          "maxRssBytes": 317390848
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 1255.85825,
+            "q1": 1276.16098975,
+            "median": 1283.578896,
+            "q3": 1293.8542085,
+            "iqr": 17.693218749999915,
+            "p95": 1325.46475855,
+            "max": 1346.984958
+          },
+          "cssBytes": 388499,
+          "cssGzipBytes": 38180,
+          "deltaMs": 1070.418313,
+          "maxRssBytes": 543899648
+        },
+        {
+          "subject": "vite-baseline",
+          "wall": {
+            "n": 30,
+            "min": 209.558834,
+            "q1": 211.52110425,
+            "median": 213.160583,
+            "q3": 214.6957915,
+            "iqr": 3.174687250000005,
+            "p95": 216.9054686,
+            "max": 218.229625
+          },
+          "cssBytes": 0,
+          "cssGzipBytes": 0,
+          "deltaMs": 0
+        }
+      ],
+      "fastest": "tailwind-v4",
+      "verdicts": [
+        {
+          "subject": "teacss-rs",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.378968542250623,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 3.191524174948656,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "build",
+      "cell": {
+        "utilities": 5000,
+        "files": 300
+      },
+      "rows": [
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 436.074958,
+            "q1": 449.1848435,
+            "median": 452.434625,
+            "q3": 455.3713435,
+            "iqr": 6.186500000000024,
+            "p95": 462.2733209,
+            "max": 476.419125
+          },
+          "cssBytes": 720684,
+          "cssGzipBytes": 66949,
+          "deltaMs": 196.4305205,
+          "maxRssBytes": 332529664
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 2697.007541,
+            "q1": 2724.27512525,
+            "median": 2739.254479,
+            "q3": 2756.889604,
+            "iqr": 32.61447874999976,
+            "p95": 2831.1527019,
+            "max": 2899.45425
+          },
+          "cssBytes": 388499,
+          "cssGzipBytes": 38180,
+          "deltaMs": 2483.2503745000004,
+          "maxRssBytes": 568016896
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 1000.636333,
+            "q1": 1020.8350935,
+            "median": 1024.829354,
+            "q3": 1036.17485425,
+            "iqr": 15.339760749999982,
+            "p95": 1051.1638337,
+            "max": 1056.715541
+          },
+          "cssBytes": 388499,
+          "cssGzipBytes": 38180,
+          "deltaMs": 768.8252494999999,
+          "maxRssBytes": 521322496
+        },
+        {
+          "subject": "vite-baseline",
+          "wall": {
+            "n": 30,
+            "min": 250.951208,
+            "q1": 253.5426875,
+            "median": 256.0041045,
+            "q3": 257.23176025,
+            "iqr": 3.68907274999998,
+            "p95": 262.81268475,
+            "max": 264.304458
+          },
+          "cssBytes": 0,
+          "cssGzipBytes": 0,
+          "deltaMs": 0
+        }
+      ],
+      "fastest": "tailwind-v4",
+      "verdicts": [
+        {
+          "subject": "teacss-rs",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.2651435088550085,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 6.054475779788075,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "build",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "rows": [
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 2125.697375,
+            "q1": 2143.29131225,
+            "median": 2151.5561665,
+            "q3": 2159.2138025,
+            "iqr": 15.92249025000001,
+            "p95": 2192.5556291999997,
+            "max": 2238.827291
+          },
+          "cssBytes": 1083726,
+          "cssGzipBytes": 90268,
+          "deltaMs": 1938.504416,
+          "maxRssBytes": 761053184
+        },
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 755.378459,
+            "q1": 767.38740575,
+            "median": 772.329646,
+            "q3": 775.6056874999999,
+            "iqr": 8.21828174999996,
+            "p95": 786.3160064,
+            "max": 795.22
+          },
+          "cssBytes": 2827608,
+          "cssGzipBytes": 234502,
+          "deltaMs": 559.2778955,
+          "maxRssBytes": 595771392
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 1653.691083,
+            "q1": 1667.25005225,
+            "median": 1674.9358335000002,
+            "q3": 1684.50530175,
+            "iqr": 17.25524949999999,
+            "p95": 1693.5852065499998,
+            "max": 1698.136583
+          },
+          "cssBytes": 1083726,
+          "cssGzipBytes": 90268,
+          "deltaMs": 1461.8840830000001,
+          "maxRssBytes": 721027072
+        },
+        {
+          "subject": "vite-baseline",
+          "wall": {
+            "n": 30,
+            "min": 208.236125,
+            "q1": 210.85255175,
+            "median": 213.0517505,
+            "q3": 215.438375,
+            "iqr": 4.585823250000004,
+            "p95": 219.81966645,
+            "max": 221.762375
+          },
+          "cssBytes": 0,
+          "cssGzipBytes": 0,
+          "deltaMs": 0
+        }
+      ],
+      "fastest": "tailwind-v4",
+      "verdicts": [
+        {
+          "subject": "teacss-rs",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.1686799699774832,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.7858003090302192,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "build",
+      "cell": {
+        "utilities": 20000,
+        "files": 30
+      },
+      "rows": [
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 765.416209,
+            "q1": 770.63218725,
+            "median": 780.585021,
+            "q3": 786.21480225,
+            "iqr": 15.582615000000033,
+            "p95": 794.65160625,
+            "max": 796.924083
+          },
+          "cssBytes": 2827608,
+          "cssGzipBytes": 234502,
+          "deltaMs": 565.3240205,
+          "maxRssBytes": 598933504
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 1653.206542,
+            "q1": 1675.248208,
+            "median": 1683.681188,
+            "q3": 1689.8518852500001,
+            "iqr": 14.603677250000146,
+            "p95": 1718.10613765,
+            "max": 1728.329667
+          },
+          "cssBytes": 1083726,
+          "cssGzipBytes": 90268,
+          "deltaMs": 1468.4201875,
+          "maxRssBytes": 730693632
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 2263.359791,
+            "q1": 2281.35299025,
+            "median": 2292.409854,
+            "q3": 2300.18785425,
+            "iqr": 18.834863999999925,
+            "p95": 2363.53566455,
+            "max": 2378.811416
+          },
+          "cssBytes": 1083726,
+          "cssGzipBytes": 90268,
+          "deltaMs": 2077.1488535,
+          "maxRssBytes": 781598720
+        },
+        {
+          "subject": "vite-baseline",
+          "wall": {
+            "n": 30,
+            "min": 210.762083,
+            "q1": 213.9562085,
+            "median": 215.2610005,
+            "q3": 217.6406665,
+            "iqr": 3.6844580000000065,
+            "p95": 222.3564122,
+            "max": 231.881917
+          },
+          "cssBytes": 0,
+          "cssGzipBytes": 0,
+          "deltaMs": 0
+        }
+      ],
+      "fastest": "tailwind-v4",
+      "verdicts": [
+        {
+          "subject": "teacss-rs",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.156947856676845,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.9367843249966747,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    },
+    {
+      "series": "build",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "rows": [
+        {
+          "subject": "tailwind-v4",
+          "wall": {
+            "n": 30,
+            "min": 799.633584,
+            "q1": 814.280552,
+            "median": 819.3846249999999,
+            "q3": 826.1717812500001,
+            "iqr": 11.891229250000151,
+            "p95": 837.5003894,
+            "max": 844.19725
+          },
+          "cssBytes": 2827608,
+          "cssGzipBytes": 234502,
+          "deltaMs": 561.2471045,
+          "maxRssBytes": 615530496
+        },
+        {
+          "subject": "teacss-ts",
+          "wall": {
+            "n": 30,
+            "min": 3720.372416,
+            "q1": 3742.4923855,
+            "median": 3750.3701455,
+            "q3": 3770.18771875,
+            "iqr": 27.69533324999975,
+            "p95": 3869.7102954999996,
+            "max": 3926.38225
+          },
+          "cssBytes": 1083726,
+          "cssGzipBytes": 90268,
+          "deltaMs": 3492.232625,
+          "maxRssBytes": 940179456
+        },
+        {
+          "subject": "teacss-rs",
+          "wall": {
+            "n": 30,
+            "min": 1724.579208,
+            "q1": 1739.97426,
+            "median": 1747.8765625,
+            "q3": 1755.8995934999998,
+            "iqr": 15.925333499999851,
+            "p95": 1804.2646561,
+            "max": 1812.81725
+          },
+          "cssBytes": 1083726,
+          "cssGzipBytes": 90268,
+          "deltaMs": 1489.7390420000002,
+          "maxRssBytes": 752730112
+        },
+        {
+          "subject": "vite-baseline",
+          "wall": {
+            "n": 30,
+            "min": 252.978958,
+            "q1": 255.65603074999999,
+            "median": 258.1375205,
+            "q3": 261.15287525,
+            "iqr": 5.496844500000037,
+            "p95": 268.59410610000003,
+            "max": 276.1875
+          },
+          "cssBytes": 0,
+          "cssGzipBytes": 0,
+          "deltaMs": 0
+        }
+      ],
+      "fastest": "tailwind-v4",
+      "verdicts": [
+        {
+          "subject": "teacss-rs",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 2.133157627286453,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        },
+        {
+          "subject": "teacss-ts",
+          "verdict": {
+            "kind": "differs",
+            "lower": "left",
+            "ratio": 4.577057014585794,
+            "p": 2.8719487663822736e-11,
+            "delta": -1
+          }
+        }
+      ]
+    }
+  ]
+}
