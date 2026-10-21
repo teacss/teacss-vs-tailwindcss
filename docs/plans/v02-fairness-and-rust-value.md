@@ -67,9 +67,12 @@
 
 ## 第 7 片（P6）：两套配置与 PostCSS
 
-- [ ] 注册表为每个对象加 `configuration: "default" | "production"`，被测包按配置写入口；记录里每个样本带配置名。
-- [ ] 三个 `*-postcss` 对象作为单独一轮。
-- 验收：报告两套配置并列；PostCSS 一轮单独出表。
+完成于 2026-10-22。
+
+- [x] 注册表把 `engineTier` 换成每个对象的层级列表，并加分组：`main`（规格 v01.1 的生产配置）、`default-config`（各自安装指南的入口：TeaCSS 不写 `@source`，Tailwind 用 `@import "tailwindcss";` 自动探测）、`postcss`（Vite 的 PostCSS 管线里用 `@teacss/postcss` 与 `@tailwindcss/postcss`，只有构建层）。引擎层与配置无关，配置变体不重测。
+- [x] `bench run` 默认跑 `main,default-config`，`--group postcss` 单独一轮；TeaCSS 的 PostCSS 插件没有引擎参数，由注册表的 `TEACSS_ENGINE` 指定，Rust 一路照样带严格模式。
+- [x] 完整报告列出全部对象；README 的表只放生产配置，另加一条：换成开箱入口后各工具构建时间的倍数。
+- 验收：全部十个对象在 1000 × 3 上通过等价校验（默认配置输出与生产配置逐字节相同；PostCSS 输出少 9 字节，因为不经插件自己的压缩，TS 与 Rust 两条 PostCSS 路径输出相同）；三轮冒烟（主组与默认配置组构建、默认配置组 dev、PostCSS 组构建）全部通过。
 
 ## 第 8 片：第二份正式报告
 

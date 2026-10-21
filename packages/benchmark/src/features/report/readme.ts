@@ -24,8 +24,20 @@ function row(table: CellTable, subject: string): SubjectRow | undefined {
   return table.rows.find((entry) => entry.subject === subject);
 }
 
+/** The production setups, fastest first; configuration variants have their own takeaway. */
 function ranked(table: CellTable): SubjectRow[] {
-  return table.rows.filter((entry) => entry.subject !== BASELINE).sort((left, right) => left.wall.median - right.wall.median);
+  return table.rows.filter((entry) => entry.subject !== BASELINE && NAMES[entry.subject] !== undefined).sort((left, right) => left.wall.median - right.wall.median);
+}
+
+/** How each tool's out-of-the-box entry changes its build time against its tuned one, at the largest cell. */
+function defaultConfigTakeaway(model: ReportModel): string[] {
+  const build = largest(model, "build");
+  if (build === undefined) return [];
+  const ratios = Object.keys(NAMES)
+    .map((subject) => ({ subject, tuned: row(build, subject)?.wall.median, out: row(build, `${subject}-default`)?.wall.median }))
+    .filter((entry): entry is { subject: string; tuned: number; out: number } => entry.tuned !== undefined && entry.out !== undefined);
+  if (ratios.length === 0) return [];
+  return [`- With each tool's out-of-the-box entry instead of the tuned one, the build takes ${joinWords(ratios.map((entry) => `${(entry.out / entry.tuned).toFixed(2)}× as long for ${name(entry.subject)}`))}, so the comparison does not hinge on one tool's configuration.`];
 }
 
 /** "1.4× slower", "about the same" for a tie, or nothing for the fastest. */
@@ -204,6 +216,7 @@ export function renderReadmeSummary(model: ReportModel, stem: string, beside?: R
     "**In short**",
     "",
     ...takeaways(model, engine, build),
+    ...defaultConfigTakeaway(model),
     ...besideTakeaway(model, beside),
     ...crossTakeaway(model, cross),
     "",

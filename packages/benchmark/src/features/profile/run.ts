@@ -10,7 +10,7 @@ import { type ProfileSummary, summarizeProfile } from "./index.ts";
 export interface ProfileSubject {
   readonly id: SubjectId;
   readonly syntax: Syntax;
-  readonly engineTier: boolean;
+  readonly tiers: readonly ("engine" | "dev" | "build")[];
 }
 
 /** Runs the task in a subject process started with these Node flags; the caller reads the profile the flags wrote. */
@@ -24,7 +24,7 @@ export async function profileSubjects(cell: Cell, corpusFor: (cell: Cell) => Cor
   try {
     for (const subject of subjects) {
       for (const tier of tiers) {
-        if (tier === "engine" && !subject.engineTier) continue;
+        if (!subject.tiers.includes(tier)) continue;
         const name = `${subject.id}-${tier}.cpuprofile`;
         const project = corpusProject(corpus, subject.syntax);
         const task: SubjectTask = tier === "engine" ? { kind: "engine", scenario: "warm", candidates: candidates(corpus, subject.syntax), extra: [], includeCss: false } : { kind: "build", modules: project.modules, files: Object.fromEntries(project.files), includeCss: false };

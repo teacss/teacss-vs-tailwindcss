@@ -30,3 +30,8 @@ test("a malformed count is refused with the option name", async () => {
 test("an unknown subject name is refused with the registered names", async () => {
   await assert.rejects(run(["verify", "--subjects", "teacss-rs"]), /--subjects: unknown teacss-rs; registered are $/);
 });
+
+test("a group with no subject is refused with the known groups", async () => {
+  const { productionRegistry } = await import("../subjects/index.ts");
+  await assert.rejects(createApp({ argv: ["verify", "--group", "nothing"], env: {}, cwd: process.cwd(), stdout: () => {}, subjectEntry: "unused", registry: productionRegistry() }), /--group: no subject in nothing; groups are main, default-config, postcss/);
+});

@@ -15,6 +15,7 @@ import { renderReadmeSummary, updateReadme } from "../features/report/readme.ts"
 import { verifyCorpus } from "../features/verify/run.ts";
 import { type Cell, type RunRecord, readRunRecord, writeRunRecord } from "../persistence/index.ts";
 import { invokeSubject, productionRegistry, type SubjectRegistration, type SubjectRegistry } from "../subjects/index.ts";
+import { DEFAULT_GROUPS } from "../subjects/registry.ts";
 
 export interface AppDeps {
   readonly argv: readonly string[];
@@ -38,6 +39,7 @@ const USAGE = `bench <command>
   run         measure the scale matrix and write results/<time>-<host>.json
               --utilities <a,b,c> (1000,5000,20000)  --files <a,b,c> (3,30,300)
               --samples <n> (30)  --tier engine|dev|build|all (all)  --subjects <a,b>
+              --group main,default-config,postcss (main,default-config)
               --seed <n>  --out <dir> (results)  --allow-busy  --no-profile  --no-price
               --install-runs <n> (3)  --configs <dir>  --community <list.json>
               --allow-node-mismatch
@@ -90,7 +92,13 @@ function tiersOf(invocation: Invocation): Tier[] {
 
 function chosenSubjects(invocation: Invocation, registry: SubjectRegistry): [SubjectId, SubjectRegistration][] {
   const wanted = invocation.options.get("subjects");
-  if (wanted === undefined || wanted === true) return [...registry];
+  if (wanted === undefined || wanted === true) {
+    const groupOption = invocation.options.get("group");
+    const groups = typeof groupOption === "string" ? groupOption.split(",") : DEFAULT_GROUPS;
+    const chosen = [...registry].filter(([, registration]) => groups.includes(registration.group));
+    if (chosen.length === 0) throw new Error(`--group: no subject in ${groups.join(", ")}; groups are main, default-config, postcss`);
+    return chosen;
+  }
   const names = wanted.split(",");
   const unknown = names.filter((name) => !registry.has(name as SubjectId));
   if (unknown.length > 0) throw new Error(`--subjects: unknown ${unknown.join(", ")}; registered are ${[...registry.keys()].join(", ")}`);
@@ -144,7 +152,7 @@ export async function createApp(deps: AppDeps): Promise<number> {
     verify: async (invocation) => {
       const corpus = corpusOf(invocation);
       deps.stdout(`verify corpus ${corpus.hash.slice(0, 12)} (${corpus.parameters.utilities} utilities, ${corpus.parameters.files} files)\n`);
-      const subjects = chosenSubjects(invocation, registry).map(([id, registration]) => ({ id, syntax: registration.syntax, engineTier: registration.engineTier, natives: registration.natives }));
+      const subjects = chosenSubjects(invocation, registry).map(([id, registration]) => ({ id, syntax: registration.syntax, tiers: registration.tiers, natives: registration.natives }));
       const report = await verifyCorpus(corpus, subjects, async (subject, task) => {
         const { response } = await invokeSubject(registry, subject, task, processDeps);
         const result = response.result;
@@ -176,7 +184,7 @@ export async function createApp(deps: AppDeps): Promise<number> {
     const seed = integerOption(invocation, "seed", DEFAULT_SEED);
     const community = typeof invocation.options.get("community") === "string" ? await communityPool(String(invocation.options.get("community"))) : undefined;
     const corpusFor = (cell: Cell): Corpus => (community === undefined ? generateCorpus({ seed, utilities: cell.utilities, files: cell.files }) : communityCorpus(community, cell.utilities, cell.files, seed));
-    const plan = { seed, corpusFor, cells, tiers: tiersOf(invocation), subjects: chosen.map(([id, registration]) => ({ id, syntax: registration.syntax, engineTier: registration.engineTier })), samplesPerCell: integerOption(invocation, "samples", 30) };
+    const plan = { seed, corpusFor, cells, tiers: tiersOf(invocation), subjects: chosen.map(([id, registration]) => ({ id, syntax: registration.syntax, tiers: registration.tiers })), samplesPerCell: integerOption(invocation, "samples", 30) };
     const startedAt = new Date().toISOString();
     const subjects: Record<string, SubjectVersions> = {};
     for (const [id] of chosen) {
@@ -209,7 +217,7 @@ export async function createApp(deps: AppDeps): Promise<number> {
       ? undefined
       : await runPrice(
           invocation,
-          chosen.filter(([, registration]) => registration.engineTier).map(([id]) => id),
+          chosen.filter(([, registration]) => registration.tiers.includes("engine")).map(([id]) => id),
         );
     const record: RunRecord = {
       version: 1,
@@ -263,7 +271,7 @@ export async function createApp(deps: AppDeps): Promise<number> {
       const dir = resolve(dirname(listFile), entry.dir);
       return { name: entry.name, dir: relative(deps.cwd, dir) || ".", commit: gitCommit(dir) };
     });
-    const tailwind = [...registry].find(([, registration]) => registration.syntax === "tailwind" && registration.engineTier);
+    const tailwind = [...registry].find(([, registration]) => registration.syntax === "tailwind" && registration.tiers.includes("engine"));
     if (tailwind === undefined) throw new Error("no Tailwind subject is registered to extract community classes");
     const { response } = await invokeSubject(registry, tailwind[0], { kind: "extract", dirs: repositories.map((repository) => resolve(deps.cwd, repository.dir)) }, processDeps);
     if (response.result.kind !== "extract") throw new Error(`${tailwind[0]}: expected an extract result`);
@@ -297,7 +305,7 @@ export async function createApp(deps: AppDeps): Promise<number> {
     );
   }
   commands["price"] = async (invocation) => {
-    const chosen = chosenSubjects(invocation, registry).filter(([, registration]) => registration.engineTier);
+    const chosen = chosenSubjects(invocation, registry).filter(([, registration]) => registration.tiers.includes("engine"));
     const price = await runPrice(
       invocation,
       chosen.map(([id]) => id),

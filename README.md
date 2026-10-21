@@ -87,6 +87,11 @@ bun run bench:ts-tailwind                            # the same without teacss-r
 bun run bench:report results/<file>.json --readme README.md   # report, JSON summary, and the README block
 ```
 
+`bun run bench` measures each tool twice: with the tuned production entry and
+with the entry its setup guide gives (`--group main,default-config`, the
+default). The PostCSS integrations are a separate round:
+`bun run bench --group postcss --tier build`.
+
 To check that the generated corpus is not cherry-picked, run the same matrix on
 classes taken from real Tailwind projects. List checked-out projects in a JSON
 file, `[{ "name": "…", "dir": "path/to/src" }]`, then:

@@ -6,7 +6,7 @@ import { checkNativeModules, checkStructure, type Mismatch } from "./index.ts";
 export interface VerifySubject {
   readonly id: SubjectId;
   readonly syntax: "teacss" | "tailwind";
-  readonly engineTier: boolean;
+  readonly tiers: readonly ("engine" | "dev" | "build")[];
   readonly natives: { readonly required: readonly string[]; readonly forbidden: readonly string[] };
 }
 
@@ -43,7 +43,7 @@ export async function verifyCorpus(corpus: Corpus, subjects: readonly VerifySubj
   const checked: { subject: string; tier: "engine" | "build"; cases: number; cssBytes: number }[] = [];
   const hashes = new Map<string, string>();
   for (const subject of subjects) {
-    const tiers: ("engine" | "build")[] = subject.engineTier ? ["engine", "build"] : ["build"];
+    const tiers = subject.tiers.filter((tier): tier is "engine" | "build" => tier !== "dev");
     for (const tier of tiers) {
       const project = corpusProject(corpus, subject.syntax);
       const task: SubjectTask = tier === "engine" ? { kind: "engine", scenario: "cold", candidates: candidates(corpus, subject.syntax), extra: [], includeCss: true } : { kind: "build", modules: project.modules, files: Object.fromEntries(project.files), includeCss: true };
