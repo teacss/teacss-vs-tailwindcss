@@ -2,7 +2,7 @@
 Status: accepted
 
 ## Context
-仓库最初的 `bench/` 是另一个对比项目的副本。它的 `bench/fixtures/teacss-vite` 实际安装的是 `unocss` 加 `presetWind3`，标签却是 teacss；语料只有 Tailwind 语法且用 `Math.random()` 生成；没有检查 Rust 引擎是否运行。本项目的测法与它不同，不以它为参照。
+仓库最初的 `bench/` 是另一个对比项目的副本。它的 `bench/fixtures/teacss-vite` 实际安装的是 `unocss` 加 `presetWind3`，标签却是 teacss；语料只有 Tailwind 语法且用 `Math.random()` 生成；没有检查 Rust 引擎是否运行。master 上后来的 PR #1 与 #2 把它的插件换成 `@teacss/vite` 0.6.7，但语料、随机性与引擎校验三个问题仍在。本项目的测法与它不同，不以它为参照。
 
 ## Decision
 整体删除 `bench/`，不保留、不迁移任何代码，也不沿用它的思路。测量方法只来自规格 v01.1 与 benchmark-checklist。
