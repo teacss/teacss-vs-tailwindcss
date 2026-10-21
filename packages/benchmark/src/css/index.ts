@@ -32,10 +32,10 @@ export function escapeClass(name: string): string {
   return name.replaceAll(/[^a-zA-Z0-9_-]/g, (character) => `\\${character}`);
 }
 
-/** Whether the stylesheet has a rule selecting this class, as both tools escape it. */
 /** What may follow a class in a selector: a combinator, another simple selector, or the end of the selector. */
 const SELECTOR_BOUNDARY = new Set([" ", "\n", "\t", ",", "{", ":", ".", ">", "[", ")", "~", "+", "#"]);
 
+/** Whether the stylesheet has a rule selecting this class, as both tools escape it. */
 export function containsClass(css: string, name: string): boolean {
   const needle = `.${escapeClass(name)}`;
   for (let at = css.indexOf(needle); at !== -1; at = css.indexOf(needle, at + 1)) {

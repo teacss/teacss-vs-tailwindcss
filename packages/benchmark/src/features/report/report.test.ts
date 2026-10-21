@@ -67,9 +67,9 @@ test("a v02 record opens with the method commit and verification, and names conf
   const v02 = { ...record(), v02Revision: 3, verification: { cells: 1, cases: 100, checks: 7 }, subjects: { "teacss-rs": { packages: {}, local: {} } } };
   const markdown = renderMarkdown(buildReport(v02));
   assert.match(markdown, /Protocol: spec v01\.1 revision 1 and v02\.1 revision 3;/);
-  assert.match(markdown, /\*\*Method and verification\.\*\* Commit `c0ffee`\. Before timing anything, 7 subject check\(s\) over 1 corpus\/corpora and 100 paired case\(s\) found no difference/);
+  assert.match(markdown, /\*\*Method and verification\.\*\* Commit `c0ffee`\. Before timing anything, every subject was checked on each of the 1 corpus and file layout\(s\) of this run \(7 subject run\(s\), 100 paired case\(s\) in all\) with no difference/);
   assert.match(markdown, /Not measured: vite-baseline, teacss-ts, tailwind-v4, teacss-ts-default, teacss-rs-default, tailwind-v4-default\./);
-  assert.match(markdown, /7\. \*\*Did it even happen\?\*\* Before timing, every subject's output on every corpus was checked/);
+  assert.match(markdown, /7\. \*\*Did it even happen\?\*\* Before timing, every subject's output on every corpus and file layout was checked/);
   const postcss = { ...v02, subjects: { "teacss-ts-postcss": { packages: {}, local: {} }, "teacss-rs-postcss": { packages: {}, local: {} }, "tailwind-v4-postcss": { packages: {}, local: {} } } };
   assert.ok(!renderMarkdown(buildReport(postcss)).includes("Subset run"), "a full PostCSS round is not a subset");
 });
