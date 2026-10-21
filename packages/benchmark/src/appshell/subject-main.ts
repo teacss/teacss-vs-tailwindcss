@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
 import { basename } from "node:path";
 import { gzipSync } from "node:zlib";
-import { type Clock, createWorkspace, loadedNativeModules, ownResourceUsage, type SubjectClient, type SubjectFactory, systemClock } from "@bench/infrastructure";
+import { type Clock, createWorkspace, duplicateNativeModules, loadedNativeModules, ownResourceUsage, type SubjectClient, type SubjectFactory, systemClock } from "@bench/infrastructure";
 import { CONTRACT_VERSION, parseSubjectRequest, type SubjectRequest, type SubjectResponse, type TaskResult } from "../contract/index.ts";
 import { countOutput } from "../css/index.ts";
 import { connectDevIo, runDevScenario } from "../features/measure/dev-scenario.ts";
@@ -93,6 +93,8 @@ export async function subjectMain(stdin: string, deps: SubjectMainDeps = { clock
   } catch (error) {
     result = { kind: "error", message: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined };
   }
+  const duplicates = duplicateNativeModules();
+  if (result.kind !== "error" && duplicates.length > 0) result = { kind: "error", message: duplicates.join("; "), stack: undefined };
   const response: SubjectResponse = { version: CONTRACT_VERSION, sentAt: Date.now(), subject: request.subject, nativeModules: loadedNativeModules(), usage: ownResourceUsage(), result };
   return { stdout: `${JSON.stringify(response)}\n`, exitCode: result.kind === "error" ? 1 : 0 };
 }

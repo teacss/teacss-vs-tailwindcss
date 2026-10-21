@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { subjectId } from "@bench/infrastructure";
 import type { RunRecord, Sample } from "../../persistence/index.ts";
-import { buildReport } from "./index.ts";
+import { buildReport, renderMarkdown } from "./index.ts";
 import { README_END, README_START, renderReadmeSummary, updateReadme } from "./readme.ts";
 
 function sample(subject: string, tier: "engine" | "build", cell: { utilities: number; files: number }, wallMs: number, index: number): Sample {
@@ -80,4 +80,6 @@ test("updateReadme replaces the marked block and appends one when there is none"
 test("a run on locally linked packages says so at the top of the README block", () => {
   const linked = { ...record(), subjects: { "teacss-rs": { packages: {}, local: { "@teacss/core": "/x/core", "@teacss/vite": "/x/vite" } } } };
   assert.match(renderReadmeSummary(buildReport(linked), "s"), /### Results from 2026-10-21\n\n\*\*Local build, not for publication\.\*\* @teacss\/core and @teacss\/vite came from a local checkout/);
+  assert.match(renderMarkdown(buildReport(linked)), /Every subject ran its published package, except the locally linked ones named at the top, which ran the local build/);
+  assert.match(renderMarkdown(buildReport(record())), /Every subject ran its published package with its documented/);
 });
