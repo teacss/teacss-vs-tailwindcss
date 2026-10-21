@@ -64,3 +64,13 @@ npm error notarget No matching version found for @teacss/engine@>=0.9.0.
 Vite 8 自带 rolldown，所以每个被测进程都会加载 `rolldown-binding.<platform>.node` 与 macOS 上的 `fsevents.node`；原生模块期望只对 `teacss-engine` 与 `tailwindcss-oxide` 作要求或禁止。teacss 开 `mergeSelectors` 时一条规则带多个选择器，结构检查按单个选择器判断条件，否则相邻选择器的伪类会串进来。
 
 `bench verify --utilities 300 --files 3` 在四个被测对象上通过：ts 与 rs 的 engine 与 build 输出哈希相同；300 个用例在 teacss 与 Tailwind 两边的属性与条件结构都对上。
+
+## 换成 Bun 之后（同日）
+
+按 [ADR-0004](../adrs/ADR-0004-bun-package-manager.md) 改用 Bun 1.4.3（isolated linker）安装同一组包：`bun install` 成功，不阻断；每个 `subject-*` 包有自己的 `node_modules`。
+
+| 检查 | 结果 |
+| --- | --- |
+| `bun run check` | 59 个测试通过，布局与依赖检查通过 |
+| `bench:verify --utilities 20000 --files 300 --subjects vite-baseline,teacss-ts,tailwind-v4` | 通过，8 秒；teacss-ts engine 1 075 927 字节、build 1 083 726 字节；Tailwind engine 3 947 561 字节、build 2 827 608 字节 |
+| `bench:verify --utilities 300 --files 3`（四个对象） | 通过；teacss-rs 进程加载 `teacss-engine.darwin-arm64.node`，输出与 teacss-ts 哈希相同 |

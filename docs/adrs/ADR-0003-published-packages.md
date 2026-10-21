@@ -1,5 +1,5 @@
-# ADR-0003: 被测对象只用已发布的 npm 包，用 pnpm 安装
-Status: accepted
+# ADR-0003: 被测对象只用已发布的 npm 包
+Status: accepted；包管理器部分被 ADR-0004 取代（改用 Bun）
 
 ## Context
 报告要让任何人一条命令复现，所以被测对象必须来自公共 registry 并被锁文件钉死。已发布的 `@teacss/core@0.8.5` 声明可选 peer `@teacss/engine >=0.9.0`，而已发布的引擎只有 `0.8.5-alpha.3`；引擎自己的 `engineCompat.core` 是 `>=0.8.5 <0.10.0`，在运行时接受 core 0.8.5。2026-10-21 的探针（见 [knowledge/engine-probe-2026-10-21.md](../knowledge/engine-probe-2026-10-21.md)）：npm 以 ETARGET 拒绝安装这对包；pnpm 安装成功并给出 unmet peer 警告；`TEACSS_ENGINE=rust` 下 Vite 构建加载了 `teacss-engine.darwin-arm64.node`，stats 为 `rust=2 ts=0`，输出与 TS 引擎逐字节相同。

@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This repository is a pnpm workspace that measures TeaCSS against Tailwind CSS
+This repository is a Bun workspace that measures TeaCSS against Tailwind CSS
 v4. `CLAUDE.md` points here.
 
 ## Read by task
@@ -14,16 +14,17 @@ v4. `CLAUDE.md` points here.
 ## Change rules
 
 - Keep the four layers and one dependency direction described in the README.
-  A new unit goes where the layer table puts it; `pnpm check:layout` and
-  `pnpm check:dependencies` are the authority.
+  A new unit goes where the layer table puts it; `bun run check:layout` and
+  `bun run check:dependencies` are the authority.
 - The base `tsconfig.base.json` owns every compiler setting. A package only
   extends it.
 - Features see the `SubjectClient` interface, never a `subject-*` package;
   only the composition root picks an implementation.
 - A measured runtime (a napi addon, Oxide) is loaded by one subject process
   only; the orchestrator never loads one.
-- Keep versions of the measured packages exact in the manifests and the
-  lockfile committed.
+- Keep versions of the measured packages exact in the manifests and
+  `bun.lock` committed. Bun installs; Node runs the harness and the subjects.
+- Use Bun for installs and scripts, never npm or pnpm.
 
 ## Documentation
 
@@ -40,5 +41,5 @@ Add, remove or rename a document and update its index in the same change.
 
 ## Verify and submit
 
-Run `pnpm check` before submitting. Commit on a task branch with a
+Run `bun run check` before submitting. Commit on a task branch with a
 conventional message.

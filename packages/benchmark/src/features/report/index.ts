@@ -6,6 +6,8 @@ export { compare, mannWhitneyU, summarize } from "./statistics.ts";
 export type Series = "engine/cold" | "engine/warm" | "build";
 export const SERIES: readonly Series[] = ["engine/cold", "engine/warm", "build"];
 export const BASELINE = "vite-baseline";
+/** Spec v01.1 §Subjects; a run that leaves one out says so in its header. */
+export const SPEC_SUBJECTS: readonly string[] = ["vite-baseline", "teacss-ts", "teacss-rs", "tailwind-v4"];
 
 export interface SubjectRow {
   readonly subject: string;
@@ -125,6 +127,12 @@ function limiterLines(limiters: Readonly<Record<string, { readonly totalMs: numb
   ];
 }
 
+function notMeasuredLines(record: Omit<RunRecord, "samples">): string[] {
+  const missing = SPEC_SUBJECTS.filter((subject) => !(subject in record.subjects));
+  if (missing.length === 0) return [];
+  return [`**Subset run.** Measured: ${Object.keys(record.subjects).join(", ")}. Not measured: ${missing.join(", ")}. No number in this report speaks for a subject that was not measured.`, ""];
+}
+
 /** Deterministic: the same record renders the same text. */
 export function renderMarkdown(model: ReportModel): string {
   const { record } = model;
@@ -134,6 +142,7 @@ export function renderMarkdown(model: ReportModel): string {
     "",
     `Protocol: spec v01.1 revision ${record.specRevision}; pair table ${record.pairTableVersion}; seed ${record.seed}; ${record.samplesPerCell} samples per subject and cell; ${model.sampleCount} samples.${record.allowBusy ? " **Recorded with --allow-busy on a loaded machine; see the load column.**" : ""}`,
     "",
+    ...notMeasuredLines(record),
     "## Verdict",
     "",
     ...SERIES.flatMap((series) => [`**${series}.** ${verdictParagraph(model, series)}`, ""]),
@@ -149,7 +158,7 @@ export function renderMarkdown(model: ReportModel): string {
     `| Memory | ${(environment.memoryBytes / 1073741824).toFixed(0)} GB |`,
     `| OS | ${environment.os} |`,
     `| Node | ${environment.node} |`,
-    `| pnpm | ${environment.pnpm} |`,
+    `| bun | ${environment.bun} |`,
     `| Lockfile | sha256 ${environment.lockfileSha256} |`,
     `| Commit | ${environment.commit} |`,
     `| Started / finished | ${record.startedAt} / ${record.finishedAt} |`,

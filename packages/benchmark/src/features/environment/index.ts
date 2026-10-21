@@ -12,7 +12,7 @@ export interface EnvironmentRecord {
   readonly memoryBytes: number;
   readonly os: string;
   readonly node: string;
-  readonly pnpm: string;
+  readonly bun: string;
   readonly lockfileSha256: string;
   readonly commit: string;
 }
@@ -26,7 +26,7 @@ function command(file: string, args: readonly string[], cwd: string): string {
 }
 
 export function captureEnvironment(root: string): EnvironmentRecord {
-  const lockfile = join(root, "pnpm-lock.yaml");
+  const lockfile = join(root, "bun.lock");
   return {
     host: hostname().split(".")[0] ?? "unknown",
     cpu: cpus()[0]?.model ?? "unknown",
@@ -34,7 +34,7 @@ export function captureEnvironment(root: string): EnvironmentRecord {
     memoryBytes: totalmem(),
     os: `${platform()} ${release()}`,
     node: nodeVersion,
-    pnpm: command("pnpm", ["--version"], root),
+    bun: command("bun", ["--version"], root),
     lockfileSha256: existsSync(lockfile) ? createHash("sha256").update(readFileSync(lockfile)).digest("hex") : "none",
     commit: command("git", ["rev-parse", "HEAD"], root),
   };

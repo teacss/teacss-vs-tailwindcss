@@ -6,7 +6,7 @@ priority: P0
 
 ## Status
 
-2026-10-21 用户让工作继续推进，提案接受。三个偏好项按默认值执行并等用户改口：报告正文英文；规模上限 20 000 utility；dev 增量层级放第二阶段。第 4 项由探针回答：pnpm 下已发布的 `@teacss/core@0.8.5` 加 `@teacss/engine@0.8.5-alpha.3` 能走 Rust 路径且输出与 TS 逐字节相同，npm 拒绝安装这对包（[ADR-0003](../adrs/ADR-0003-published-packages.md)）。
+2026-10-21 用户让工作继续推进，提案接受。三个偏好项按默认值执行并等用户改口：报告正文英文；规模上限 20 000 utility；dev 增量层级放第二阶段。第 4 项由探针回答：Bun（最初用 pnpm 验证）下已发布的 `@teacss/core@0.8.5` 加 `@teacss/engine@0.8.5-alpha.3` 能走 Rust 路径且输出与 TS 逐字节相同，npm 拒绝安装这对包（[ADR-0003](../adrs/ADR-0003-published-packages.md)）。
 
 已落地：计划第 1 片（骨架与检查）、第 0 片（[规格 v01.1](../specs/v01.1-benchmark-protocol.md) draft、[ADR-0001 至 0003](../adrs/index.md)）。尚无被测对象与结果。
 
@@ -20,7 +20,7 @@ TeaCSS 需要一份对外站得住的性能对比：TeaCSS TypeScript 引擎（`
 - 语料是 Tailwind 语法（`hover:p-4`），TeaCSS 用 `p:4@hover`，两边没有成对输入，无法证明做了同样的工作。
 - 语料用 `Math.random()` 生成，每次不同，跨机器不可复现。
 - 没有检查 Rust 引擎是否真的运行（`@teacss/engine` 在 alpha 期间会静默回退到 TS）。
-- 根目录是 `@icebreakers/monorepo` 模板（eslint、prettier、commitlint、changesets、turbo），与 Billgo 技术栈（Biome、四层架构）不一致；`FUNDING.yml` 指向上游作者。
+- 根目录是 `@icebreakers/monorepo` 模板（eslint、prettier、commitlint、changesets、turbo），与 Billgo 技术栈（Biome、四层架构）不一致。
 
 ## Proposed direction
 
@@ -63,7 +63,7 @@ interface PairedCase {
 - 每个样本在新进程中运行，被测对象轮替（A、B、C、D、A、B…），一轮内顺序随机。
 - 每个对象每个场景不少于 30 个样本；报告中位数、四分位距、p95、最小值，并对相近的两方做秩和检验；差距小于运行间波动的记为「无可测差异」。
 - 全部对象用各自文档推荐的生产配置与 release 构建；TeaCSS Rust 侧强制 `engine: "rust"` 且 `TEACSS_ENGINE_STRICT=1`，回退即报错；每个被测进程结束时上报它加载了哪些原生模块，ts 对象不得加载 `.node`，rs 与 tailwind 对象必须加载。
-- 运行前记录 CPU、核数、内存、OS、Node、pnpm、所有被测包的精确版本与 lockfile 哈希、1 分钟负载；1 分钟负载高于核数的 20% 时拒绝开始（可用 `--allow-busy` 覆盖，报告会标注）。
+- 运行前记录 CPU、核数、内存、OS、Node、Bun、所有被测包的精确版本与 lockfile 哈希、1 分钟负载；1 分钟负载高于核数的 20% 时拒绝开始（可用 `--allow-busy` 覆盖，报告会标注）。
 - 每个对象另做一次不计入统计的 `--cpu-prof` 剖析，报告写出限制因素（前三个自耗时帧）。
 - 输出体积（原始、gzip）作为次要指标一并记录。
 
@@ -87,7 +87,7 @@ scripts/check-layout.mjs, scripts/check-dependencies.mjs
 
 ### 工具链
 
-Node 24（`.node-version`），pnpm workspace（沿用现有声明，精确锁定），TypeScript 直接由 Node 运行（无需 tsx），Biome（`@biomejs/biome` + `@devjskit/biome-config`），`node:test`。移除 eslint、prettier、commitlint、changesets、turbo、husky、`@icebreakers/monorepo`。被测版本精确钉死：vite 8.3.4（三方共用，Tailwind 的 vite 插件支持 ^8，`@teacss/vite` 要求 >=8），tailwindcss 系列 4.3.3，`@teacss/*` 0.8.5，`@teacss/engine` 0.8.5-alpha.3。
+Node 24（`.node-version`）运行，Bun workspace 管理依赖（isolated linker，精确锁定，见 ADR-0004），TypeScript 直接由 Node 运行（无需 tsx），Biome（`@biomejs/biome` + `@devjskit/biome-config`），`node:test`。移除 eslint、prettier、commitlint、changesets、turbo、husky、`@icebreakers/monorepo`。被测版本精确钉死：vite 8.3.4（三方共用，Tailwind 的 vite 插件支持 ^8，`@teacss/vite` 要求 >=8），tailwindcss 系列 4.3.3，`@teacss/*` 0.8.5，`@teacss/engine` 0.8.5-alpha.3。
 
 ## Scope
 
@@ -99,9 +99,9 @@ Node 24（`.node-version`），pnpm workspace（沿用现有声明，精确锁�
 
 - **成对语料而不是共用一份 Tailwind 语料**：现有做法让 TeaCSS 处理它不认识的类，相当于测「跳过」。只有配对输入加等价校验才能回答「做了同样的工作吗」。
 - **进程隔离而不是同进程轮流**：三个原生模块（napi 引擎、Oxide、lightningcss）在同一进程里会互相污染热身状态与内存；一个进程一个对象也让「加载了哪个引擎」可以直接证明。
-- **删除而不是保留 `bench/`**：它的 teacss 标签是错的，保留会误导读者。思路（基线减法、轮替、分位数）记入 ADR 并致谢上游 `sonofmagic/tailwindcss-vs-unocss`（MIT）。
+- **删除而不是保留 `bench/`**：它的 teacss 标签是错的，保留会误导读者；本项目的测法与它不同，不沿用其思路（ADR-0001）。
 - **方法学先于数字**：规格（`docs/specs/`）在第一次正式运行前被接受并提交，等于预注册；之后只允许在报告里标注偏离，不允许改规格迎合结果。
-- **使用已发布的 npm 包**：任何人 `git clone && pnpm install && pnpm bench` 得到同一套依赖。本地 link 兄弟仓库仅作开发便利（`--local`），报告不采用 link 结果。
+- **使用已发布的 npm 包**：任何人 `git clone && bun install && bun run bench` 得到同一套依赖。本地 link 兄弟仓库仅作开发便利（`--local`），报告不采用 link 结果。
 - **利益冲突的处理**：作者测自己的工具。缓解方式是公开配对表、原始样本、一条命令复现、Tailwind 按其官方文档配置、报告写出限制因素与「无可测差异」的结论，并在 README 邀请外部复现与指正。
 
 ## Open questions

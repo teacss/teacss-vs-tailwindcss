@@ -24,7 +24,7 @@ function record(): RunRecord {
     seed: 1,
     samplesPerCell: 30,
     allowBusy: false,
-    environment: { host: "h", cpu: "c", cores: 8, memoryBytes: 8 * 1073741824, os: "o", node: "v24", pnpm: "10", lockfileSha256: "l", commit: "c0ffee" },
+    environment: { host: "h", cpu: "c", cores: 8, memoryBytes: 8 * 1073741824, os: "o", node: "v24", bun: "1.4.3", lockfileSha256: "l", commit: "c0ffee" },
     subjects: { fast: { packages: { fast: "1.0.0" } } },
     cells: [{ cell: { utilities: 100, files: 2 }, corpusHash: "abc", loadShareBefore: 0.1, loadShareAfter: 0.12 }],
     limiters: { "fast/engine": { totalMs: 100, top: [{ name: "generate (core.js:1)", selfMs: 40, share: 0.4 }] } },
@@ -57,6 +57,7 @@ test("the markdown is deterministic and states the verdicts in words", () => {
   assert.match(first, /slow: 2\.82x the median of fast \(p = < 0\.001, Cliff's delta -1\.00\)/);
   assert.match(first, /\| slow \| 401\.0 ms \| 2\.0 ms \| 402\.0 ms \| 400\.0 ms \| 300\.0 ms \| 1\.0 KB \| 0\.2 KB \| 1 MB \|/);
   assert.match(first, /No engine\/warm samples in this run/);
+  assert.match(first, /\*\*Subset run\.\*\* Measured: fast\. Not measured: vite-baseline, teacss-ts, teacss-rs, tailwind-v4\./);
   assert.match(first, /\| fast\/engine \| generate \(core\.js:1\) 40\.0 ms \(40%\) \|/);
   assert.equal(renderSummary(buildReport(record())), renderSummary(buildReport(record())));
 });

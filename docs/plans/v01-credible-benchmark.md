@@ -10,22 +10,22 @@
 
 - [x] 用户让工作继续推进；提案 accepted，三个偏好项按默认值记录在提案 Status 里。
 - [x] `docs/specs/v01.1-benchmark-protocol.md`（英文，随报告公开）：被测对象与包版本、两个层级的计时起止、语料形状、规模矩阵、运行协议、两级等价、统计规则、环境记录、报告结构、验收表。
-- [x] `docs/adrs/ADR-0001`（删除 fork 的 harness）、`ADR-0002`（成对语料与两级等价）、`ADR-0003`（只用已发布包，pnpm 安装）。ADR 放在 `docs/adrs/`，不是 `docs/knowledge/`。
+- [x] `docs/adrs/ADR-0001`（删除 fork 的 harness）、`ADR-0002`（成对语料与两级等价）、`ADR-0003`（只用已发布包），后加 `ADR-0004`（Bun 管理依赖）。ADR 放在 `docs/adrs/`，不是 `docs/knowledge/`。
 - [x] 第 4 项待决事项用探针回答，证据在 `docs/knowledge/engine-probe-2026-10-21.md`。
 - [ ] 规格接受：用户确认后把 `status` 改为 accepted。此前第 2 到第 6 片可以推进，第 7 片的正式运行不能。
 
 ## 第 1 片：仓库骨架与检查
 
-完成于 2026-10-21，分支 `bench-skeleton`，五个提交。干净 clone 下 `pnpm install --frozen-lockfile && pnpm check` 通过。
+完成于 2026-10-21，分支 `bench-skeleton`，五个提交。干净 clone 下冻结锁文件安装与全部检查通过（当时用 pnpm，后按 ADR-0004 换成 Bun）。
 
 - [x] 删除 `bench/`、`turbo.json`、`vitest.*`、`tsconfig.build.json`、`tsconfig.dts.json`、`.github/FUNDING.yml`、`SECURITY.md`（模板占位文本）；根 `package.json` 只剩 Biome、TypeScript 6.0.3 与 `@types/node`。
-- [x] `pnpm-workspace.yaml`：`apps/*`、`packages/*`；`.node-version` 24.14.1；根 `tsconfig.base.json` 持有唯一的 strict 集合，每个包只 `extends`。Node 24 直接运行 `.ts`，没有构建步骤。
+- [x] workspace：`apps/*`、`packages/*`（现在写在根 `package.json` 的 `workspaces`，由 Bun 管理）；`.node-version` 24.14.1；根 `tsconfig.base.json` 持有唯一的 strict 集合，每个包只 `extends`。Node 24 直接运行 `.ts`，没有构建步骤。
 - [x] Biome：`@biomejs/biome` + `@devjskit/biome-config`，脚本 `lint`、`lint:check`。`biome.json` 的 override 禁止 `packages/benchmark/src/features/**` 导入 `@bench/subject-*` 与 `appshell`。
 - [x] `scripts/check-layout.ts`：顶层只允许 `apps/`、`packages/`、`docs/`、`results/`、`scripts/` 与根清单；禁止 `core`、`common`、`shared`、`utils`、`domain`；包名必须是 `@bench/<目录名>`；壳的 `src` 只允许 `main.ts`、`subject.ts` 与测试；包的 `tsconfig` 只能 `extends` 基线。
 - [x] `scripts/check-dependencies.ts`：层级表在 `scripts/workspace.ts`。壳只依赖恰好一个产品；产品依赖基础层与隔离层（组合根在产品里挑实现，特性目录由 Biome override 挡住）；隔离层只依赖基础层；基础层不依赖任何工作区包；工作区依赖必须用 `workspace:` 协议。
 - [x] 每条规则一个 `node:test` 用例：植入违规后脚本返回该路径。
-- [x] `.github/workflows/check.yml`：`pnpm install --frozen-lockfile && pnpm check`。
-- [x] `README.md`（英文，面向外部读者）、`AGENTS.md`、`CLAUDE.md`、`LICENSE` 改为 Billgo，致谢上游一句。
+- [x] `.github/workflows/check.yml`：`bun install --frozen-lockfile && bun run check`，Node 24 运行。
+- [x] `README.md`（英文，面向外部读者）、`AGENTS.md`、`CLAUDE.md`、`LICENSE` 改为 Billgo。
 - 验收：通过。布局检查在真实仓库第一次运行就抓到了 `git rm` 后残留的未跟踪 `bench/` 目录。
 
 ## 第 2 片：基础层、合同与壳
@@ -37,7 +37,7 @@
 - [x] `packages/benchmark/subjects`：编排侧的 `invokeSubject`，按注册表里的模块标识符起子进程；非零退出、超时、错误结果都抛 `SubjectProcessError` 并附 stderr。
 - [x] `appshell`：`createApp`（接收原始 argv/env/cwd，路由 `help`、`subjects`）与 `subjectMain`（子进程：读一条请求、`import()` 唯一一个模块、执行、写一条响应）。
 - [x] `apps/bench/src/main.ts` 与 `subject.ts` 只依赖 `@bench/benchmark`。
-- [x] `persistence`：`results/<时间>-<主机>.json` 的写入与读取；`features/environment`：CPU、核数、内存、OS、Node、pnpm、锁文件哈希、提交。
+- [x] `persistence`：`results/<时间>-<主机>.json` 的写入与读取；`features/environment`：CPU、核数、内存、OS、Node、Bun、锁文件哈希、提交。
 - 偏离简报的地方：ChildProcess 没有 `resourceUsage()`，CPU 与 RSS 改由子进程用 `process.resourceUsage()` 自报并进入响应；`bench run` 不在本片，等语料与被测对象就位后随第 5 片一起来，避免写一个一次性的占位循环。
 - 验收：30 个测试通过，含假对象经真实子进程的 describe、engine、build 往返，以及植入错误时的失败。
 
@@ -54,7 +54,7 @@
 
 完成于 2026-10-21。
 
-- [x] 待决事项 4 的答案见第 0 片；被测对象全部用发布包，`pnpm-lock.yaml` 钉死。
+- [x] 待决事项 4 的答案见第 0 片；被测对象全部用发布包，`bun.lock` 钉死。
 - [x] `packages/subject-vite-baseline`、`subject-tailwind-v4`、`subject-teacss`（一个包、两个入口 `./ts` 与 `./rs`，同一套 teacss 包只换引擎模式）。engine 层：teacss 走 `createGenerator` + `generate`，Tailwind 走 `compile` + `build(candidates)`，都不带 preflight。build 层：Vite JS API 在临时目录构建，入口与软链见 `docs/knowledge/engine-probe-2026-10-21.md`。版本从各包自己的 `node_modules/<name>/package.json` 读。
 - [x] 注册表 `subjects/registry.ts`：每个对象的模块（`import.meta.resolve` 得到的文件 URL）、环境（teacss 两个对象都带 `TEACSS_ENGINE_STRICT=1`）、语法、是否有 engine 层、原生模块的必须与禁止前缀。
 - [x] `features/verify`：css-tree 解析；强等价按哈希；覆盖与结构检查合一（每个用例的选择器存在、声明的属性集包含期望、条件结构按伪类与宽度媒体查询归类）；物理 longhand 对归一为逻辑属性；`not` 媒体查询取反；原生模块期望。
@@ -88,9 +88,11 @@
 - [x] `features/profile`：解析 V8 `.cpuprofile`，按函数汇总自耗时；`bench run` 在测量结束后对最大的格每个对象每个层级跑一次不计数的 `--cpu-prof` 子进程（`--no-profile` 跳过），结果写入记录的 `limiters`，报告的 Limiter 段渲染前三帧。
 - [x] `.github/workflows/bench.yml`：手动触发（可传规模与样本数）与每周一次，先 `bench:verify`，再 `--allow-busy` 跑矩阵，报告与原始记录作为 artifact 上传，不自动提交。
 - [x] 根脚本 `bench`、`bench:verify`、`bench:report`。
-- [ ] 本机正式运行：需要一分钟负载低于核数 20%（M2 Max 为 2.4）。2026-10-21 本机负载 6 到 8，负载门拒绝；排练记录只证明管线。
+- [x] `--subjects` 同时作用于 `run` 与 `verify`，未知名字报错；子集运行的报告在结论前写明「Subset run」与未测对象。根脚本 `bench:ts-tailwind` 跑 vite-baseline、teacss-ts、tailwind-v4。
+- [ ] 第一份报告只含 teacss-ts 与 Tailwind v4（所有者 2026-10-21 决定：teacss-rs 等 teacss-rs 项目优化完成再测）。本机正式运行需要一分钟负载低于 2.4；当天 teacss-rs 会话持续运行 `cargo check`，负载在 5 到 24 之间。
 - [ ] CI 交叉验证运行。
 - [ ] 按 benchmark-checklist 审核后发布 `docs/reports/<date>.md`，README 每层一个主数字。
+- [ ] teacss-rs 加入：teacss-rs 优化完成并发布新的 `@teacss/engine` 后，更新 `packages/subject-teacss/package.json` 的引擎版本与 `bun.lock`，先跑四对象 `bench:verify`（强等价必须通过），再跑全矩阵，作为第二份报告；规格修订号与 `engineCompat` 变化写进报告。
 
 ## 第二阶段（另立提案）
 

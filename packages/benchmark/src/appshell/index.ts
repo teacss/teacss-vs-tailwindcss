@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
-import { type Invocation, parseInvocation, subjectId } from "@bench/infrastructure";
+import { type Invocation, parseInvocation, type SubjectId, subjectId } from "@bench/infrastructure";
 import { DEFAULT_SEED, generateCorpus, PAIR_TABLE_VERSION, profileCorpus } from "../features/corpus/index.ts";
 import { captureEnvironment, loadShare } from "../features/environment/index.ts";
 import { measure, type Tier } from "../features/measure/run.ts";
@@ -8,7 +8,7 @@ import { profileSubjects } from "../features/profile/run.ts";
 import { buildReport, renderMarkdown, renderSummary } from "../features/report/index.ts";
 import { verifyCorpus } from "../features/verify/run.ts";
 import { type RunRecord, readRunRecord, writeRunRecord } from "../persistence/index.ts";
-import { invokeSubject, productionRegistry, type SubjectRegistry } from "../subjects/index.ts";
+import { invokeSubject, productionRegistry, type SubjectRegistration, type SubjectRegistry } from "../subjects/index.ts";
 
 export interface AppDeps {
   readonly argv: readonly string[];
@@ -27,7 +27,7 @@ const USAGE = `bench <command>
   corpus      generate a paired corpus and print its hash
               --utilities <n> (5000)  --files <n> (30)  --seed <n>  --profile
   verify      run the equivalence checks of spec v01.1 on one corpus
-              --utilities <n> (5000)  --files <n> (30)  --seed <n>
+              --utilities <n> (5000)  --files <n> (30)  --seed <n>  --subjects <a,b>
   run         measure the scale matrix and write results/<time>-<host>.json
               --utilities <a,b,c> (1000,5000,20000)  --files <a,b,c> (3,30,300)
               --samples <n> (30)  --tier engine|build|all (all)  --subjects <a,b>
@@ -65,6 +65,15 @@ function tiersOf(invocation: Invocation): Tier[] {
   if (raw === "all") return ["engine", "build"];
   if (raw === "engine" || raw === "build") return [raw];
   throw new Error(`--tier must be engine, build or all, found "${String(raw)}"`);
+}
+
+function chosenSubjects(invocation: Invocation, registry: SubjectRegistry): [SubjectId, SubjectRegistration][] {
+  const wanted = invocation.options.get("subjects");
+  if (wanted === undefined || wanted === true) return [...registry];
+  const names = wanted.split(",");
+  const unknown = names.filter((name) => !registry.has(name as SubjectId));
+  if (unknown.length > 0) throw new Error(`--subjects: unknown ${unknown.join(", ")}; registered are ${[...registry.keys()].join(", ")}`);
+  return [...registry].filter(([id]) => names.includes(id));
 }
 
 function corpusOf(invocation: Invocation) {
@@ -105,7 +114,7 @@ export async function createApp(deps: AppDeps): Promise<number> {
     verify: async (invocation) => {
       const corpus = corpusOf(invocation);
       deps.stdout(`verify corpus ${corpus.hash.slice(0, 12)} (${corpus.parameters.utilities} utilities, ${corpus.parameters.files} files)\n`);
-      const subjects = [...registry].map(([id, registration]) => ({ id, syntax: registration.syntax, engineTier: registration.engineTier, natives: registration.natives }));
+      const subjects = chosenSubjects(invocation, registry).map(([id, registration]) => ({ id, syntax: registration.syntax, engineTier: registration.engineTier, natives: registration.natives }));
       const report = await verifyCorpus(corpus, subjects, async (subject, task) => {
         const { response } = await invokeSubject(registry, subject, task, processDeps);
         const result = response.result;
@@ -127,9 +136,7 @@ export async function createApp(deps: AppDeps): Promise<number> {
       deps.stdout(`run: refused, the one-minute load is ${(share * 100).toFixed(0)}% of the cores (limit ${LOAD_SHARE_LIMIT * 100}%); pass --allow-busy to record a run on a busy machine\n`);
       return 3;
     }
-    const wanted = invocation.options.get("subjects");
-    const chosen = [...registry].filter(([id]) => wanted === undefined || wanted === true || wanted.split(",").includes(id));
-    if (chosen.length === 0) throw new Error(`--subjects named none of ${[...registry.keys()].join(", ")}`);
+    const chosen = chosenSubjects(invocation, registry);
     const cells = integerList(invocation, "utilities", [1_000, 5_000, 20_000]).flatMap((utilities) => integerList(invocation, "files", [3, 30, 300]).map((files) => ({ utilities, files })));
     const plan = { seed: integerOption(invocation, "seed", DEFAULT_SEED), cells, tiers: tiersOf(invocation), subjects: chosen.map(([id, registration]) => ({ id, syntax: registration.syntax, engineTier: registration.engineTier })), samplesPerCell: integerOption(invocation, "samples", 30) };
     const startedAt = new Date().toISOString();

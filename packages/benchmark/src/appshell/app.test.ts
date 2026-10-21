@@ -26,3 +26,7 @@ test("corpus --profile prints the family and condition counts", async () => {
 test("a malformed count is refused with the option name", async () => {
   await assert.rejects(run(["corpus", "--utilities", "many"]), /--utilities must be a non-negative integer/);
 });
+
+test("an unknown subject name is refused with the registered names", async () => {
+  await assert.rejects(run(["verify", "--subjects", "teacss-rs"]), /--subjects: unknown teacss-rs; registered are $/);
+});

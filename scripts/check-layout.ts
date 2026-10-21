@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { BANNED_UNIT_NAMES, expectedPackageName, isRecord, listWorkspaceDirs, type Problem, readWorkspace, runCheck } from "./workspace.ts";
 
 const ROOT_DIRS = new Set(["apps", "packages", "docs", "results", "scripts"]);
-const ROOT_FILES = new Set(["package.json", "pnpm-workspace.yaml", "pnpm-lock.yaml", "tsconfig.base.json", "tsconfig.json", "biome.json", "README.md", "AGENTS.md", "CLAUDE.md", "LICENSE"]);
+const ROOT_FILES = new Set(["package.json", "bun.lock", "bunfig.toml", "tsconfig.base.json", "tsconfig.json", "biome.json", "README.md", "AGENTS.md", "CLAUDE.md", "LICENSE"]);
 const SHELL_SOURCES = new Set(["main.ts", "subject.ts"]);
 const BASE_TSCONFIG = "../../tsconfig.base.json";
 const PACKAGE_COMPILER_OPTIONS = new Set(["types"]);

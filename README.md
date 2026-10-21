@@ -35,33 +35,30 @@ foundation depends on nothing in the workspace. `scripts/check-layout.ts` and
 
 ## Develop
 
-Node 24 runs the TypeScript sources directly; there is no build step.
+Bun installs the workspace; Node 24 runs the TypeScript sources directly, so
+there is no build step.
 
 ```sh
-pnpm install
-pnpm check
+bun install
+bun run check
 ```
 
-`pnpm check` runs Biome, the per-package type checks, the tests and both
-structure checks. Each script can run on its own: `pnpm lint:check`,
-`pnpm typecheck`, `pnpm test`, `pnpm check:layout`, `pnpm check:dependencies`.
+`bun run check` runs Biome, the per-package type checks, the tests and both
+structure checks. Each script can run on its own: `bun run lint:check`,
+`bun run typecheck`, `bun run test`, `bun run check:layout`,
+`bun run check:dependencies`.
 
 ## Measure
 
 ```sh
-pnpm bench:verify --utilities 5000 --files 30   # equivalence checks on one corpus
-pnpm bench                                        # the full matrix, 30 samples per cell, into results/
-pnpm bench:report results/<file>.json             # Markdown and JSON summary into docs/reports/
+bun run bench:verify --utilities 5000 --files 30   # equivalence checks on one corpus
+bun run bench                                        # the full matrix, 30 samples per cell, into results/
+bun run bench:ts-tailwind                            # the same without teacss-rs
+bun run bench:report results/<file>.json             # Markdown and JSON summary into docs/reports/
 ```
 
-`pnpm bench` refuses to start when the one-minute load exceeds 20 % of the
+`bun run bench` refuses to start when the one-minute load exceeds 20 % of the
 logical cores; `--allow-busy` records the run anyway and the report says so.
-`node apps/bench/src/main.ts --help` lists every option. Use pnpm: npm refuses
-to install the published `@teacss/core` 0.8.5 beside `@teacss/engine`
-0.8.5-alpha.3 ([ADR-0003](docs/adrs/ADR-0003-published-packages.md)).
-
-## Credits
-
-The baseline-subtraction and interleaved-run ideas come from
-[sonofmagic/tailwindcss-vs-unocss](https://github.com/sonofmagic/tailwindcss-vs-unocss)
-(MIT). None of its code remains here.
+`node apps/bench/src/main.ts --help` lists every option. Bun is the package
+manager; Node 24 runs the harness and every measured process, because that is the runtime a Vite build uses by default
+([ADR-0003](docs/adrs/ADR-0003-published-packages.md)).

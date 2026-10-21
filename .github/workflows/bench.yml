@@ -21,13 +21,14 @@ jobs:
     timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm bench:verify
+      - run: bun install --frozen-lockfile
+      - run: bun run bench:verify
       - run: node apps/bench/src/main.ts run --utilities "${{ github.event.inputs.utilities || '1000,5000,20000' }}" --files "${{ github.event.inputs.files || '3,30,300' }}" --samples "${{ github.event.inputs.samples || '30' }}" --allow-busy --out results-ci
       - run: for file in results-ci/*.json; do node apps/bench/src/main.ts report "$file" --out results-ci; done
       - uses: actions/upload-artifact@v4
