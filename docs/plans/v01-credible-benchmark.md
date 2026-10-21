@@ -13,15 +13,17 @@
 
 ## 第 1 片：仓库骨架与检查
 
-- [ ] 删除 `bench/`、`turbo.json`、`vitest.*`、`tsconfig.build.json`、`tsconfig.dts.json`、`.github/FUNDING.yml`；根 `package.json` 去掉 eslint、prettier、commitlint、changesets、husky、lint-staged、`@icebreakers/*`、tsup、unbuild、vitest。
-- [ ] `pnpm-workspace.yaml`：`apps/*`、`packages/*`；`.node-version` 24.14.1；根 `tsconfig.base.json` 持有唯一的 strict 集合，每个包只 `extends`。
-- [ ] Biome：`@biomejs/biome` + `@devjskit/biome-config`，脚本 `lint`、`lint:check`。
-- [ ] `scripts/check-layout.mjs`：目录只允许 `apps/`、`packages/`、`docs/`、`results/`、`scripts/`；禁止 `core`、`common`、`shared`、`utils`、`domain` 命名；壳目录只允许 `main.ts`、`subject.ts`；任何 `tsconfig` 不得放松基线。
-- [ ] `scripts/check-dependencies.mjs`：读每个 `package.json`，依赖只能指向下层；`benchmark` 不得依赖任何 `subject-*`；`subject-*` 只能依赖 `infrastructure` 的接口导出；`infrastructure` 不依赖任何工作区包。
-- [ ] `.github/workflows/check.yml`：lint、typecheck、`node --test`、两个检查脚本。
-- [ ] 根 `README.md` 改写：目标、一条命令复现、当前状态「无结果」。
-- 验收：`pnpm check` 在空骨架上通过；对每条规则各植入一处违规（一个 `packages/shared`、一条向上依赖、一个放松的 tsconfig），对应脚本必须失败。
-- 验证命令：`pnpm check`，以及 `node --test scripts/`。
+完成于 2026-10-21，分支 `bench-skeleton`，五个提交。干净 clone 下 `pnpm install --frozen-lockfile && pnpm check` 通过。
+
+- [x] 删除 `bench/`、`turbo.json`、`vitest.*`、`tsconfig.build.json`、`tsconfig.dts.json`、`.github/FUNDING.yml`、`SECURITY.md`（模板占位文本）；根 `package.json` 只剩 Biome、TypeScript 6.0.3 与 `@types/node`。
+- [x] `pnpm-workspace.yaml`：`apps/*`、`packages/*`；`.node-version` 24.14.1；根 `tsconfig.base.json` 持有唯一的 strict 集合，每个包只 `extends`。Node 24 直接运行 `.ts`，没有构建步骤。
+- [x] Biome：`@biomejs/biome` + `@devjskit/biome-config`，脚本 `lint`、`lint:check`。`biome.json` 的 override 禁止 `packages/benchmark/src/features/**` 导入 `@bench/subject-*` 与 `appshell`。
+- [x] `scripts/check-layout.ts`：顶层只允许 `apps/`、`packages/`、`docs/`、`results/`、`scripts/` 与根清单；禁止 `core`、`common`、`shared`、`utils`、`domain`；包名必须是 `@bench/<目录名>`；壳的 `src` 只允许 `main.ts`、`subject.ts` 与测试；包的 `tsconfig` 只能 `extends` 基线。
+- [x] `scripts/check-dependencies.ts`：层级表在 `scripts/workspace.ts`。壳只依赖恰好一个产品；产品依赖基础层与隔离层（组合根在产品里挑实现，特性目录由 Biome override 挡住）；隔离层只依赖基础层；基础层不依赖任何工作区包；工作区依赖必须用 `workspace:` 协议。
+- [x] 每条规则一个 `node:test` 用例：植入违规后脚本返回该路径。
+- [x] `.github/workflows/check.yml`：`pnpm install --frozen-lockfile && pnpm check`。
+- [x] `README.md`（英文，面向外部读者）、`AGENTS.md`、`CLAUDE.md`、`LICENSE` 改为 Billgo，致谢上游一句。
+- 验收：通过。布局检查在真实仓库第一次运行就抓到了 `git rm` 后残留的未跟踪 `bench/` 目录。
 
 ## 第 2 片：基础层、合同与壳
 
