@@ -59,6 +59,16 @@ test("a stylesheet that lags is polled until every new class is there", async ()
   assert.ok((run.samples[0]?.polls ?? 0) >= 2);
 });
 
+test("a round is timed to the receipt of the first complete stylesheet, with one clock read per poll", async () => {
+  const { io } = fakeServer(["p:4"], { lag: 4 });
+  const run = await runDevScenario({ modules: [], corpusClasses: ["p:4"], extra: [["m:1"]], moduleHeader: "" }, io, fakeClock());
+  // The clock steps 1 ms per read: the start, then per stale poll its receipt and the timeout check, then the receipt of the complete one.
+  assert.deepEqual(
+    run.samples.map((sample) => [sample.polls, sample.wallMs]),
+    [[3, 5]],
+  );
+});
+
 test("a class that never appears invalidates the run after the timeout", async () => {
   const { io } = fakeServer(["p:4"]);
   const silent: DevIo = { ...io, fetch: async (path) => (path === "/__tea.css" ? stylesheetModule(["p:4"]) : io.fetch(path)) };

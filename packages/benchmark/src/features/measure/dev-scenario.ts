@@ -54,13 +54,28 @@ function milliseconds(start: bigint, end: bigint): number {
   return Number(end - start) / 1e6;
 }
 
-async function pollUntil(io: DevIo, stylesheet: string, classes: readonly string[], clock: Clock, started: bigint, what: string): Promise<{ css: string; polls: number }> {
+interface Stylesheet {
+  readonly text: string;
+  readonly css: string;
+}
+
+/**
+ * The clock stops when the first response with every class arrives. A response with the same text
+ * as the last one is not read again: reading shares the server's thread, so it would delay the server.
+ */
+async function pollUntil(io: DevIo, stylesheet: string, classes: readonly string[], clock: Clock, started: bigint, last: Stylesheet | undefined, what: string): Promise<{ sheet: Stylesheet; polls: number; elapsedMs: number }> {
   let polls = 0;
   for (;;) {
-    const css = cssOfStylesheetModule(await io.fetch(stylesheet));
+    const text = await io.fetch(stylesheet);
+    const received = clock.now();
     polls++;
-    if (classes.every((name) => containsClass(css, name))) return { css, polls };
+    if (text !== last?.text) {
+      const sheet = { text, css: cssOfStylesheetModule(text) };
+      last = sheet;
+      if (classes.every((name) => containsClass(sheet.css, name))) return { sheet, polls, elapsedMs: milliseconds(started, received) };
+    }
     if (milliseconds(started, clock.now()) > DEV_TIMEOUT_MS) {
+      const css = last?.css ?? "";
       const missing = classes.filter((name) => !containsClass(css, name));
       throw new Error(`${what}: ${missing.length} class(es) still missing after ${DEV_TIMEOUT_MS} ms, first ${missing[0]}`);
     }
@@ -71,7 +86,7 @@ async function pollUntil(io: DevIo, stylesheet: string, classes: readonly string
 /**
  * Spec v02.1 §Tiers `dev`: load the page as a browser would, replay the stylesheet module's HMR
  * events, then per round write a module with new classes, import it from the entry, request both,
- * and time until the stylesheet module serves every new class.
+ * and time to the first stylesheet response that serves every new class.
  */
 export async function runDevScenario(input: DevScenarioInput, io: DevIo, clock: Clock): Promise<DevRun> {
   const entry = await io.fetch(`/${ENTRY}`);
@@ -79,7 +94,7 @@ export async function runDevScenario(input: DevScenarioInput, io: DevIo, clock: 
   const stylesheet = stylesheetPath(entry);
   const stylesheetModule = await io.fetch(stylesheet);
   for (const match of stylesheetModule.matchAll(/import\.meta\.hot\.send\(("[^"]+")\)/g)) io.sendHot(JSON.parse(match[1] ?? '""') as string);
-  let { css } = await pollUntil(io, stylesheet, input.corpusClasses, clock, clock.now(), "first stylesheet");
+  let last = (await pollUntil(io, stylesheet, input.corpusClasses, clock, clock.now(), undefined, "first stylesheet")).sheet;
   const samples: DevSample[] = [];
   for (const [round, classes] of input.extra.entries()) {
     const name = `src/dev-${String(round).padStart(3, "0")}.js`;
@@ -88,11 +103,11 @@ export async function runDevScenario(input: DevScenarioInput, io: DevIo, clock: 
     io.append(ENTRY, `import "./${name.slice(4)}";\n`);
     await io.fetch(`/${ENTRY}`);
     await io.fetch(`/${name}`);
-    const result = await pollUntil(io, stylesheet, classes, clock, started, `round ${round}`);
-    samples.push({ wallMs: milliseconds(started, clock.now()), polls: result.polls, cssBytes: Buffer.byteLength(result.css), cssSha256: createHash("sha256").update(result.css).digest("hex") });
-    css = result.css;
+    const result = await pollUntil(io, stylesheet, classes, clock, started, last, `round ${round}`);
+    last = result.sheet;
+    samples.push({ wallMs: result.elapsedMs, polls: result.polls, cssBytes: Buffer.byteLength(last.css), cssSha256: createHash("sha256").update(last.css).digest("hex") });
   }
-  return { samples, css };
+  return { samples, css: last.css };
 }
 
 /** The real io: HTTP for module requests, Vite's HMR socket for custom events. */
