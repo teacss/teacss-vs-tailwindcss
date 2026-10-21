@@ -7,8 +7,8 @@ import { WARM_TIMED_ITERATIONS } from "./engine-scenario.ts";
 import { type Measured, measure, RunInvalid, type RunPlan } from "./run.ts";
 
 const subjects = [
-  { id: subjectId("alpha"), syntax: "teacss" as const, engineTier: true },
-  { id: subjectId("beta"), syntax: "tailwind" as const, engineTier: false },
+  { id: subjectId("alpha"), syntax: "teacss" as const, tiers: ["engine", "dev", "build"] as const },
+  { id: subjectId("beta"), syntax: "tailwind" as const, tiers: ["build"] as const },
 ];
 const plan: RunPlan = { seed: 1, corpusFor: (cell) => generateCorpus({ seed: 1, utilities: cell.utilities, files: cell.files }), cells: [{ utilities: 20, files: 2 }], tiers: ["engine", "build"], subjects, samplesPerCell: 4 };
 

@@ -3,10 +3,11 @@ import { createRequire } from "node:module";
 import { dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { type CoverageResult, type DevServer, describePackages, nativeArtifact, type ResolvedPackage, resolvePackage, type SubjectClient, subjectId, type Workspace } from "@bench/infrastructure";
-import { createGenerator, type EngineMode } from "@teacss/core";
+import { createGenerator } from "@teacss/core";
+import { pluginTeacss as pluginTeacssPostcss } from "@teacss/postcss";
 import presetStandard from "@teacss/preset-standard";
 import { pluginTeacss } from "@teacss/vite";
-import { build, createServer, type PluginOption } from "vite";
+import { build, createServer, type InlineConfig, type PluginOption } from "vite";
 
 const require = createRequire(import.meta.url);
 const PACKAGES = ["@teacss/core", "@teacss/preset-standard", "@teacss/vite", "vite"];
@@ -21,12 +22,14 @@ function resolved() {
 }
 const INCLUDE = "// @teacss-include\n";
 const CSS_ENTRY = '@presets "standard";\n@source "./src/**/*.js";\n@teacss;\n';
+/** The setup guide's entry without `@source`, which the Vite pipeline does not need (spec v02.1 §Configurations). */
+const DEFAULT_CSS_ENTRY = '@presets "standard";\n@teacss;\n';
 
-async function viteBuild(workspace: Workspace, engine: EngineMode): Promise<string> {
+async function viteBuild(workspace: Workspace, setup: Pick<InlineConfig, "plugins" | "css">): Promise<string> {
   const previous = process.cwd();
   process.chdir(workspace.dir);
   try {
-    await build({ root: workspace.dir, configFile: false, logLevel: "silent", plugins: [pluginTeacss(undefined, { engine })] });
+    await build({ root: workspace.dir, configFile: false, logLevel: "silent", ...setup });
   } finally {
     process.chdir(previous);
   }
@@ -76,10 +79,17 @@ async function engineCoverage(packages: readonly ResolvedPackage[], entries: rea
   return results;
 }
 
-/** One subject per engine mode over the same packages; the mode is explicit so the environment cannot flip it. */
-export function teacssSubject(engine: "ts" | "rust"): SubjectClient {
+export type TeacssVariant = "production" | "default" | "postcss";
+
+/**
+ * One subject per engine mode and configuration over the same packages. The Vite variants pass the
+ * mode explicitly so the environment cannot flip it; the PostCSS plugin has no such option, so its
+ * registration sets `TEACSS_ENGINE`.
+ */
+export function teacssSubject(engine: "ts" | "rust", variant: TeacssVariant = "production"): SubjectClient {
+  const viteSetup = (): Pick<InlineConfig, "plugins" | "css"> => ({ plugins: [pluginTeacss(undefined, { engine })] });
   return {
-    id: subjectId(engine === "ts" ? "teacss-ts" : "teacss-rs"),
+    id: subjectId(`${engine === "ts" ? "teacss-ts" : "teacss-rs"}${variant === "production" ? "" : `-${variant}`}`),
     describe: async () => {
       const packages = resolved();
       const engineDir = packages.find((entry) => entry.name === "@teacss/engine");
@@ -97,12 +107,16 @@ export function teacssSubject(engine: "ts" | "rust"): SubjectClient {
     },
     prepare: async (workspace, project) => {
       for (const [path, content] of project.files) workspace.write(path, project.modules.includes(path) ? `${INCLUDE}${content}` : content);
-      workspace.write("index.css", CSS_ENTRY);
+      workspace.write("index.css", variant === "default" ? DEFAULT_CSS_ENTRY : CSS_ENTRY);
       workspace.link("node_modules/@teacss/preset-standard", dirname(require.resolve("@teacss/preset-standard/package.json")));
-      workspace.write("src/main.js", `${INCLUDE}${project.modules.map((module) => `import "./${module.replace(/^src\//, "")}";`).join("\n")}\nimport "virtual:teacss.css";\n`);
+      const stylesheet = variant === "postcss" ? "../index.css" : "virtual:teacss.css";
+      workspace.write("src/main.js", `${INCLUDE}${project.modules.map((module) => `import "./${module.replace(/^src\//, "")}";`).join("\n")}\nimport "${stylesheet}";\n`);
     },
-    build: async (workspace) => ({ css: await viteBuild(workspace, engine) }),
-    devServer: (workspace) => startDevServer(workspace, pluginTeacss(undefined, { engine })),
+    build: async (workspace) => ({ css: await viteBuild(workspace, variant === "postcss" ? { css: { postcss: { plugins: [pluginTeacssPostcss({ cwd: workspace.dir })] } } } : viteSetup()) }),
+    devServer: async (workspace) => {
+      if (variant === "postcss") throw new Error("the PostCSS round has no dev tier");
+      return startDevServer(workspace, viteSetup().plugins ?? []);
+    },
     moduleHeader: INCLUDE,
     extract: async () => [],
     coverage: async (entries) => (engine === "rust" ? engineCoverage(resolved(), entries) : []),

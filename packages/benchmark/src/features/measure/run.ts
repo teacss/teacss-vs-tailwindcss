@@ -10,7 +10,8 @@ export type { Tier };
 export interface MeasureSubject {
   readonly id: SubjectId;
   readonly syntax: Syntax;
-  readonly engineTier: boolean;
+  /** The tiers this subject takes part in. */
+  readonly tiers: readonly Tier[];
 }
 
 export interface RunPlan {
@@ -59,7 +60,7 @@ function jobsFor(plan: RunPlan): Job[] {
   const jobs: Job[] = [];
   for (const subject of plan.subjects) {
     for (const tier of plan.tiers) {
-      if (tier !== "build" && !subject.engineTier) continue;
+      if (!subject.tiers.includes(tier)) continue;
       if (tier === "dev") {
         for (const size of DEV_SIZES) jobs.push({ subject, tier, scenario: undefined, size, samples: plan.samplesPerCell });
         continue;

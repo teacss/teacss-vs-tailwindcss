@@ -48,3 +48,29 @@ test("the README names the tool that emits more CSS, and says TeaCSS for either 
   } as const;
   assert.match(renderReadmeSummary(buildReport(record), "s"), /- For the same classes, Tailwind CSS v4 emits 1\.5× the CSS of TeaCSS: 1,566 rules against 928\./);
 });
+
+test("the README compares each tool's out-of-the-box build with its tuned one", async () => {
+  const { buildReport } = await import("./index.ts");
+  const { renderReadmeSummary } = await import("./readme.ts");
+  const cell = { utilities: 10, files: 3 };
+  const samples: Sample[] = [];
+  for (let index = 0; index < 5; index++) samples.push(build("tailwind-v4", cell, 100, 1, 1), build("tailwind-v4-default", cell, 110, 1, 1), build("teacss-rs", cell, 200, 1, 1), build("teacss-rs-default", cell, 200, 1, 1));
+  const record = {
+    version: 1,
+    specRevision: 3,
+    pairTableVersion: 1,
+    startedAt: "2026-10-22T00:00:00.000Z",
+    finishedAt: "x",
+    seed: 1,
+    samplesPerCell: 5,
+    allowBusy: false,
+    environment: { host: "h", cpu: "c", cores: 1, memoryBytes: 1, os: "o", node: "v24", bun: "1", lockfileSha256: "l", commit: "c" },
+    subjects: {},
+    cells: [{ cell, corpusHash: "x", loadShareBefore: 0, loadShareAfter: 0 }],
+    limiters: {},
+    samples,
+  } as const;
+  const text = renderReadmeSummary(buildReport(record), "s");
+  assert.match(text, /- With each tool's out-of-the-box entry instead of the tuned one, the build takes 1\.00× as long for TeaCSS \(Rust engine\) and 1\.10× as long for Tailwind CSS v4/);
+  assert.ok(!text.includes("tailwind-v4-default |"), "variants stay out of the tables");
+});
