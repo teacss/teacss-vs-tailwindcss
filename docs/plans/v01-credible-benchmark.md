@@ -30,37 +30,25 @@
 
 ## 第 2 片：基础层、合同与壳
 
-数据形状先定：
+完成于 2026-10-21，提交 `f559037`。
 
-```ts
-// packages/infrastructure/src/subject-client/index.ts
-interface SubjectClient {
-  readonly id: SubjectId;                         // "teacss-ts" | "teacss-rs" | "tailwind-v4" | "vite-baseline"
-  describe(): Promise<SubjectVersions>;           // 包名→精确版本，napi 二进制路径
-  prepare(workspace: Workspace, corpus: Corpus): Promise<void>; // 写入 fixture
-  runEngine(input: EngineInput): Promise<EngineOutput>;       // tier engine
-  runBuild(workspace: Workspace): Promise<BuildOutput>;       // tier build
-  loadedNativeModules(): readonly string[];        // 结束时上报
-}
-// packages/benchmark/src/contract/index.ts
-interface SubjectRequest { version: 1; sentAt: number; subject: SubjectId; tier: Tier; scenario: ScenarioId; corpusHash: string }
-interface SubjectResponse { version: 1; sentAt: number; sample: Sample } | { version: 1; sentAt: number; error: SubjectError }
-```
-
-- [ ] `packages/infrastructure`：`config`（解析 CLI 与环境到类型化对象，其余代码不读 `process.env`）、`logging`、`clock`（`process.hrtime.bigint`）、`processes`（spawn 子进程、收集 `resourceUsage`、超时）、`workspace`（临时目录、写 fixture 文件）、`subject-client` 接口、`test-support`（假被测对象：可配置耗时、可植入错误、可植入「加载了 .node」）。
-- [ ] `packages/benchmark/contract`：上面两种消息，带 `version` 字段；`persistence`：`results/<date>-<host>.json` 的读写与 schema 校验。
-- [ ] `packages/benchmark/appshell`：组装 `SubjectClient` 实现表（唯一允许 import `subject-*` 的地方）、路由四个子命令。
-- [ ] `apps/bench/src/main.ts`：读环境、构造 appshell、处理信号；`apps/bench/src/subject.ts`：从 stdin 读一条 `SubjectRequest`，只装载一个对象，写回一条 `SubjectResponse`。
-- 验收：用假对象跑 `bench run --subject fake --runs 3` 得到一条合法的结果记录；植入错误时命令非零退出且记录不落盘；`bench --help` 列出四个子命令。
-- 验证命令：`node apps/bench/src/main.ts --help`；`node --test packages/`。
+- [x] `packages/infrastructure`：`config`（argv 解析）、`logging`、`clock`、`processes`（spawn 子进程，喂 stdin，收 stdout/stderr 与墙钟）、`workspace`、`runtime`（`process.report` 里的 `.node` 列表、自身 `resourceUsage`）、`SubjectClient` 接口、`test-support`（假时钟、假被测对象、会抛错的假对象）。
+- [x] `packages/benchmark/contract`：`SubjectRequest`（带 `version`、`module` 标识符、任务）与 `SubjectResponse`（带 `nativeModules`、`usage`、结果或错误），两端都经校验函数。
+- [x] `packages/benchmark/subjects`：编排侧的 `invokeSubject`，按注册表里的模块标识符起子进程；非零退出、超时、错误结果都抛 `SubjectProcessError` 并附 stderr。
+- [x] `appshell`：`createApp`（接收原始 argv/env/cwd，路由 `help`、`subjects`）与 `subjectMain`（子进程：读一条请求、`import()` 唯一一个模块、执行、写一条响应）。
+- [x] `apps/bench/src/main.ts` 与 `subject.ts` 只依赖 `@bench/benchmark`。
+- [x] `persistence`：`results/<时间>-<主机>.json` 的写入与读取；`features/environment`：CPU、核数、内存、OS、Node、pnpm、锁文件哈希、提交。
+- 偏离简报的地方：ChildProcess 没有 `resourceUsage()`，CPU 与 RSS 改由子进程用 `process.resourceUsage()` 自报并进入响应；`bench run` 不在本片，等语料与被测对象就位后随第 5 片一起来，避免写一个一次性的占位循环。
+- 验收：30 个测试通过，含假对象经真实子进程的 describe、engine、build 往返，以及植入错误时的失败。
 
 ## 第 3 片：成对语料
 
-- [ ] `packages/benchmark/features/corpus`：带种子的 PRNG（如 mulberry32，自实现，无依赖）；配对表 `pairs.ts`（版本号、每个属性族的 teacss 与 tailwind 模板、属性名、允许的条件）；生成器按 `(seed, utilities, files)` 产出 `Corpus { hash, cases, files }`；输出两套源文件（TeaCSS 侧带 `// @teacss-include`，Tailwind 侧由 `@source` 覆盖）。
-- [ ] 配对表的每个 teacss 名称对照 teacss skill 的属性参考核对；每个 tailwind 类对照 Tailwind v4 文档核对。
-- [ ] 测试：同一参数两次生成哈希相同；不同种子不同；规模矩阵每格都能生成；`properties` 与 `conditions` 非空。
-- 验收：`bench corpus --utilities 5000 --files 30` 两次运行哈希一致；语料统计（属性族分布、条件分布）打印并写入 `docs/knowledge/corpus-profile.md`。
-- 验证命令：`node apps/bench/src/main.ts corpus --utilities 5000 --files 30 --print-hash`。
+完成于 2026-10-21。
+
+- [x] `features/corpus`：mulberry32 种子随机；配对表 `pairs.ts`（版本 1：12 个间距属性 × 18 个值，3 个颜色属性 × 16 族 × 5 档 × 3 种透明度加 3 个任意色，6 档字号，4 档圆角，8 种 grid 列；8 个条件的单独与两两组合，断点不两两组合）；`generateCorpus(seed, utilities, files)` 从 29 853 个用例里按种子取样并哈希；`corpusProject` 产出 `src/gen-NNN.js` 与 `index.html`，每个 `<div>` 15 个类；`profileCorpus` 统计属性族与条件分布。
+- [x] 配对表每一项经真实工具验证：teacss 与 Tailwind 各 29 853 / 29 853 匹配（证据在 `docs/knowledge/engine-probe-2026-10-21.md`）。`dark` 不进表，原因同处记录。
+- [x] `bench corpus --utilities --files --seed [--profile]`。
+- 验收：同参数两次哈希一致；规模矩阵每格可生成；测试覆盖。
 
 ## 第 4 片：四个被测对象与等价校验
 

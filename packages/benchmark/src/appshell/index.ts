@@ -1,4 +1,5 @@
 import { type Invocation, parseInvocation, type SubjectId, subjectId } from "@bench/infrastructure";
+import { DEFAULT_SEED, generateCorpus, profileCorpus } from "../features/corpus/index.ts";
 import { invokeSubject, type SubjectRegistry } from "../subjects/index.ts";
 
 export interface AppDeps {
@@ -18,7 +19,17 @@ const USAGE = `bench <command>
 
   help        this text
   subjects    list the registered subjects and the versions each one reports
+  corpus      generate a paired corpus and print its hash
+              --utilities <n> (5000)  --files <n> (30)  --seed <n>  --profile
 `;
+
+function integerOption(invocation: Invocation, name: string, fallback: number): number {
+  const raw = invocation.options.get(name);
+  if (raw === undefined) return fallback;
+  const value = Number(raw);
+  if (!Number.isInteger(value) || value < 0) throw new Error(`--${name} must be a non-negative integer, found "${String(raw)}"`);
+  return value;
+}
 
 const SUBJECT_TIMEOUT_MS = 60_000;
 
@@ -44,6 +55,12 @@ export async function createApp(deps: AppDeps): Promise<number> {
           .join(" ");
         deps.stdout(`${id}: ${versions} (native: ${response.nativeModules.join(", ") || "none"})\n`);
       }
+      return 0;
+    },
+    corpus: async (invocation) => {
+      const corpus = generateCorpus({ seed: integerOption(invocation, "seed", DEFAULT_SEED), utilities: integerOption(invocation, "utilities", 5_000), files: integerOption(invocation, "files", 30) });
+      deps.stdout(`corpus ${corpus.hash}\nseed ${corpus.parameters.seed} utilities ${corpus.parameters.utilities} files ${corpus.parameters.files} pair-table ${corpus.pairTableVersion}\n`);
+      if (invocation.options.has("profile")) deps.stdout(`${JSON.stringify(profileCorpus(corpus), null, 2)}\n`);
       return 0;
     },
   };
