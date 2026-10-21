@@ -3,8 +3,8 @@ import { compare, type Summary, summarize, type Verdict } from "./statistics.ts"
 
 export { compare, mannWhitneyU, summarize } from "./statistics.ts";
 
-export type Series = "engine/cold" | "engine/warm" | "engine/incremental-10" | "engine/incremental-100" | "build";
-export const SERIES: readonly Series[] = ["engine/cold", "engine/warm", "engine/incremental-10", "engine/incremental-100", "build"];
+export type Series = "engine/cold" | "engine/warm" | "engine/incremental-10" | "engine/incremental-100" | "dev/+10" | "dev/+100" | "build";
+export const SERIES: readonly Series[] = ["engine/cold", "engine/warm", "engine/incremental-10", "engine/incremental-100", "dev/+10", "dev/+100", "build"];
 export const BASELINE = "vite-baseline";
 /** v01.1 series state their absence; later series appear only when measured, so older records render as before. */
 const ALWAYS_STATED: ReadonlySet<Series> = new Set(["engine/cold", "engine/warm", "build"]);
@@ -37,7 +37,9 @@ export interface ReportModel {
 }
 
 function seriesOf(sample: Sample): Series {
-  return sample.tier === "build" ? "build" : `engine/${sample.scenario}`;
+  if (sample.tier === "build") return "build";
+  if (sample.tier === "dev") return `dev/+${sample.size}`;
+  return `engine/${sample.scenario}`;
 }
 
 function cellKey(cell: Cell): string {

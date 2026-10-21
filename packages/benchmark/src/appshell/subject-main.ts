@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { gzipSync } from "node:zlib";
 import { type Clock, createWorkspace, loadedNativeModules, ownResourceUsage, type SubjectClient, type SubjectFactory, systemClock } from "@bench/infrastructure";
 import { CONTRACT_VERSION, parseSubjectRequest, type SubjectRequest, type SubjectResponse, type TaskResult } from "../contract/index.ts";
+import { connectDevIo, runDevScenario } from "../features/measure/dev-scenario.ts";
 import { runEngineScenario } from "../features/measure/index.ts";
 
 export interface SubjectMainDeps {
@@ -29,6 +30,25 @@ async function runTask(request: SubjectRequest, deps: SubjectMainDeps): Promise<
     case "engine": {
       const { samples, css } = await runEngineScenario(task, () => loadSubject(request), deps.clock);
       return { kind: "engine", samples, css: task.includeCss ? css : undefined };
+    }
+    case "dev": {
+      const subject = await loadSubject(request);
+      const workspace = createWorkspace(`bench-dev-${request.subject}`);
+      try {
+        const files = Object.fromEntries(Object.entries(task.files));
+        await subject.prepare(workspace, { modules: task.modules, files: new Map(Object.entries(files)) });
+        const server = await subject.devServer(workspace);
+        const io = await connectDevIo(server.origin, workspace);
+        try {
+          const { samples } = await runDevScenario({ modules: task.modules, corpusClasses: task.corpusClasses, extra: task.extra, moduleHeader: subject.moduleHeader }, io, deps.clock);
+          return { kind: "dev", samples };
+        } finally {
+          io.close();
+          await server.close();
+        }
+      } finally {
+        workspace.remove();
+      }
     }
     case "build": {
       const subject = await loadSubject(request);

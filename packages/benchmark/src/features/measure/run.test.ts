@@ -14,6 +14,7 @@ const plan: RunPlan = { seed: 1, cells: [{ utilities: 20, files: 2 }], tiers: ["
 function fakeMeasured(task: SubjectTask, hash = "same"): Measured {
   const usage = { cpuUserMs: 1, cpuSystemMs: 1, maxRssBytes: 1 };
   if (task.kind === "build") return { result: { kind: "build", cssBytes: 10, cssGzipBytes: 5, cssSha256: hash, css: undefined }, nativeModules: [], usage, wallMs: 7 };
+  if (task.kind === "dev") return { result: { kind: "dev", samples: task.extra.map((group) => ({ wallMs: 5, polls: 2, cssBytes: 10, cssSha256: group.join(",") })) }, nativeModules: [], usage, wallMs: 9 };
   if (task.kind !== "engine") throw new Error("unexpected task");
   const count = task.scenario === "cold" ? 1 : WARM_TIMED_ITERATIONS;
   const perCall = task.extra.length > 0;
@@ -77,4 +78,26 @@ test("a subject error invalidates the run before anything is returned", async ()
 test("an output hash that changes between samples invalidates the run", async () => {
   let calls = 0;
   await assert.rejects(measure({ ...plan, tiers: ["build"] }, { invoke: async (_subject, task) => fakeMeasured(task, `h${calls++ > 2 ? "x" : ""}`), loadShare: () => 0, progress: () => {} }), (error: unknown) => error instanceof RunInvalid && /output changed between samples/.test(error.message));
+});
+
+test("the dev tier runs one server process per size and cell, with a fresh group of classes per round", async () => {
+  const seen: { size: number; groups: number; distinct: number }[] = [];
+  const output = await measure(
+    { ...plan, tiers: ["dev"], samplesPerCell: 5 },
+    {
+      invoke: async (_subject, task) => {
+        if (task.kind === "dev") seen.push({ size: task.size, groups: task.extra.length, distinct: new Set(task.extra.flat()).size });
+        return fakeMeasured(task);
+      },
+      loadShare: () => 0,
+      progress: () => {},
+    },
+  );
+  assert.deepEqual(
+    seen.map((entry) => entry.size).sort((left, right) => left - right),
+    [10, 100],
+  );
+  assert.ok(seen.every((entry) => entry.groups === 5 && entry.distinct === entry.size * 5));
+  assert.equal(output.samples.filter((sample) => sample.tier === "dev" && sample.subject === "alpha").length, 10);
+  assert.equal(output.samples.filter((sample) => sample.subject === "beta").length, 0);
 });

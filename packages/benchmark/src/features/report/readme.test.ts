@@ -21,6 +21,10 @@ function record(): RunRecord {
     for (let index = 0; index < 30; index++) {
       const scale = cell.utilities / 10;
       samples.push(sample("teacss-rs", "engine", cell, 10 * scale + (index % 3), index), sample("tailwind-v4", "engine", cell, 15 * scale + (index % 3), index));
+      for (const size of [10, 100] as const) {
+        const ms = size === 10 ? 300 : 500;
+        samples.push({ ...sample("teacss-rs", "engine", cell, 2 * ms + (index % 3), index), tier: "dev", size, polls: 3 } as unknown as Sample, { ...sample("tailwind-v4", "engine", cell, ms + (index % 3), index), tier: "dev", size, polls: 3 } as unknown as Sample);
+      }
       for (const [scenario, ms] of [
         ["incremental-10", 40],
         ["incremental-100", 60],
@@ -60,7 +64,9 @@ test("the summary is two small tables, a few takeaways and the links, in plain w
   assert.match(text, /- @teacss\/engine 0\.8\.5-alpha\.4, tailwindcss 4\.3\.3; one Apple M2 Max, Node v24\.14\.1\./);
   assert.match(text, /\[Full report\]\(docs\/reports\/2026-10-21T09-19-14-mac\.md\) · \[audit\]/);
   assert.ok(!text.includes("Per 1,000"));
-  assert.match(text, /\*\*Adding new classes to a running build\*\* that already holds those 10,000/);
+  assert.match(text, /\*\*Adding new classes to an engine\*\* that already holds those 10,000/);
+  assert.match(text, /\*\*Saving a new file in the Vite dev server\*\* with 10,000 classes already in 30 files/);
+  assert.match(text, /\| Tailwind CSS v4 \| 301 ms \| 501 ms \|\n\| TeaCSS \(Rust engine\) \| 601 ms \(2\.0× slower\) \| 1\.00 s \(2\.0× slower\) \|/);
   assert.match(text, /\| TeaCSS \(Rust engine\) \| 41 ms \| 61 ms \|\n\| Tailwind CSS v4 \| 81 ms \(2\.0× slower\) \| 121 ms \(2\.0× slower\) \|/);
   assert.equal(text, renderReadmeSummary(buildReport(record()), "2026-10-21T09-19-14-mac"));
 });

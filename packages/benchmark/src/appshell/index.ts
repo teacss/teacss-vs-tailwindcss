@@ -32,7 +32,7 @@ const USAGE = `bench <command>
               --utilities <n> (5000)  --files <n> (30)  --seed <n>  --subjects <a,b>
   run         measure the scale matrix and write results/<time>-<host>.json
               --utilities <a,b,c> (1000,5000,20000)  --files <a,b,c> (3,30,300)
-              --samples <n> (30)  --tier engine|build|all (all)  --subjects <a,b>
+              --samples <n> (30)  --tier engine|dev|build|all (all)  --subjects <a,b>
               --seed <n>  --out <dir> (results)  --allow-busy  --no-profile  --allow-node-mismatch
   report      render a results file as Markdown and a JSON summary
               <results.json>  --out <dir> (docs/reports)  --readme <README.md>
@@ -64,9 +64,9 @@ function integerList(invocation: Invocation, name: string, fallback: readonly nu
 
 function tiersOf(invocation: Invocation): Tier[] {
   const raw = invocation.options.get("tier") ?? "all";
-  if (raw === "all") return ["engine", "build"];
-  if (raw === "engine" || raw === "build") return [raw];
-  throw new Error(`--tier must be engine, build or all, found "${String(raw)}"`);
+  if (raw === "all") return ["engine", "dev", "build"];
+  if (raw === "engine" || raw === "build" || raw === "dev") return [raw];
+  throw new Error(`--tier must be engine, dev, build or all, found "${String(raw)}"`);
 }
 
 function chosenSubjects(invocation: Invocation, registry: SubjectRegistry): [SubjectId, SubjectRegistration][] {
@@ -165,10 +165,16 @@ export async function createApp(deps: AppDeps): Promise<number> {
     const largest = plan.cells.reduce((best, cell) => (cell.utilities * cell.files >= best.utilities * best.files ? cell : best));
     const limiters = invocation.options.has("no-profile")
       ? {}
-      : await profileSubjects(largest, plan.seed, plan.subjects, plan.tiers, async (subject, task, nodeArgs) => {
-          deps.stdout(`  profiling ${subject} ${task.kind} on ${largest.utilities}x${largest.files} (not counted)\n`);
-          await invokeSubject(registry, subject, task, { ...processDeps, nodeArgs });
-        });
+      : await profileSubjects(
+          largest,
+          plan.seed,
+          plan.subjects,
+          plan.tiers.filter((tier): tier is "engine" | "build" => tier !== "dev"),
+          async (subject, task, nodeArgs) => {
+            deps.stdout(`  profiling ${subject} ${task.kind} on ${largest.utilities}x${largest.files} (not counted)\n`);
+            await invokeSubject(registry, subject, task, { ...processDeps, nodeArgs });
+          },
+        );
     const record: RunRecord = {
       version: 1,
       specRevision: SPEC_REVISION,

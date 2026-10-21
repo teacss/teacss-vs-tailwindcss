@@ -1,10 +1,10 @@
 import { createRequire } from "node:module";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { describePackages, resolvePackage, type SubjectClient, type SubjectFactory, subjectId, type Workspace } from "@bench/infrastructure";
+import { type DevServer, describePackages, resolvePackage, type SubjectClient, type SubjectFactory, subjectId, type Workspace } from "@bench/infrastructure";
 import { compile } from "@tailwindcss/node";
 import tailwindcss from "@tailwindcss/vite";
-import { build } from "vite";
+import { build, createServer, type PluginOption } from "vite";
 
 const require = createRequire(import.meta.url);
 const HERE = fileURLToPath(new URL(".", import.meta.url));
@@ -29,6 +29,15 @@ async function viteBuild(workspace: Workspace): Promise<string> {
     .join("");
 }
 
+async function startDevServer(workspace: Workspace, plugins: PluginOption[]): Promise<DevServer> {
+  process.chdir(workspace.dir);
+  const server = await createServer({ root: workspace.dir, configFile: false, logLevel: "silent", plugins, server: { port: 0, host: "127.0.0.1" } });
+  await server.listen();
+  const origin = server.resolvedUrls?.local[0]?.replace(/\/$/, "");
+  if (origin === undefined) throw new Error("the development server reported no local URL");
+  return { origin, close: () => server.close() };
+}
+
 export const createSubject: SubjectFactory = (): SubjectClient => ({
   id: subjectId("tailwind-v4"),
   describe: async () => describePackages(PACKAGES.map((name) => resolvePackage(name, HERE))),
@@ -47,4 +56,6 @@ export const createSubject: SubjectFactory = (): SubjectClient => ({
     workspace.link("node_modules/tailwindcss", dirname(require.resolve("tailwindcss/package.json")));
   },
   build: async (workspace) => ({ css: await viteBuild(workspace) }),
+  devServer: (workspace) => startDevServer(workspace, [tailwindcss()]),
+  moduleHeader: "",
 });
