@@ -97,6 +97,14 @@ bun run bench --community projects.json --out results
 bun run bench:report results/<generated>.json --beside results/<community>.json --readme README.md
 ```
 
+The `bench` GitHub workflow runs the same matrix on a Linux runner and uploads
+its record as an artifact. Download it and attach it as a cross-check; the
+report refuses records that ran a different spec revision or corpus:
+
+```sh
+bun run bench:report results/<local>.json --cross <ci-record>.json --readme README.md
+```
+
 To measure unreleased TeaCSS builds, link a built teacss-ts checkout first:
 
 ```sh

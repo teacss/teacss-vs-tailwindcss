@@ -1,3 +1,4 @@
+import { crossComparisons } from "./cross.ts";
 import type { CellTable, ReportModel, Series, SubjectRow } from "./index.ts";
 import { BASELINE } from "./index.ts";
 
@@ -133,6 +134,14 @@ function besideTakeaway(model: ReportModel, beside: ReportModel | undefined): st
   return [`- On ${source}, the same tools come out fastest.`];
 }
 
+function crossTakeaway(model: ReportModel, cross: ReportModel | undefined): string[] {
+  if (cross === undefined) return [];
+  const comparisons = crossComparisons(model, cross);
+  if (comparisons.length === 0) return [];
+  const agreeing = comparisons.filter((entry) => entry.agreement !== "different leader").length;
+  return [`- On a second machine (${cross.record.environment.cpu}, ${cross.record.environment.os}), the fastest tool is the same or within noise in ${agreeing} of ${comparisons.length} comparisons.`];
+}
+
 function joinWords(items: readonly string[]): string {
   return items.length <= 1 ? (items[0] ?? "") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
 }
@@ -181,7 +190,7 @@ function takeaways(model: ReportModel, engine: CellTable | undefined, build: Cel
 }
 
 /** Two small tables, a few takeaways and the links, all derived from the model. */
-export function renderReadmeSummary(model: ReportModel, stem: string, beside?: ReportModel): string {
+export function renderReadmeSummary(model: ReportModel, stem: string, beside?: ReportModel, cross?: ReportModel): string {
   const engine = largest(model, "engine/warm") ?? largest(model, "engine/cold");
   const build = largest(model, "build");
   const lines = [README_START, "", `### Results from ${model.record.startedAt.slice(0, 10)}`, ""];
@@ -191,7 +200,17 @@ export function renderReadmeSummary(model: ReportModel, stem: string, beside?: R
   if (build !== undefined) lines.push(...buildTable(build));
   lines.push(...rustTable(model));
   if (engine === undefined && build === undefined) lines.push("No measurements in this run.", "");
-  lines.push("**In short**", "", ...takeaways(model, engine, build), ...besideTakeaway(model, beside), "", `[Full report](docs/reports/${stem}.md) · [audit](docs/reports/${stem}.audit.md) · [raw samples](results/${stem}.json) · [method](docs/specs/v01.1-benchmark-protocol.md)`, "", README_END);
+  lines.push(
+    "**In short**",
+    "",
+    ...takeaways(model, engine, build),
+    ...besideTakeaway(model, beside),
+    ...crossTakeaway(model, cross),
+    "",
+    `[Full report](docs/reports/${stem}.md) · [audit](docs/reports/${stem}.audit.md) · [raw samples](results/${stem}.json) · [method](docs/specs/v01.1-benchmark-protocol.md)`,
+    "",
+    README_END,
+  );
   return lines.join("\n");
 }
 
