@@ -1,6 +1,7 @@
 import type { Cell, RunRecord, Sample } from "../../persistence/index.ts";
 import { type RustFindings, rustFindings } from "./rust.ts";
 import { compare, type Summary, summarize, type Verdict } from "./statistics.ts";
+import { type WorkRow, workRows, workTable } from "./work.ts";
 
 export { compare, mannWhitneyU, summarize } from "./statistics.ts";
 
@@ -37,6 +38,8 @@ export interface ReportModel {
   readonly sampleCount: number;
   /** Spec v02.1 value and price of Rust, empty for records that predate it. */
   readonly rust: RustFindings;
+  /** Spec v02.1 work produced at the largest cell, empty for records that predate it. */
+  readonly work: readonly WorkRow[];
 }
 
 function seriesOf(sample: Sample): Series {
@@ -90,7 +93,7 @@ export function buildReport(record: RunRecord): ReportModel {
       tables.push({ series, cell, rows, fastest, verdicts });
     }
   }
-  return { record: rest, tables, sampleCount: samples.length, rust: rustFindings(record) };
+  return { record: rest, tables, sampleCount: samples.length, rust: rustFindings(record), work: workRows(record) };
 }
 
 const ms = (value: number): string => `${value.toFixed(1)} ms`;
@@ -163,6 +166,7 @@ export function renderMarkdown(model: ReportModel): string {
     "## Results",
     "",
     ...SERIES.flatMap((series) => model.tables.filter((table) => table.series === series).map(tableMarkdown)),
+    ...(model.work.length === 0 ? [] : ["## Work produced", "", "What each production build emits at the largest cell. The tools write different values, shorthands and wrappers for the same classes, so the last column is context for the size difference, not a ranking.", "", ...workTable(model.work, {}), ""]),
     ...model.rust.sections,
     "## Environment",
     "",
