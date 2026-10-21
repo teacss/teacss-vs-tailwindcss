@@ -64,8 +64,12 @@ export async function runEngineScenario(input: EngineScenarioInput, load: () => 
   for (let iteration = 0; iteration < WARM_UNTIMED_ITERATIONS; iteration++) await session.generate(candidates);
   const samples: EngineSample[] = [];
   let last = "";
+  // Tailwind's compiler keeps every candidate it has seen, so each call asks every tool for all classes so far.
+  const cumulative = [...candidates];
   for (const group of input.extra) {
-    const { sample, css } = await timed(clock, () => session.generate([...candidates, ...group]));
+    cumulative.push(...group);
+    const asked = [...cumulative];
+    const { sample, css } = await timed(clock, () => session.generate(asked));
     const missing = group.filter((name) => !containsClass(css, name));
     if (missing.length > 0) throw new Error(`${scenario}: the output lacks ${missing.length} new class(es), first ${missing[0]}`);
     samples.push(sample);

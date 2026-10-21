@@ -37,7 +37,7 @@ function groups(k: number): string[][] {
   return Array.from({ length: WARM_TIMED_ITERATIONS }, (_, round) => Array.from({ length: k }, (_, index) => `m:${round * k + index}@hover`));
 }
 
-test("incremental keeps one session, adds each group to the full set and times only those calls", async () => {
+test("incremental keeps one session and asks for every class so far, as Tailwind's compiler keeps them", async () => {
   const calls: number[] = [];
   let sessions = 0;
   const subject = {
@@ -50,7 +50,7 @@ test("incremental keeps one session, adds each group to the full set and times o
   };
   const { samples, css } = await runEngineScenario({ scenario: "incremental-10", candidates: ["p:4", "m:2"], extra: groups(10) }, async () => subject, fakeClock());
   assert.equal(sessions, 1);
-  assert.deepEqual(calls, [2, 2, 2, ...Array(WARM_TIMED_ITERATIONS).fill(12)]);
+  assert.deepEqual(calls, [2, 2, 2, ...Array.from({ length: WARM_TIMED_ITERATIONS }, (_, call) => 2 + 10 * (call + 1))]);
   assert.equal(samples.length, WARM_TIMED_ITERATIONS);
   assert.ok(css.includes(".m\\:99\\@hover"));
 });

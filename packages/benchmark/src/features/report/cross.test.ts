@@ -32,9 +32,12 @@ function record(warm: Readonly<Record<string, number>>, build: Readonly<Record<s
 
 test("records from different spec revisions or corpora are refused", () => {
   const local = record({ a: 10 }, { a: 10 });
-  assert.throws(() => assertComparable(local, record({ a: 10 }, { a: 10 }, { revision: 2 })), /different spec revisions \(3 and 2\)/);
+  assert.throws(() => assertComparable(local, record({ a: 10 }, { a: 10 }, { revision: 2 })), /different protocols \(v01\.1 revision 3 and 2/);
   assert.throws(() => assertComparable(local, record({ a: 10 }, { a: 10 }, { hash: "other" })), /cell 100x3 measured different corpora/);
   assert.doesNotThrow(() => assertComparable(local, record({ a: 20 }, { a: 20 })));
+  assert.throws(() => assertComparable(local, { ...record({ a: 10 }, { a: 10 }), v02Revision: 2 }), /v02\.1 revision none and 2/);
+  assert.throws(() => assertComparable(local, { ...record({ a: 10 }, { a: 10 }), cells: [{ cell: { utilities: 1, files: 1 }, corpusHash: "x", loadShareBefore: 0, loadShareAfter: 0 }] }), /share no cell/);
+  assert.throws(() => assertComparable(local, { ...record({ a: 10 }, { a: 10 }), community: { repositories: [], found: 1, kept: 1, untranslated: [] } }), /community corpus and the other the generated one/);
 });
 
 test("each series and cell is a same leader, a tie, or a different leader", () => {

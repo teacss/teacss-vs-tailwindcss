@@ -9,7 +9,7 @@ import { captureEnvironment, loadShare } from "../features/environment/index.ts"
 import { measure, type Tier } from "../features/measure/run.ts";
 import { installFresh, measurePrice, type PriceRecord, teacssEntries } from "../features/price/index.ts";
 import { profileSubjects } from "../features/profile/run.ts";
-import { assertComparable } from "../features/report/cross.ts";
+import { assertComparable, assertSameProtocol } from "../features/report/cross.ts";
 import { buildReport, renderMarkdown, renderSummary } from "../features/report/index.ts";
 import { renderReadmeSummary, updateReadme } from "../features/report/readme.ts";
 import { verifyCorpus } from "../features/verify/run.ts";
@@ -34,8 +34,8 @@ const USAGE = `bench <command>
   corpus      generate a paired corpus and print its hash
               --utilities <n> (5000)  --files <n> (30)  --seed <n>  --profile
               --community <list.json>  build it from real Tailwind projects instead
-  verify      run the equivalence checks of spec v01.1 on one corpus
-              --utilities <n> (5000)  --files <n> (30)  --seed <n>  --subjects <a,b>
+  verify      run the equivalence checks of spec v01.1 on one corpus (bench run does this first)
+              --utilities <n> (5000)  --files <n> (30)  --seed <n>  --subjects <a,b>  --community <list.json>
   run         measure the scale matrix and write results/<time>-<host>.json
               --utilities <a,b,c> (1000,5000,20000)  --files <a,b,c> (3,30,300)
               --samples <n> (30)  --tier engine|dev|build|all (all)  --subjects <a,b>
@@ -52,6 +52,7 @@ const USAGE = `bench <command>
 `;
 
 const SPEC_REVISION = 3;
+const SPEC_V02_REVISION = 3;
 /** Spec v01.1 §Run protocol: refuse above this share of the logical cores. */
 const LOAD_SHARE_LIMIT = 0.2;
 
@@ -150,21 +151,10 @@ export async function createApp(deps: AppDeps): Promise<number> {
       return 0;
     },
     verify: async (invocation) => {
-      const corpus = corpusOf(invocation);
-      deps.stdout(`verify corpus ${corpus.hash.slice(0, 12)} (${corpus.parameters.utilities} utilities, ${corpus.parameters.files} files)\n`);
-      const subjects = chosenSubjects(invocation, registry).map(([id, registration]) => ({ id, syntax: registration.syntax, tiers: registration.tiers, natives: registration.natives }));
-      const report = await verifyCorpus(corpus, subjects, async (subject, task) => {
-        const { response } = await invokeSubject(registry, subject, task, processDeps);
-        const result = response.result;
-        if (result.kind !== "engine" && result.kind !== "build") throw new Error(`${subject}: expected an engine or build result`);
-        const cssSha256 = result.kind === "engine" ? (result.samples[0]?.cssSha256 ?? "") : result.cssSha256;
-        deps.stdout(`  ${subject} ${task.kind}: ${result.kind === "engine" ? `${result.samples[0]?.cssBytes ?? 0}` : `${result.cssBytes}`} bytes, native ${response.nativeModules.join(", ") || "none"}\n`);
-        return { css: result.css, cssSha256, nativeModules: response.nativeModules };
-      });
-      for (const entry of report.checked) deps.stdout(`  ok ${entry.subject} ${entry.tier}: ${entry.cases} cases in ${entry.cssBytes} bytes\n`);
-      for (const finding of report.findings) deps.stdout(`  FAIL ${finding.subject} ${finding.tier} ${finding.check}: ${finding.detail}\n`);
-      deps.stdout(report.findings.length === 0 ? "verify: ok\n" : `verify: ${report.findings.length} finding(s)\n`);
-      return report.findings.length === 0 ? 0 : 1;
+      const corpus = typeof invocation.options.get("community") === "string" ? communityCorpus(await communityPool(String(invocation.options.get("community"))), integerOption(invocation, "utilities", 5_000), integerOption(invocation, "files", 30), integerOption(invocation, "seed", DEFAULT_SEED)) : corpusOf(invocation);
+      const findings = await verifyOn(corpus, chosenSubjects(invocation, registry), true);
+      deps.stdout(findings === 0 ? "verify: ok\n" : `verify: ${findings} finding(s)\n`);
+      return findings === 0 ? 0 : 1;
     },
   };
   commands["run"] = async (invocation) => {
@@ -184,7 +174,19 @@ export async function createApp(deps: AppDeps): Promise<number> {
     const seed = integerOption(invocation, "seed", DEFAULT_SEED);
     const community = typeof invocation.options.get("community") === "string" ? await communityPool(String(invocation.options.get("community"))) : undefined;
     const corpusFor = (cell: Cell): Corpus => (community === undefined ? generateCorpus({ seed, utilities: cell.utilities, files: cell.files }) : communityCorpus(community, cell.utilities, cell.files, seed));
-    const plan = { seed, corpusFor, cells, tiers: tiersOf(invocation), subjects: chosen.map(([id, registration]) => ({ id, syntax: registration.syntax, tiers: registration.tiers })), samplesPerCell: integerOption(invocation, "samples", 30) };
+    const plan = { seed, corpusFor, cells, tiers: tiersOf(invocation), subjects: chosen.map(([id, registration]) => ({ id, syntax: registration.syntax, tiers: registration.tiers, natives: registration.natives })), samplesPerCell: integerOption(invocation, "samples", 30) };
+    // Spec v01.1 §Equivalence: every distinct corpus is checked on every subject before anything is timed.
+    const corpora = new Map(cells.map((cell) => corpusFor(cell)).map((corpus) => [corpus.hash, corpus]));
+    let checks = 0;
+    for (const corpus of corpora.values()) {
+      const findings = await verifyOn(corpus, chosen, false);
+      if (findings > 0) {
+        deps.stdout(`run: refused, ${findings} equivalence finding(s) on corpus ${corpus.hash.slice(0, 12)}; nothing was measured\n`);
+        return 1;
+      }
+      checks += chosen.length;
+    }
+    const verification = { cells: corpora.size, cases: [...corpora.values()].reduce((sum, corpus) => sum + corpus.cases.length, 0), checks };
     const startedAt = new Date().toISOString();
     const subjects: Record<string, SubjectVersions> = {};
     for (const [id] of chosen) {
@@ -222,6 +224,8 @@ export async function createApp(deps: AppDeps): Promise<number> {
     const record: RunRecord = {
       version: 1,
       specRevision: SPEC_REVISION,
+      v02Revision: SPEC_V02_REVISION,
+      verification,
       pairTableVersion: PAIR_TABLE_VERSION,
       startedAt,
       finishedAt: new Date().toISOString(),
@@ -248,7 +252,9 @@ export async function createApp(deps: AppDeps): Promise<number> {
     const stem = basename(file, ".json");
     mkdirSync(out, { recursive: true });
     const besideFile = invocation.options.get("beside");
-    const beside = typeof besideFile === "string" ? buildReport(readRunRecord(besideFile)) : undefined;
+    const besideRecord = typeof besideFile === "string" ? readRunRecord(besideFile) : undefined;
+    if (besideRecord !== undefined) assertSameProtocol(readRunRecord(file), besideRecord);
+    const beside = besideRecord === undefined ? undefined : buildReport(besideRecord);
     const crossFile = invocation.options.get("cross");
     const crossRecord = typeof crossFile === "string" ? readRunRecord(crossFile) : undefined;
     if (crossRecord !== undefined) assertComparable(readRunRecord(file), crossRecord);
@@ -263,6 +269,23 @@ export async function createApp(deps: AppDeps): Promise<number> {
     }
     return 0;
   };
+  /** Spec v01.1 §Equivalence on one corpus; prints every finding and returns how many there were. */
+  async function verifyOn(corpus: Corpus, chosen: readonly [SubjectId, SubjectRegistration][], verbose: boolean): Promise<number> {
+    deps.stdout(`verify corpus ${corpus.hash.slice(0, 12)} (${corpus.parameters.utilities} utilities, ${corpus.parameters.files} files)\n`);
+    const subjects = chosen.map(([id, registration]) => ({ id, syntax: registration.syntax, tiers: registration.tiers, natives: registration.natives }));
+    const report = await verifyCorpus(corpus, subjects, async (subject, task) => {
+      const { response } = await invokeSubject(registry, subject, task, processDeps);
+      const result = response.result;
+      if (result.kind !== "engine" && result.kind !== "build") throw new Error(`${subject}: expected an engine or build result`);
+      const cssSha256 = result.kind === "engine" ? (result.samples[0]?.cssSha256 ?? "") : result.cssSha256;
+      if (verbose) deps.stdout(`  ${subject} ${task.kind}: ${result.kind === "engine" ? `${result.samples[0]?.cssBytes ?? 0}` : `${result.cssBytes}`} bytes, native ${response.nativeModules.join(", ") || "none"}\n`);
+      return { css: result.css, cssSha256, nativeModules: response.nativeModules };
+    });
+    if (verbose) for (const entry of report.checked) deps.stdout(`  ok ${entry.subject} ${entry.tier}: ${entry.cases} cases in ${entry.cssBytes} bytes\n`);
+    for (const finding of report.findings) deps.stdout(`  FAIL ${finding.subject} ${finding.tier} ${finding.check}: ${finding.detail}\n`);
+    return report.findings.length;
+  }
+
   /** Reads the repository list, asks Tailwind which of its utilities each tree uses, and keeps the translatable ones. */
   async function communityPool(listFile: string): Promise<CommunityPool> {
     const parsed: unknown = JSON.parse(readFileSync(listFile, "utf8"));

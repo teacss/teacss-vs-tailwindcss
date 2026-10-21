@@ -14,7 +14,7 @@ export interface InstallMeasurement {
 
 export interface SubjectPrice {
   readonly native: NativeArtifact | undefined;
-  /** Time to import the native binary in a fresh process, one entry per process. */
+  /** Time to `require` the `.node` file in a process that has imported no tool code, one entry per process. */
   readonly nativeLoadMs: readonly number[];
   readonly install: InstallMeasurement | undefined;
   /** The subject's own engine judging each entry configuration; empty for a subject without one. */
@@ -50,28 +50,32 @@ function key(packages: Readonly<Record<string, string>>): string {
 
 /** Spec v02.1 §Report, the price of Rust: what each tool ships, loads and installs, and what its engine can serve. */
 export async function measurePrice(plan: PricePlan, deps: PriceDeps): Promise<PriceRecord> {
+  const versions = new Map<SubjectId, SubjectVersions>();
+  for (const subject of plan.subjects) versions.set(subject, await deps.describe(subject));
+  const sets = new Map<string, Readonly<Record<string, string>>>();
+  for (const entry of versions.values()) sets.set(key(entry.packages), entry.packages);
+  // Rounds interleave the tools, as the measured matrix does, so network drift does not land on one of them.
+  const installs = new Map<string, { installMs: number[]; installedBytes: number }>();
+  for (let run = 0; run < plan.installRuns; run++) {
+    for (const [packageKey, packages] of sets) {
+      deps.progress(`installing ${packageKey} from an empty cache (round ${run + 1}/${plan.installRuns})`);
+      const measured = await deps.install(packages);
+      const entry = installs.get(packageKey) ?? { installMs: [], installedBytes: 0 };
+      entry.installMs.push(measured.wallMs);
+      entry.installedBytes = measured.installedBytes;
+      installs.set(packageKey, entry);
+    }
+  }
   const subjects: Record<string, SubjectPrice> = {};
-  const installs = new Map<string, InstallMeasurement>();
   for (const subject of plan.subjects) {
-    const versions = await deps.describe(subject);
+    const own = versions.get(subject);
+    if (own === undefined) continue;
     const nativeLoadMs: number[] = [];
-    if (versions.native !== undefined) {
-      for (let run = 0; run < NATIVE_LOAD_RUNS; run++) nativeLoadMs.push(await deps.loadNative(subject, versions.native.path));
-    }
-    const packageKey = key(versions.packages);
-    if (plan.installRuns > 0 && !installs.has(packageKey)) {
-      const installMs: number[] = [];
-      let installedBytes = 0;
-      for (let run = 0; run < plan.installRuns; run++) {
-        deps.progress(`installing ${subject}'s packages from an empty cache (${run + 1}/${plan.installRuns})`);
-        const measured = await deps.install(versions.packages);
-        installMs.push(measured.wallMs);
-        installedBytes = measured.installedBytes;
-      }
-      installs.set(packageKey, { packages: versions.packages, installMs, installedBytes });
-    }
+    if (own.native !== undefined) for (let run = 0; run < NATIVE_LOAD_RUNS; run++) nativeLoadMs.push(await deps.loadNative(subject, own.native.path));
+    const measuredInstall = installs.get(key(own.packages));
+    const install = measuredInstall === undefined ? undefined : { packages: own.packages, installMs: measuredInstall.installMs, installedBytes: measuredInstall.installedBytes };
     const coverage = plan.coverage === undefined ? [] : await deps.coverage(subject, plan.coverage.entries);
-    subjects[subject] = { native: versions.native, nativeLoadMs, install: installs.get(packageKey), coverage };
+    subjects[subject] = { native: own.native, nativeLoadMs, install, coverage };
   }
   return { subjects, coverageSource: plan.coverage?.source };
 }

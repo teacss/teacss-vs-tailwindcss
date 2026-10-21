@@ -1,5 +1,5 @@
 import type { SubjectId } from "@bench/infrastructure";
-import { DEV_SIZES, type DevSize, type EngineScenario, incrementalSize, type SubjectTask, type TaskResult, type Tier } from "../../contract/index.ts";
+import { checkNativeModules, DEV_SIZES, type DevSize, type EngineScenario, incrementalSize, type NativeExpectation, type SubjectTask, type TaskResult, type Tier } from "../../contract/index.ts";
 import { type Corpus, candidates, corpusProject, extraCases, type Syntax } from "../../corpus/index.ts";
 import { mulberry32, shuffled } from "../../corpus/prng.ts";
 import type { Cell, CellRecord, Sample } from "../../persistence/index.ts";
@@ -10,8 +10,8 @@ export type { Tier };
 export interface MeasureSubject {
   readonly id: SubjectId;
   readonly syntax: Syntax;
-  /** The tiers this subject takes part in. */
   readonly tiers: readonly Tier[];
+  readonly natives: NativeExpectation;
 }
 
 export interface RunPlan {
@@ -159,13 +159,13 @@ export async function measure(plan: RunPlan, deps: MeasureDeps): Promise<Measure
   const cells: CellRecord[] = [];
   const samples: Sample[] = [];
   const jobs = jobsFor(plan);
-  const measured = new Set<string>();
+  const seenCells = new Set<string>();
   for (const requested of plan.cells) {
     const corpus = plan.corpusFor(requested);
     // A community corpus can hold fewer classes than asked for; samples are labelled with what was measured.
     const cell: Cell = { utilities: corpus.parameters.utilities, files: corpus.parameters.files };
-    if (measured.has(`${cell.utilities}x${cell.files}`)) continue;
-    measured.add(`${cell.utilities}x${cell.files}`);
+    if (seenCells.has(`${cell.utilities}x${cell.files}`)) continue;
+    seenCells.add(`${cell.utilities}x${cell.files}`);
     const loadShareBefore = deps.loadShare();
     const collected = new Map<string, number>();
     const hashes = new Map<string, string>();
@@ -179,6 +179,8 @@ export async function measure(plan: RunPlan, deps: MeasureDeps): Promise<Measure
         deps.progress(`${id} round ${round} (${have}/${plan.samplesPerCell})`);
         const measured = await deps.invoke(job.subject.id, taskFor(job, corpus));
         if (measured.result.kind === "error") throw new RunInvalid(`${id}: ${measured.result.message}`);
+        const nativeProblems = checkNativeModules(measured.nativeModules, job.subject.natives);
+        if (nativeProblems.length > 0) throw new RunInvalid(`${id}: ${nativeProblems.join("; ")}`);
         for (const sample of toSamples(job, cell, have, measured)) {
           const hashId = hashKey(id, job, sample);
           const expected = hashes.get(hashId);

@@ -41,7 +41,12 @@ export interface CellRecord {
 
 export interface RunRecord {
   readonly version: typeof RECORD_VERSION;
+  /** Revision of spec v01.1. */
   readonly specRevision: number;
+  /** Revision of spec v02.1; absent in records written before it. */
+  readonly v02Revision?: number;
+  /** The equivalence checks run on every cell's corpus before measuring; absent before spec v02.1. */
+  readonly verification?: { readonly cells: number; readonly cases: number; readonly checks: number };
   readonly pairTableVersion: number;
   readonly startedAt: string;
   readonly finishedAt: string;

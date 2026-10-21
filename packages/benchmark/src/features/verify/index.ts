@@ -124,16 +124,4 @@ export function checkIdentical(leftSha256: string, rightSha256: string): StrongR
   return { identical: leftSha256 === rightSha256, leftSha256, rightSha256 };
 }
 
-export interface NativeExpectation {
-  /** Prefixes of `.node` file names the process must have loaded. */
-  readonly required: readonly string[];
-  /** Prefixes it must not have loaded. */
-  readonly forbidden: readonly string[];
-}
-
-export function checkNativeModules(loaded: readonly string[], expectation: NativeExpectation): string[] {
-  const problems: string[] = [];
-  for (const prefix of expectation.required) if (!loaded.some((name) => name.startsWith(prefix))) problems.push(`did not load ${prefix}`);
-  for (const prefix of expectation.forbidden) if (loaded.some((name) => name.startsWith(prefix))) problems.push(`loaded ${prefix}`);
-  return problems;
-}
+export { checkNativeModules, type NativeExpectation } from "../../contract/index.ts";

@@ -33,11 +33,18 @@ export function escapeClass(name: string): string {
 }
 
 /** Whether the stylesheet has a rule selecting this class, as both tools escape it. */
+/** What may follow a class in a selector: a combinator, another simple selector, or the end of the selector. */
+const SELECTOR_BOUNDARY = new Set([" ", "\n", "\t", ",", "{", ":", ".", ">", "[", ")", "~", "+", "#"]);
+
 export function containsClass(css: string, name: string): boolean {
-  return css.includes(`.${escapeClass(name)}`);
+  const needle = `.${escapeClass(name)}`;
+  for (let at = css.indexOf(needle); at !== -1; at = css.indexOf(needle, at + 1)) {
+    const next = css[at + needle.length];
+    if (next === undefined || SELECTOR_BOUNDARY.has(next)) return true;
+  }
+  return false;
 }
 
-/** Style rules and their declarations in a stylesheet. */
 export function countOutput(css: string): { rules: number; declarations: number } {
   const rules = parseRules(css);
   return { rules: rules.length, declarations: rules.reduce((sum, rule) => sum + rule.properties.length, 0) };

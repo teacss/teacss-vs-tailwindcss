@@ -7,8 +7,8 @@ import { WARM_TIMED_ITERATIONS } from "./engine-scenario.ts";
 import { type Measured, measure, RunInvalid, type RunPlan } from "./run.ts";
 
 const subjects = [
-  { id: subjectId("alpha"), syntax: "teacss" as const, tiers: ["engine", "dev", "build"] as const },
-  { id: subjectId("beta"), syntax: "tailwind" as const, tiers: ["build"] as const },
+  { id: subjectId("alpha"), syntax: "teacss" as const, tiers: ["engine", "dev", "build"] as const, natives: { required: [], forbidden: [] } },
+  { id: subjectId("beta"), syntax: "tailwind" as const, tiers: ["build"] as const, natives: { required: [], forbidden: [] } },
 ];
 const plan: RunPlan = { seed: 1, corpusFor: (cell) => generateCorpus({ seed: 1, utilities: cell.utilities, files: cell.files }), cells: [{ utilities: 20, files: 2 }], tiers: ["engine", "build"], subjects, samplesPerCell: 4 };
 
@@ -127,4 +127,9 @@ test("cells are labelled with the corpus actually measured, and two requests for
     [{ utilities: 12, files: 3 }],
   );
   assert.ok(output.samples.every((sample) => sample.cell.utilities === 12));
+});
+
+test("a sample whose process loaded a forbidden native binary invalidates the run", async () => {
+  const strict = { ...plan, tiers: ["build"] as const, subjects: [{ ...subjects[1]!, natives: { required: [], forbidden: ["teacss-engine"] } }] };
+  await assert.rejects(measure(strict, { invoke: async (_subject, task) => ({ ...fakeMeasured(task), nativeModules: ["teacss-engine.darwin-arm64.node"] }), loadShare: () => 0, progress: () => {} }), (error: unknown) => error instanceof RunInvalid && /loaded teacss-engine/.test(error.message));
 });
