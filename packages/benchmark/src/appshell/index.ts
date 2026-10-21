@@ -176,7 +176,8 @@ export async function createApp(deps: AppDeps): Promise<number> {
     const corpusFor = (cell: Cell): Corpus => (community === undefined ? generateCorpus({ seed, utilities: cell.utilities, files: cell.files }) : communityCorpus(community, cell.utilities, cell.files, seed));
     const plan = { seed, corpusFor, cells, tiers: tiersOf(invocation), subjects: chosen.map(([id, registration]) => ({ id, syntax: registration.syntax, tiers: registration.tiers, natives: registration.natives })), samplesPerCell: integerOption(invocation, "samples", 30) };
     // Spec v01.1 §Equivalence: every distinct corpus is checked on every subject before anything is timed.
-    const corpora = new Map(cells.map((cell) => corpusFor(cell)).map((corpus) => [corpus.hash, corpus]));
+    // The corpus hash covers the classes, not how they are split into files, and the build tier sees the split.
+    const corpora = new Map(cells.map((cell) => corpusFor(cell)).map((corpus) => [`${corpus.hash}:${corpus.parameters.files}`, corpus]));
     let checks = 0;
     for (const corpus of corpora.values()) {
       const findings = await verifyOn(corpus, chosen, false);

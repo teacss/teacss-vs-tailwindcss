@@ -53,7 +53,7 @@ function comparison(table: CellTable, entry: SubjectRow, fastest: SubjectRow): s
 }
 
 function fileSensitivity(model: ReportModel, subject: string): number | undefined {
-  const tables = model.tables.filter((table) => table.series === "build");
+  const tables = model.tables.filter((table) => table.series === "build" && table.group === "main");
   const utilities = Math.max(...tables.map((table) => table.cell.utilities));
   const same = tables.filter((table) => table.cell.utilities === utilities).sort((left, right) => left.cell.files - right.cell.files);
   const few = row(same[0] ?? tables[0] ?? ({} as CellTable), subject)?.deltaMs;
@@ -182,7 +182,7 @@ function takeaways(model: ReportModel, engine: CellTable | undefined, build: Cel
     const sensitive = ranked(build)
       .map((entry) => ({ subject: entry.subject, ratio: fileSensitivity(model, entry.subject) }))
       .filter((item): item is { subject: string; ratio: number } => item.ratio !== undefined && item.ratio >= 1.3);
-    const sizes = model.tables.filter((table) => table.series === "build" && table.cell.utilities === build.cell.utilities).map((table) => table.cell.files);
+    const sizes = model.tables.filter((table) => table.series === "build" && table.group === "main" && table.cell.utilities === build.cell.utilities).map((table) => table.cell.files);
     if (sensitive.length > 0 && sizes.length > 1) points.push(`${sensitive.map((item) => `${name(item.subject)} gets ${item.ratio.toFixed(1)}× slower`).join("; ")} when the same classes are spread over ${Math.max(...sizes)} files instead of ${Math.min(...sizes)}; the other tools do not care how many files there are.`);
   }
   const produced = [...model.work].filter((row) => NAMES[row.subject] !== undefined);

@@ -208,7 +208,7 @@ function verificationLines(record: Omit<RunRecord, "samples">, hasDev: boolean):
   const verification = record.verification;
   if (verification === undefined) return [];
   return [
-    `**Method and verification.** Commit \`${record.environment.commit}\`. Before timing anything, ${verification.checks} subject check(s) over ${verification.cells} corpus/corpora and ${verification.cases} paired case(s) found no difference in properties or conditions; a run with any finding writes no record.${hasDev ? " Dev-tier times include up to 5 ms of polling delay, the same for every tool." : ""}`,
+    `**Method and verification.** Commit \`${record.environment.commit}\`. Before timing anything, every subject was checked on each of the ${verification.cells} corpus and file layout(s) of this run (${verification.checks} subject run(s), ${verification.cases} paired case(s) in all) with no difference in properties or conditions; a run with any finding writes no record.${hasDev ? " Dev-tier times include up to 5 ms of polling delay, the same for every tool." : ""}`,
     "",
   ];
 }
@@ -286,7 +286,7 @@ export function renderMarkdown(model: ReportModel, beside?: ReportModel, cross?:
     "6. **Does it matter?** The build tier is the end-to-end path a user waits on; the engine tier is one part of it, and the delta over the baseline shows the share.",
     record.v02Revision === undefined
       ? "7. **Did it even happen?** Every sample of a subject and cell produced the same output hash, and `bench verify` on the same corpus checks that the output selects every case with the expected properties and conditions."
-      : "7. **Did it even happen?** Before timing, every subject's output on every corpus was checked to select every case with the expected properties and conditions. Every warm and build sample of a subject and cell produced the same output hash, every incremental call the same hash as that call in the other processes, every timed incremental or dev call contained each class it added, and every response loaded exactly the native binaries its subject should.",
+      : "7. **Did it even happen?** Before timing, every subject's output on every corpus and file layout was checked to select every case with the expected properties and conditions. Every warm and build sample of a subject and cell produced the same output hash, every incremental call the same hash as that call in the other processes, every timed incremental or dev call contained each class it added, and every response loaded exactly the native binaries its subject should.",
     "",
     "## Known limits",
     "",

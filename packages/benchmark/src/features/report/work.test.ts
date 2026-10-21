@@ -103,3 +103,31 @@ test("verdicts are computed within a configuration group, so a faster variant ca
   );
   assert.match(renderReadmeSummary(model, "s"), /\| TeaCSS \(Rust engine\) \| 201 ms \(2\.0× slower\) \|/);
 });
+
+test("the file-count takeaway survives a run that also measured the out-of-the-box configuration", async () => {
+  const { buildReport } = await import("./index.ts");
+  const { renderReadmeSummary } = await import("./readme.ts");
+  const samples: Sample[] = [];
+  for (const files of [3, 300]) {
+    const cell = { utilities: 10, files };
+    for (let index = 0; index < 30; index++) {
+      samples.push(build("vite-baseline", cell, 100 + (index % 3), 0, 0), build("tailwind-v4", cell, 200 + (index % 3), 1, 1), build("teacss-ts", cell, (files === 3 ? 200 : 500) + (index % 3), 1, 1), build("teacss-ts-default", cell, 210 + (index % 3), 1, 1));
+    }
+  }
+  const record = {
+    version: 1,
+    specRevision: 3,
+    pairTableVersion: 1,
+    startedAt: "2026-10-22T00:00:00.000Z",
+    finishedAt: "x",
+    seed: 1,
+    samplesPerCell: 30,
+    allowBusy: false,
+    environment: { host: "h", cpu: "c", cores: 1, memoryBytes: 1, os: "o", node: "v24", bun: "1", lockfileSha256: "l", commit: "c" },
+    subjects: {},
+    cells: [3, 300].map((files) => ({ cell: { utilities: 10, files }, corpusHash: "x", loadShareBefore: 0, loadShareAfter: 0 })),
+    limiters: {},
+    samples,
+  } as const;
+  assert.match(renderReadmeSummary(buildReport(record), "s"), /TeaCSS \(TypeScript engine\) gets 4\.0× slower when the same classes are spread over 300 files instead of 3/);
+});
