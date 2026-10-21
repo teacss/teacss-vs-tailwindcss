@@ -127,6 +127,12 @@ function limiterLines(limiters: Readonly<Record<string, { readonly totalMs: numb
   ];
 }
 
+function localLines(record: Omit<RunRecord, "samples">): string[] {
+  const linked = Object.entries(record.subjects).flatMap(([subject, versions]) => Object.entries(versions.local ?? {}).map(([name, dir]) => `${subject}: ${name} from ${dir}`));
+  if (linked.length === 0) return [];
+  return [`**Local build, not for publication.** These packages came from local checkouts, not from \`bun.lock\`, so nobody else can reproduce this run: ${linked.join("; ")}.`, ""];
+}
+
 function notMeasuredLines(record: Omit<RunRecord, "samples">): string[] {
   const missing = SPEC_SUBJECTS.filter((subject) => !(subject in record.subjects));
   if (missing.length === 0) return [];
@@ -142,6 +148,7 @@ export function renderMarkdown(model: ReportModel): string {
     "",
     `Protocol: spec v01.1 revision ${record.specRevision}; pair table ${record.pairTableVersion}; seed ${record.seed}; ${record.samplesPerCell} samples per subject and cell; ${model.sampleCount} samples.${record.allowBusy ? " **Recorded with --allow-busy on a loaded machine; see the load column.**" : ""}`,
     "",
+    ...localLines(record),
     ...notMeasuredLines(record),
     "## Verdict",
     "",

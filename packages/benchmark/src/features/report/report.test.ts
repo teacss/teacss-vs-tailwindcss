@@ -25,7 +25,7 @@ function record(): RunRecord {
     samplesPerCell: 30,
     allowBusy: false,
     environment: { host: "h", cpu: "c", cores: 8, memoryBytes: 8 * 1073741824, os: "o", node: "v24", bun: "1.4.3", lockfileSha256: "l", commit: "c0ffee" },
-    subjects: { fast: { packages: { fast: "1.0.0" } } },
+    subjects: { fast: { packages: { fast: "1.0.0" }, local: {} } },
     cells: [{ cell: { utilities: 100, files: 2 }, corpusHash: "abc", loadShareBefore: 0.1, loadShareAfter: 0.12 }],
     limiters: { "fast/engine": { totalMs: 100, top: [{ name: "generate (core.js:1)", selfMs: 40, share: 0.4 }] } },
     samples,

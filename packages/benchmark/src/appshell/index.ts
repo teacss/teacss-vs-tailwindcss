@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
-import { type Invocation, parseInvocation, type SubjectId, subjectId } from "@bench/infrastructure";
+import { type Invocation, parseInvocation, type SubjectId, type SubjectVersions, subjectId } from "@bench/infrastructure";
 import { DEFAULT_SEED, generateCorpus, PAIR_TABLE_VERSION, profileCorpus } from "../features/corpus/index.ts";
 import { captureEnvironment, loadShare } from "../features/environment/index.ts";
 import { measure, type Tier } from "../features/measure/run.ts";
@@ -101,7 +101,8 @@ export async function createApp(deps: AppDeps): Promise<number> {
         const versions = Object.entries(response.result.versions.packages)
           .map(([name, version]) => `${name}@${version}`)
           .join(" ");
-        deps.stdout(`${id}: ${versions} (native: ${response.nativeModules.join(", ") || "none"})\n`);
+        const local = Object.entries(response.result.versions.local).map(([name, dir]) => `${name} from ${dir}`);
+        deps.stdout(`${id}: ${versions} (native: ${response.nativeModules.join(", ") || "none"})${local.length > 0 ? ` LOCAL: ${local.join(", ")}` : ""}\n`);
       }
       return 0;
     },
@@ -140,7 +141,7 @@ export async function createApp(deps: AppDeps): Promise<number> {
     const cells = integerList(invocation, "utilities", [1_000, 5_000, 20_000]).flatMap((utilities) => integerList(invocation, "files", [3, 30, 300]).map((files) => ({ utilities, files })));
     const plan = { seed: integerOption(invocation, "seed", DEFAULT_SEED), cells, tiers: tiersOf(invocation), subjects: chosen.map(([id, registration]) => ({ id, syntax: registration.syntax, engineTier: registration.engineTier })), samplesPerCell: integerOption(invocation, "samples", 30) };
     const startedAt = new Date().toISOString();
-    const subjects: Record<string, { packages: Record<string, string> }> = {};
+    const subjects: Record<string, SubjectVersions> = {};
     for (const [id] of chosen) {
       const { response } = await invokeSubject(registry, id, { kind: "describe" }, processDeps);
       if (response.result.kind !== "describe") throw new Error(`${id}: expected a describe result`);

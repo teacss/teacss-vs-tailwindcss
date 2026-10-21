@@ -99,8 +99,8 @@ function parseResult(value: unknown): TaskResult {
   switch (value["kind"]) {
     case "describe": {
       const versions = value["versions"];
-      if (!isRecord(versions) || !isStringRecord(versions["packages"])) throw new Error("response: describe versions shape");
-      return { kind: "describe", versions: { packages: versions["packages"] } };
+      if (!isRecord(versions) || !isStringRecord(versions["packages"]) || !isStringRecord(versions["local"])) throw new Error("response: describe versions shape");
+      return { kind: "describe", versions: { packages: versions["packages"], local: versions["local"] } };
     }
     case "engine":
       if (!Array.isArray(value["samples"])) throw new Error("response: engine samples are not an array");

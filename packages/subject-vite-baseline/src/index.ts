@@ -1,5 +1,8 @@
-import { readFileSync } from "node:fs";
-import { type SubjectClient, type SubjectFactory, subjectId, type Workspace } from "@bench/infrastructure";
+import { fileURLToPath } from "node:url";
+import { describePackages, resolvePackage, type SubjectClient, type SubjectFactory, subjectId, type Workspace } from "@bench/infrastructure";
+
+const HERE = fileURLToPath(new URL(".", import.meta.url));
+
 import { build, type PluginOption } from "vite";
 
 async function viteBuild(workspace: Workspace, plugins: PluginOption[]): Promise<string> {
@@ -20,15 +23,9 @@ function entryModule(modules: readonly string[], cssImport: string | undefined, 
   return `${header}${imports.join("\n")}\n`;
 }
 
-function packageVersion(name: string): string {
-  const manifest: unknown = JSON.parse(readFileSync(new URL(`../node_modules/${name}/package.json`, import.meta.url), "utf8"));
-  if (typeof manifest !== "object" || manifest === null || !("version" in manifest) || typeof manifest.version !== "string") throw new Error(`${name}: no version`);
-  return manifest.version;
-}
-
 export const createSubject: SubjectFactory = (): SubjectClient => ({
   id: subjectId("vite-baseline"),
-  describe: async () => ({ packages: { vite: packageVersion("vite") } }),
+  describe: async () => describePackages([resolvePackage("vite", HERE)]),
   engine: async () => {
     throw new Error("vite-baseline has no engine tier");
   },

@@ -12,6 +12,8 @@ export function subjectId(raw: string): SubjectId {
 
 export interface SubjectVersions {
   readonly packages: Readonly<Record<string, string>>;
+  /** Packages resolved outside the lockfile's store, by package name to their real directory. Empty for a reproducible run. */
+  readonly local: Readonly<Record<string, string>>;
 }
 
 export interface EngineInput {

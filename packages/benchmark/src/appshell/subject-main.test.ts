@@ -14,7 +14,7 @@ function request(task: unknown, module = fakeModule): string {
 
 test("describe, engine and build answer through the fake module", async () => {
   const describe = parseSubjectResponse(JSON.parse((await subjectMain(request({ kind: "describe" }), deps)).stdout));
-  assert.deepEqual(describe.result, { kind: "describe", versions: { packages: { fake: "0.0.0" } } });
+  assert.deepEqual(describe.result, { kind: "describe", versions: { packages: { fake: "0.0.0" }, local: {} } });
   assert.ok(describe.usage.maxRssBytes > 0);
 
   const engine = parseSubjectResponse(JSON.parse((await subjectMain(request({ kind: "engine", scenario: "warm", candidates: ["p:4"], includeCss: false }), deps)).stdout));

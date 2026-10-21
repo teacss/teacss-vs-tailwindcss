@@ -22,7 +22,7 @@ test("a run record round-trips through the results directory under a date-and-ho
       environment: captureEnvironment(process.cwd()),
       cells: [{ cell: { utilities: 1, files: 1 }, corpusHash: "abc", loadShareBefore: 0.1, loadShareAfter: 0.1 }],
       limiters: {},
-      subjects: { fake: { packages: { fake: "0.0.0" } } },
+      subjects: { fake: { packages: { fake: "0.0.0" }, local: {} } },
       samples: [{ tier: "engine", scenario: "cold", subject: subjectId("fake"), cell: { utilities: 1, files: 1 }, index: 0, wallMs: 1.5, cssBytes: 10, cssSha256: "abc", nativeModules: [] }],
     };
     const path = writeRunRecord(dir, record);

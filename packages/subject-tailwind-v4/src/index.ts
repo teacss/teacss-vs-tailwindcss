@@ -1,23 +1,18 @@
-import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname } from "node:path";
-import { type SubjectClient, type SubjectFactory, subjectId, type Workspace } from "@bench/infrastructure";
+import { fileURLToPath } from "node:url";
+import { describePackages, resolvePackage, type SubjectClient, type SubjectFactory, subjectId, type Workspace } from "@bench/infrastructure";
 import { compile } from "@tailwindcss/node";
 import tailwindcss from "@tailwindcss/vite";
 import { build } from "vite";
 
 const require = createRequire(import.meta.url);
+const HERE = fileURLToPath(new URL(".", import.meta.url));
 const PACKAGES = ["tailwindcss", "@tailwindcss/vite", "@tailwindcss/node", "@tailwindcss/oxide", "vite"];
 
 /** Theme and utilities only: preflight is off on every subject in the engine tier (spec v01.1). */
 const ENGINE_ENTRY = '@layer theme, utilities;\n@import "tailwindcss/theme.css" layer(theme);\n@import "tailwindcss/utilities.css" layer(utilities);\n';
 const BUILD_ENTRY = '@import "tailwindcss" source(none);\n@source "./**/*.js";\n';
-
-function packageVersion(name: string): string {
-  const manifest: unknown = JSON.parse(readFileSync(new URL(`../node_modules/${name}/package.json`, import.meta.url), "utf8"));
-  if (typeof manifest !== "object" || manifest === null || !("version" in manifest) || typeof manifest.version !== "string") throw new Error(`${name}: no version`);
-  return manifest.version;
-}
 
 async function viteBuild(workspace: Workspace): Promise<string> {
   const previous = process.cwd();
@@ -36,7 +31,7 @@ async function viteBuild(workspace: Workspace): Promise<string> {
 
 export const createSubject: SubjectFactory = (): SubjectClient => ({
   id: subjectId("tailwind-v4"),
-  describe: async () => ({ packages: Object.fromEntries(PACKAGES.map((name) => [name, packageVersion(name)])) }),
+  describe: async () => describePackages(PACKAGES.map((name) => resolvePackage(name, HERE))),
   engine: async ({ candidates }) => {
     const compiler = await compile(ENGINE_ENTRY, { base: dirname(require.resolve("tailwindcss/package.json")), onDependency: () => {} });
     return { css: compiler.build([...candidates]) };

@@ -57,7 +57,15 @@ bun run bench:ts-tailwind                            # the same without teacss-r
 bun run bench:report results/<file>.json             # Markdown and JSON summary into docs/reports/
 ```
 
-`bun run bench` refuses to start when the one-minute load exceeds 20 % of the
+To measure unreleased TeaCSS builds, link a built teacss-ts checkout first:
+
+```sh
+bun run bench:link link --ts ../teacss-ts   # bench:link status shows where each package resolves
+bun run bench:link unlink
+```
+
+A report from a linked run says so on its first line and is not for
+publication. `bun run bench` refuses to start when the one-minute load exceeds 20 % of the
 logical cores; `--allow-busy` records the run anyway and the report says so.
 `node apps/bench/src/main.ts --help` lists every option. Bun is the package
 manager; Node 24 runs the harness and every measured process, because that is the runtime a Vite build uses by default

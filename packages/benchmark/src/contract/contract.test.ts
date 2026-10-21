@@ -18,5 +18,5 @@ test("a response whose result kind is unknown is refused with the kind", () => {
 });
 
 test("a response without usage is refused", () => {
-  assert.throws(() => parseSubjectResponse({ version: 1, sentAt: 0, subject: "fake", nativeModules: [], result: { kind: "describe", versions: { packages: {} } } }), /usage shape/);
+  assert.throws(() => parseSubjectResponse({ version: 1, sentAt: 0, subject: "fake", nativeModules: [], result: { kind: "describe", versions: { packages: {}, local: {} } } }), /usage shape/);
 });

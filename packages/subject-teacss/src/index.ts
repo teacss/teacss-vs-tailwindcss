@@ -1,22 +1,25 @@
-import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname } from "node:path";
-import { type SubjectClient, subjectId, type Workspace } from "@bench/infrastructure";
+import { fileURLToPath } from "node:url";
+import { describePackages, resolvePackage, type SubjectClient, subjectId, type Workspace } from "@bench/infrastructure";
 import { createGenerator, type EngineMode } from "@teacss/core";
 import presetStandard from "@teacss/preset-standard";
 import { pluginTeacss } from "@teacss/vite";
 import { build } from "vite";
 
 const require = createRequire(import.meta.url);
-const PACKAGES = ["@teacss/core", "@teacss/preset-standard", "@teacss/vite", "@teacss/engine", "vite"];
+const PACKAGES = ["@teacss/core", "@teacss/preset-standard", "@teacss/vite", "vite"];
+const HERE = fileURLToPath(new URL(".", import.meta.url));
+
+/** The engine core loads is the one beside core, which differs from this package's own when core is linked to a checkout. */
+function resolved() {
+  const packages = PACKAGES.map((name) => resolvePackage(name, HERE));
+  const core = packages[0];
+  if (core === undefined) throw new Error("@teacss/core is not resolved");
+  return [...packages, resolvePackage("@teacss/engine", core.dir)];
+}
 const INCLUDE = "// @teacss-include\n";
 const CSS_ENTRY = '@presets "standard";\n@source "./src/**/*.js";\n@teacss;\n';
-
-function packageVersion(name: string): string {
-  const manifest: unknown = JSON.parse(readFileSync(new URL(`../node_modules/${name}/package.json`, import.meta.url), "utf8"));
-  if (typeof manifest !== "object" || manifest === null || !("version" in manifest) || typeof manifest.version !== "string") throw new Error(`${name}: no version`);
-  return manifest.version;
-}
 
 async function viteBuild(workspace: Workspace, engine: EngineMode): Promise<string> {
   const previous = process.cwd();
@@ -37,7 +40,7 @@ async function viteBuild(workspace: Workspace, engine: EngineMode): Promise<stri
 export function teacssSubject(engine: "ts" | "rust"): SubjectClient {
   return {
     id: subjectId(engine === "ts" ? "teacss-ts" : "teacss-rs"),
-    describe: async () => ({ packages: Object.fromEntries(PACKAGES.map((name) => [name, packageVersion(name)])) }),
+    describe: async () => describePackages(resolved()),
     engine: async ({ candidates }) => {
       const generator = await createGenerator({ presets: [presetStandard()], engine });
       const { css } = await generator.generate(new Set(candidates), { preflights: false, minify: true });

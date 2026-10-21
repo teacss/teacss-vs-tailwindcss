@@ -31,7 +31,7 @@ const deps = { subjectEntry, cwd: process.cwd(), env, timeoutMs: 30_000 };
 
 test("a subject process answers describe, engine and build and reports no native module", async () => {
   const describe = await invokeSubject(registry, fake, { kind: "describe" }, deps);
-  assert.deepEqual(describe.response.result, { kind: "describe", versions: { packages: { fake: "0.0.0" } } });
+  assert.deepEqual(describe.response.result, { kind: "describe", versions: { packages: { fake: "0.0.0" }, local: {} } });
   assert.deepEqual(describe.response.nativeModules, []);
   assert.ok(describe.response.usage.cpuUserMs > 0);
 

@@ -92,7 +92,8 @@
 - [ ] 第一份报告只含 teacss-ts 与 Tailwind v4（所有者 2026-10-21 决定：teacss-rs 等 teacss-rs 项目优化完成再测）。本机正式运行需要一分钟负载低于 2.4；当天 teacss-rs 会话持续运行 `cargo check`，负载在 5 到 24 之间。
 - [ ] CI 交叉验证运行。
 - [ ] 按 benchmark-checklist 审核后发布 `docs/reports/<date>.md`，README 每层一个主数字。
-- [ ] teacss-rs 加入：teacss-rs 优化完成并发布新的 `@teacss/engine` 后，更新 `packages/subject-teacss/package.json` 的引擎版本与 `bun.lock`，先跑四对象 `bench:verify`（强等价必须通过），再跑全矩阵，作为第二份报告；规格修订号与 `engineCompat` 变化写进报告。
+- [x] 本地构建模式（2026-10-21，按所有者要求先写代码、不跑测量、不加新单测）：`scripts/link-local.ts`（`bun run bench:link status|link --ts <dir>|unlink`）把 teacss 被测对象的 core、vite、preset-standard 接到已构建的 teacss-ts 检出，engine 跟随 core 解析；被测对象按真实路径报告版本，`node_modules/.bun` 以外的包进 `local`，报告首行标「Local build, not for publication」。`status` 已在本机跑过；`link`/`unlink` 未实际执行，因为它会改 `packages/subject-teacss/node_modules`，而 teacss-ts 检出正由另一会话修改。
+- [ ] teacss-rs 加入：未发布时用本地构建模式先排练（teacss-rs 的 `dev-link.mjs link` 接进 teacss-ts，再 `bench:link link`），只作内部参考；teacss-rs 优化完成并发布新的 `@teacss/engine` 后，更新 `packages/subject-teacss/package.json` 的引擎版本与 `bun.lock`，先跑四对象 `bench:verify`（强等价必须通过），再跑全矩阵，作为第二份报告；规格修订号与 `engineCompat` 变化写进报告。
 
 ## 第二阶段（另立提案）
 
