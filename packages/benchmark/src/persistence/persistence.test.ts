@@ -12,9 +12,15 @@ test("a run record round-trips through the results directory under a date-and-ho
   try {
     const record: RunRecord = {
       version: 1,
+      specRevision: 1,
+      pairTableVersion: 1,
       startedAt: "2026-10-21T10:00:00.000Z",
       finishedAt: "2026-10-21T10:05:00.000Z",
+      seed: 1,
+      samplesPerCell: 1,
+      allowBusy: false,
       environment: captureEnvironment(process.cwd()),
+      cells: [{ cell: { utilities: 1, files: 1 }, corpusHash: "abc", loadShareBefore: 0.1, loadShareAfter: 0.1 }],
       subjects: { fake: { packages: { fake: "0.0.0" } } },
       samples: [{ tier: "engine", scenario: "cold", subject: subjectId("fake"), cell: { utilities: 1, files: 1 }, index: 0, wallMs: 1.5, cssBytes: 10, cssSha256: "abc", nativeModules: [] }],
     };

@@ -23,12 +23,25 @@ interface SampleBase {
 
 export type Sample = (SampleBase & { readonly tier: "engine"; readonly scenario: EngineScenario }) | (SampleBase & { readonly tier: "build"; readonly cpuUserMs: number; readonly cpuSystemMs: number; readonly maxRssBytes: number; readonly cssGzipBytes: number });
 
+export interface CellRecord {
+  readonly cell: Cell;
+  readonly corpusHash: string;
+  readonly loadShareBefore: number;
+  readonly loadShareAfter: number;
+}
+
 export interface RunRecord {
   readonly version: typeof RECORD_VERSION;
+  readonly specRevision: number;
+  readonly pairTableVersion: number;
   readonly startedAt: string;
   readonly finishedAt: string;
+  readonly seed: number;
+  readonly samplesPerCell: number;
+  readonly allowBusy: boolean;
   readonly environment: EnvironmentRecord;
   readonly subjects: Readonly<Record<string, SubjectVersions>>;
+  readonly cells: readonly CellRecord[];
   readonly samples: readonly Sample[];
 }
 

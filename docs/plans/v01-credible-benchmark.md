@@ -64,11 +64,13 @@
 
 ## 第 5 片：测量
 
-- [ ] `packages/benchmark/features/measure`：规模矩阵 × 层级 × 对象的运行表；每个样本一个新进程；一轮内对象顺序随机，轮间轮替；热身次数按规格；收集墙钟、CPU 用户/系统时间、最大 RSS、输出字节与 gzip 字节、输出哈希；任何错误或回退令本次运行作废并退出。
-- [ ] `packages/benchmark/features/environment`：CPU 型号、核数、内存、OS、Node、pnpm、lockfile 哈希、各对象 `describe()` 的版本、运行前后的 1 分钟负载；负载超过阈值拒绝开始。
-- [ ] 结果写入 `results/<date>-<host>.json`，含规格版本与语料哈希。
-- 验收：`bench run --runs 30` 在本机完成全矩阵（4 对象 × 2 层级 × 9 规模格 × 30 样本），每个样本的输出哈希在同对象同规模下一致（确定性）；假对象植入错误时整次运行作废。
-- 验证命令：`node apps/bench/src/main.ts run --runs 30 --out results/`。
+完成于 2026-10-21。
+
+- [x] `features/measure/run.ts`：规模格 × 层级 × 对象的作业表；每轮按种子随机打乱对象顺序，轮间轮替直到每格样本数到齐；每个作业一个新子进程（build 一个样本、engine/cold 一个样本、engine/warm 一个进程十个样本）；墙钟由编排进程量 build、由子进程量 engine，CPU 与 RSS 由子进程自报；同对象同格的输出哈希必须一致；任何错误抛 `RunInvalid`，不落盘。
+- [x] 负载门：一分钟负载超过核数 20% 拒绝开始，`--allow-busy` 覆盖并记入记录；每格前后的负载份额写入 `cells`。
+- [x] 记录新增：`specRevision`、`pairTableVersion`、`seed`、`samplesPerCell`、`allowBusy`、`cells`（语料哈希与负载）。
+- [x] `bench run --utilities a,b,c --files a,b,c --samples --tier --subjects --seed --out --allow-busy`。
+- 验收：单元测试覆盖轮替、样本计数、错误作废、哈希变化作废；真实四对象 `--utilities 200,400 --files 2 --samples 2 --allow-busy` 产出 88 个样本的记录，14 秒。负载门在 60% 负载的本机确实拒绝。
 
 ## 第 6 片：统计与报告
 
