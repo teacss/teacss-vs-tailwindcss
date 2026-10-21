@@ -48,9 +48,9 @@ export function assertComparable(local: Protocol, other: Protocol): void {
  */
 export function crossComparisons(local: ReportModel, other: ReportModel): CrossComparison[] {
   const comparisons: CrossComparison[] = [];
-  for (const table of local.tables) {
+  for (const table of local.tables.filter((entry) => entry.group === "main")) {
     const cell = `${table.cell.utilities}x${table.cell.files}`;
-    const twin = other.tables.find((candidate) => candidate.series === table.series && `${candidate.cell.utilities}x${candidate.cell.files}` === cell);
+    const twin = other.tables.find((candidate) => candidate.group === "main" && candidate.series === table.series && `${candidate.cell.utilities}x${candidate.cell.files}` === cell);
     const here = leader(table);
     const there = twin === undefined ? undefined : leader(twin);
     if (twin === undefined || here === undefined || there === undefined) continue;

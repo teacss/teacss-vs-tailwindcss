@@ -24,9 +24,20 @@ export interface SubjectRow {
   readonly maxRssBytes: number | undefined;
 }
 
+/** Subjects of one configuration are ranked against each other only (spec v02.1 §Configurations). */
+export type TableGroup = "main" | "default-config" | "postcss";
+const GROUP_ORDER: readonly TableGroup[] = ["main", "default-config", "postcss"];
+
+export function groupOf(subject: string): TableGroup {
+  if (subject.endsWith("-default")) return "default-config";
+  if (subject.endsWith("-postcss")) return "postcss";
+  return "main";
+}
+
 export interface CellTable {
   readonly series: Series;
   readonly cell: Cell;
+  readonly group: TableGroup;
   readonly rows: readonly SubjectRow[];
   /** The subject with the lowest median, and the verdict of every other subject against it. */
   readonly fastest: string;
@@ -71,27 +82,31 @@ export function buildReport(record: RunRecord): ReportModel {
       const inCell = samples.filter((sample) => seriesOf(sample) === series && cellKey(sample.cell) === cellKey(cell));
       if (inCell.length === 0) continue;
       const walls = wallsBySubject(inCell);
-      const subjects = [...walls.keys()].filter((subject) => series !== "build" || subject !== BASELINE);
       const baseline = series === "build" ? walls.get(BASELINE) : undefined;
       const baselineMedian = baseline === undefined ? undefined : summarize(baseline).median;
-      const rows = subjects.map((subject): SubjectRow => {
-        const own = inCell.filter((sample) => sample.subject === subject);
-        const wall = summarize(walls.get(subject) ?? []);
-        const first = own[0];
-        return {
-          subject,
-          wall,
-          cssBytes: first?.cssBytes ?? 0,
-          cssGzipBytes: first?.tier === "build" ? first.cssGzipBytes : undefined,
-          deltaMs: baselineMedian === undefined ? undefined : wall.median - baselineMedian,
-          maxRssBytes: first?.tier === "build" ? Math.max(...own.map((sample) => (sample.tier === "build" ? sample.maxRssBytes : 0))) : undefined,
-        };
-      });
-      if (baselineMedian !== undefined) rows.push({ subject: BASELINE, wall: summarize(baseline ?? []), cssBytes: 0, cssGzipBytes: 0, deltaMs: 0, maxRssBytes: undefined });
-      const ranked = rows.filter((row) => row.subject !== BASELINE).sort((left, right) => left.wall.median - right.wall.median);
-      const fastest = ranked[0]?.subject ?? "";
-      const verdicts = ranked.slice(1).map((row) => ({ subject: row.subject, verdict: compare(walls.get(fastest) ?? [], walls.get(row.subject) ?? []) }));
-      tables.push({ series, cell, rows, fastest, verdicts });
+      const measured = [...walls.keys()].filter((subject) => subject !== BASELINE);
+      for (const group of GROUP_ORDER) {
+        const subjects = measured.filter((subject) => groupOf(subject) === group);
+        if (subjects.length === 0) continue;
+        const rows = subjects.map((subject): SubjectRow => {
+          const own = inCell.filter((sample) => sample.subject === subject);
+          const wall = summarize(walls.get(subject) ?? []);
+          const first = own[0];
+          return {
+            subject,
+            wall,
+            cssBytes: first?.cssBytes ?? 0,
+            cssGzipBytes: first?.tier === "build" ? first.cssGzipBytes : undefined,
+            deltaMs: baselineMedian === undefined ? undefined : wall.median - baselineMedian,
+            maxRssBytes: first?.tier === "build" ? Math.max(...own.map((sample) => (sample.tier === "build" ? sample.maxRssBytes : 0))) : undefined,
+          };
+        });
+        if (baselineMedian !== undefined) rows.push({ subject: BASELINE, wall: summarize(baseline ?? []), cssBytes: 0, cssGzipBytes: 0, deltaMs: 0, maxRssBytes: undefined });
+        const ranked = rows.filter((row) => row.subject !== BASELINE).sort((left, right) => left.wall.median - right.wall.median);
+        const fastest = ranked[0]?.subject ?? "";
+        const verdicts = ranked.slice(1).map((row) => ({ subject: row.subject, verdict: compare(walls.get(fastest) ?? [], walls.get(row.subject) ?? []) }));
+        tables.push({ series, cell, group, rows, fastest, verdicts });
+      }
     }
   }
   return { record: rest, tables, sampleCount: samples.length, rust: rustFindings(record), work: workRows(record) };
@@ -115,11 +130,11 @@ function tableMarkdown(table: CellTable): string {
     return `${base} ${row.deltaMs === undefined ? "" : ms(row.deltaMs)} | ${kb(row.cssBytes)} | ${row.cssGzipBytes === undefined ? "" : kb(row.cssGzipBytes)} | ${row.maxRssBytes === undefined ? "" : `${(row.maxRssBytes / 1048576).toFixed(0)} MB`} |`;
   });
   const verdicts = table.verdicts.map((entry) => `- ${verdictText(entry, table.fastest)}`);
-  return [`#### ${table.series}, ${table.cell.utilities} utilities in ${table.cell.files} files`, "", header, rule, ...rows, "", `Lowest median: ${table.fastest}.`, ...verdicts, ""].join("\n");
+  return [`#### ${table.series}, ${table.cell.utilities} utilities in ${table.cell.files} files${table.group === "main" ? "" : ` (${table.group})`}`, "", header, rule, ...rows, "", `Lowest median: ${table.fastest}.`, ...verdicts, ""].join("\n");
 }
 
 function verdictParagraph(model: ReportModel, series: Series): string {
-  const tables = model.tables.filter((table) => table.series === series);
+  const tables = model.tables.filter((table) => table.series === series && table.group === "main");
   if (tables.length === 0) return `No ${series} samples in this run.`;
   const largest = tables.reduce((best, table) => (table.cell.utilities * table.cell.files >= best.cell.utilities * best.cell.files ? table : best));
   const others = largest.verdicts.map((entry) => verdictText(entry, largest.fastest));
@@ -144,8 +159,15 @@ function localLines(record: Omit<RunRecord, "samples">): string[] {
   return [`**Local build, not for publication.** These packages came from local checkouts, not from \`bun.lock\`, so nobody else can reproduce this run: ${linked.join("; ")}.`, ""];
 }
 
+/** Spec v02.1 §Configurations: a default run measures the tuned and the out-of-the-box setup of every tool. */
+const V02_SUBJECTS: readonly string[] = [...SPEC_SUBJECTS, "teacss-ts-default", "teacss-rs-default", "tailwind-v4-default"];
+const POSTCSS_SUBJECTS: readonly string[] = ["teacss-ts-postcss", "teacss-rs-postcss", "tailwind-v4-postcss"];
+
 function notMeasuredLines(record: Omit<RunRecord, "samples">): string[] {
-  const missing = SPEC_SUBJECTS.filter((subject) => !(subject in record.subjects));
+  const measured = Object.keys(record.subjects);
+  // A PostCSS round is its own run (spec v02.1); only its own three subjects are expected there.
+  const expected = record.v02Revision === undefined ? SPEC_SUBJECTS : measured.every((subject) => POSTCSS_SUBJECTS.includes(subject)) ? POSTCSS_SUBJECTS : V02_SUBJECTS;
+  const missing = expected.filter((subject) => !(subject in record.subjects));
   if (missing.length === 0) return [];
   return [`**Subset run.** Measured: ${Object.keys(record.subjects).join(", ")}. Not measured: ${missing.join(", ")}. No number in this report speaks for a subject that was not measured.`, ""];
 }
@@ -181,14 +203,28 @@ function besideLines(beside: ReportModel): string[] {
   ];
 }
 
+/** Spec v02.1 §Report: the method's commit and what was verified, before any verdict. */
+function verificationLines(record: Omit<RunRecord, "samples">, hasDev: boolean): string[] {
+  const verification = record.verification;
+  if (verification === undefined) return [];
+  return [
+    `**Method and verification.** Commit \`${record.environment.commit}\`. Before timing anything, ${verification.checks} subject check(s) over ${verification.cells} corpus/corpora and ${verification.cases} paired case(s) found no difference in properties or conditions; a run with any finding writes no record.${hasDev ? " Dev-tier times include up to 5 ms of polling delay, the same for every tool." : ""}`,
+    "",
+  ];
+}
+
 export function renderMarkdown(model: ReportModel, beside?: ReportModel, cross?: ReportModel): string {
   const { record } = model;
   const environment = record.environment;
   const lines = [
     `# TeaCSS vs Tailwind CSS v4: run ${record.startedAt}`,
     "",
-    `Protocol: spec v01.1 revision ${record.specRevision}; pair table ${record.pairTableVersion}; seed ${record.seed}; ${record.samplesPerCell} samples per subject and cell; ${model.sampleCount} samples.${record.allowBusy ? " **Recorded with --allow-busy on a loaded machine; see the load column.**" : ""}`,
+    `Protocol: spec v01.1 revision ${record.specRevision}${record.v02Revision === undefined ? "" : ` and v02.1 revision ${record.v02Revision}`}; pair table ${record.pairTableVersion}; seed ${record.seed}; ${record.samplesPerCell} samples per subject and cell; ${model.sampleCount} samples.${record.allowBusy ? " **Recorded with --allow-busy on a loaded machine; see the load column.**" : ""}`,
     "",
+    ...verificationLines(
+      record,
+      model.tables.some((table) => table.series.startsWith("dev/")),
+    ),
     ...localLines(record),
     ...notMeasuredLines(record),
     ...(record.community === undefined ? [] : [`**Community corpus.** The classes come from public Tailwind projects; see the Community corpus section.`, ""]),
@@ -241,12 +277,16 @@ export function renderMarkdown(model: ReportModel, beside?: ReportModel, cross?:
     "## Benchmark checklist",
     "",
     "1. **Why not double?** The Limiter section names the frames where each subject spends its time; a change that does not touch them cannot move the number much.",
-    "2. **Was it tuned?** Every subject ran its published package with its documented production configuration (spec v01.1 §Subjects); the Rust engine ran with `TEACSS_ENGINE_STRICT=1`, so a fallback would have failed the run.",
+    record.v02Revision === undefined
+      ? "2. **Was it tuned?** Every subject ran its published package with its documented production configuration (spec v01.1 §Subjects); the Rust engine ran with `TEACSS_ENGINE_STRICT=1`, so a fallback would have failed the run."
+      : "2. **Was it tuned?** Every subject ran its published package. The `main` subjects use each tool's tuned production entry, the `-default` subjects the entry its setup guide gives, and the `-postcss` subjects its PostCSS integration (spec v02.1 §Configurations); every TeaCSS Rust subject ran with `TEACSS_ENGINE_STRICT=1`, so a fallback would have failed the run.",
     "3. **Did it break limits?** The CSS sizes in the tables bound the work; a median below the time to write that many bytes would be suspect.",
     "4. **Did it error?** A run with any subject error, timeout or fallback writes no record; this record exists, so every sample succeeded.",
     "5. **Does it reproduce?** Each cell holds the stated number of samples per subject, interleaved per round; the tables give the IQR and the p95, and a pair closer than the larger IQR or with p >= 0.01 is reported as no measurable difference.",
     "6. **Does it matter?** The build tier is the end-to-end path a user waits on; the engine tier is one part of it, and the delta over the baseline shows the share.",
-    "7. **Did it even happen?** Every sample of a subject and cell produced the same output hash, and `bench verify` on the same corpus checks that the output selects every case with the expected properties and conditions.",
+    record.v02Revision === undefined
+      ? "7. **Did it even happen?** Every sample of a subject and cell produced the same output hash, and `bench verify` on the same corpus checks that the output selects every case with the expected properties and conditions."
+      : "7. **Did it even happen?** Before timing, every subject's output on every corpus was checked to select every case with the expected properties and conditions. Every warm and build sample of a subject and cell produced the same output hash, every incremental call the same hash as that call in the other processes, every timed incremental or dev call contained each class it added, and every response loaded exactly the native binaries its subject should.",
     "",
     "## Known limits",
     "",

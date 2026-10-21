@@ -1,31 +1,12 @@
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { type CommandResult, type CoverageResult, type NativeArtifact, runCommand, type SubjectId, type SubjectVersions } from "@bench/infrastructure";
+import { type CommandResult, type CoverageResult, runCommand, type SubjectId, type SubjectVersions } from "@bench/infrastructure";
+import type { PriceRecord, SubjectPrice } from "../../persistence/index.ts";
+
+export type { InstallMeasurement, PriceRecord, SubjectPrice } from "../../persistence/index.ts";
 
 export const NATIVE_LOAD_RUNS = 5;
-
-export interface InstallMeasurement {
-  readonly packages: Readonly<Record<string, string>>;
-  /** Wall time of `bun install` into an empty directory with an empty cache, one entry per run. */
-  readonly installMs: readonly number[];
-  readonly installedBytes: number;
-}
-
-export interface SubjectPrice {
-  readonly native: NativeArtifact | undefined;
-  /** Time to `require` the `.node` file in a process that has imported no tool code, one entry per process. */
-  readonly nativeLoadMs: readonly number[];
-  readonly install: InstallMeasurement | undefined;
-  /** The subject's own engine judging each entry configuration; empty for a subject without one. */
-  readonly coverage: readonly CoverageResult[];
-}
-
-export interface PriceRecord {
-  readonly subjects: Readonly<Record<string, SubjectPrice>>;
-  /** Where the judged entry stylesheets came from, or undefined when none were given. */
-  readonly coverageSource: string | undefined;
-}
 
 export interface PriceDeps {
   readonly describe: (subject: SubjectId) => Promise<SubjectVersions>;

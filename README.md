@@ -36,7 +36,7 @@ is written for developers who want the answer without reading the full report.
 - TeaCSS (Rust engine) generates the CSS fastest; Tailwind CSS v4 finishes the whole build fastest.
 - Generating the CSS is only part of the build's CSS cost: 10 % for TeaCSS (Rust engine) and 13 % for TeaCSS (TypeScript engine). The rest is the build plugin, so a faster engine does not by itself give a faster build.
 - TeaCSS (TypeScript engine) gets 1.8× slower when the same classes are spread over 300 files instead of 3; the other tools do not care how many files there are.
-- Every tool was given the same classes, and every output was checked before a run counted. The tools emit different colour and size values by design, so this is the time to a correct stylesheet, not to identical bytes.
+- Every tool was given the same classes; their outputs were checked against the paired classes with `bench verify`, separately from this run. The tools emit different colour and size values by design, so this is the time to a correct stylesheet, not to identical bytes.
 - vite 8.3.4, @teacss/core 0.9.0-alpha.1, @teacss/engine 0.8.5-alpha.4, tailwindcss 4.3.3; one Apple M2 Max, Node v26.7.0. Milliseconds will differ on your machine; the ratios carry over.
 
 [Full report](docs/reports/2026-10-21T09-19-14-mac.md) · [audit](docs/reports/2026-10-21T09-19-14-mac.audit.md) · [raw samples](results/2026-10-21T09-19-14-mac.json) · [method](docs/specs/v01.1-benchmark-protocol.md)

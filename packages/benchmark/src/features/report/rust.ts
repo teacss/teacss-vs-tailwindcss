@@ -1,6 +1,6 @@
 import type { RunRecord, Sample } from "../../persistence/index.ts";
 import type { Series } from "./index.ts";
-import { summarize } from "./statistics.ts";
+import { compare, summarize } from "./statistics.ts";
 
 export const TS = "teacss-ts";
 export const RS = "teacss-rs";
@@ -26,8 +26,10 @@ export interface ValueRow {
   readonly ts: number | undefined;
   readonly rs: number | undefined;
   readonly format: (value: number) => string;
-  /** True when a larger number is better, so the ratio reads the right way round. */
-  readonly higherIsBetter?: boolean;
+  /** The samples behind `ts` and `rs`; absent for a single measurement, which supports no verdict. */
+  readonly samples?: { readonly ts: readonly number[]; readonly rs: readonly number[] };
+  /** Why the two values are context rather than a comparison, shown in place of a verdict. */
+  readonly notComparable?: string;
 }
 
 /** Whether the record has the per-call resource fields spec v02.1 added; older records render as before. */
@@ -39,13 +41,20 @@ export function hasV02Data(record: Pick<RunRecord, "samples">): boolean {
 export function valueRows(record: RunRecord): ValueRow[] {
   const cell = largestCellKey(record.samples);
   const at = (subject: string, series: Series): Sample[] => record.samples.filter((sample) => sample.subject === subject && seriesOf(sample) === series && `${sample.cell.utilities}x${sample.cell.files}` === cell);
-  const wall = (series: Series) => ({ ts: median(at(TS, series).map((sample) => sample.wallMs)), rs: median(at(RS, series).map((sample) => sample.wallMs)) });
-  const field = (pick: (sample: Sample) => number | undefined, combine: (values: number[]) => number | undefined = median) => {
+  const measured = (pick: (sample: Sample) => number | undefined, series: Series) => {
     const values = (subject: string) =>
-      at(subject, "engine/warm")
+      at(subject, series)
         .map(pick)
         .filter((value): value is number => value !== undefined);
-    return { ts: combine(values(TS)), rs: combine(values(RS)) };
+    const ts = values(TS);
+    const rs = values(RS);
+    return { ts: median(ts), rs: median(rs), samples: { ts, rs } };
+  };
+  const wall = (series: Series) => measured((sample) => sample.wallMs, series);
+  const engineField = (pick: (sample: Extract<Sample, { tier: "engine" }>) => number | undefined) => measured((sample) => (sample.tier === "engine" ? pick(sample) : undefined), "engine/warm");
+  const highest = (subject: string): number | undefined => {
+    const values = at(subject, "engine/warm").flatMap((sample) => (sample.tier === "engine" && sample.rssBytes !== undefined ? [sample.rssBytes] : []));
+    return values.length === 0 ? undefined : Math.max(...values);
   };
   const spread = (subject: string): number | undefined => {
     const values = at(subject, "engine/warm").map((sample) => sample.wallMs);
@@ -60,16 +69,10 @@ export function valueRows(record: RunRecord): ValueRow[] {
     { label: "Add 100 classes to a running engine", ...wall("engine/incremental-100"), format: seconds },
     { label: "Dev server: save a file with 10 new classes", ...wall("dev/+10"), format: seconds },
     { label: "Vite production build", ...wall("build"), format: seconds },
-    { label: "CPU time per warm generation", ...field((sample) => (sample.tier === "engine" ? sample.cpuMs : undefined)), format: seconds },
-    { label: "JavaScript heap after generating", ...field((sample) => (sample.tier === "engine" ? sample.heapBytes : undefined)), format: megabytes },
-    {
-      label: "Peak resident memory while generating",
-      ...field(
-        (sample) => (sample.tier === "engine" ? sample.rssBytes : undefined),
-        (values) => (values.length === 0 ? undefined : Math.max(...values)),
-      ),
-      format: megabytes,
-    },
+    { label: "CPU time per warm generation", ...engineField((sample) => sample.cpuMs), format: seconds },
+    { label: "Resident memory after generating", ...engineField((sample) => sample.rssBytes), format: megabytes },
+    { label: "JavaScript heap after generating", ...engineField((sample) => sample.heapBytes), format: megabytes, notComparable: "not comparable: the Rust engine's memory is outside the heap" },
+    { label: "Resident memory after the call (highest)", ts: highest(TS), rs: highest(RS), format: megabytes },
     { label: "Time spent in garbage collection", ts: gc(TS), rs: gc(RS), format: (value) => `${(value * 100).toFixed(0)} %` },
     { label: "Run-to-run spread (IQR over median)", ts: spread(TS), rs: spread(RS), format: (value) => `${(value * 100).toFixed(1)} %` },
   ];
@@ -91,13 +94,19 @@ export function identicalOutputs(record: RunRecord): { identical: number; compar
   return { identical: both.filter((entry) => entry.ts === entry.rs).length, compared: both.length };
 }
 
+/** Spec v01.1 §Statistics: a ratio only when the samples differ; lower is better for every row here. */
+export function valueVerdict(row: ValueRow): { readonly text: string; readonly factor: number | undefined; readonly rustBetter: boolean | undefined } {
+  if (row.ts === undefined || row.rs === undefined) return { text: "", factor: undefined, rustBetter: undefined };
+  if (row.notComparable !== undefined) return { text: row.notComparable, factor: undefined, rustBetter: undefined };
+  if (row.samples === undefined || row.samples.ts.length < 2 || row.samples.rs.length < 2) return { text: "single measurement, no verdict", factor: undefined, rustBetter: undefined };
+  const verdict = compare(row.samples.rs, row.samples.ts);
+  if (verdict.kind === "no-measurable-difference") return { text: "no measurable difference", factor: undefined, rustBetter: undefined };
+  const rustBetter = verdict.lower === "left";
+  return { text: `${verdict.ratio.toFixed(1)}× ${rustBetter ? "better" : "worse"}`, factor: verdict.ratio, rustBetter };
+}
+
 function ratio(row: ValueRow): string {
-  if (row.ts === undefined || row.rs === undefined || row.ts === 0 || row.rs === 0) return "";
-  const factor = row.ts / row.rs;
-  if (Math.abs(factor - 1) < 0.05) return "about the same";
-  const better = row.higherIsBetter === true ? factor < 1 : factor > 1;
-  const size = factor > 1 ? factor : 1 / factor;
-  return `${size.toFixed(1)}× ${better ? "better" : "worse"}`;
+  return valueVerdict(row).text;
 }
 
 export function valueTable(record: RunRecord, names: { ts: string; rs: string }): string[] {

@@ -1,10 +1,9 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { SubjectId, SubjectVersions } from "@bench/infrastructure";
+import type { CoverageResult, NativeArtifact, SubjectId, SubjectVersions } from "@bench/infrastructure";
 import type { DevSize, EngineScenario } from "../contract/index.ts";
 import type { CommunityPool } from "../corpus/community.ts";
 import type { EnvironmentRecord } from "../features/environment/index.ts";
-import type { PriceRecord } from "../features/price/index.ts";
 import type { ProfileSummary } from "../features/profile/index.ts";
 
 export const RECORD_VERSION = 1;
@@ -81,4 +80,27 @@ export function readRunRecord(path: string): RunRecord {
   if (typeof parsed !== "object" || parsed === null || !("version" in parsed) || parsed.version !== RECORD_VERSION) throw new Error(`${path}: not a version ${RECORD_VERSION} run record`);
   if (!("samples" in parsed) || !Array.isArray(parsed.samples) || !("environment" in parsed)) throw new Error(`${path}: run record without samples or environment`);
   return parsed as RunRecord;
+}
+
+/** Spec v02.1 price of Rust, as `features/price` measures it and the report reads it. */
+export interface InstallMeasurement {
+  readonly packages: Readonly<Record<string, string>>;
+  /** Wall time of `bun install` into an empty directory with an empty cache, one entry per run. */
+  readonly installMs: readonly number[];
+  readonly installedBytes: number;
+}
+
+export interface SubjectPrice {
+  readonly native: NativeArtifact | undefined;
+  /** Time to `require` the `.node` file in a process that has imported no tool code, one entry per process. */
+  readonly nativeLoadMs: readonly number[];
+  readonly install: InstallMeasurement | undefined;
+  /** The subject's own engine judging each entry configuration; empty for a subject without one. */
+  readonly coverage: readonly CoverageResult[];
+}
+
+export interface PriceRecord {
+  readonly subjects: Readonly<Record<string, SubjectPrice>>;
+  /** Where the judged entry stylesheets came from, or undefined when none were given. */
+  readonly coverageSource: string | undefined;
 }

@@ -1,6 +1,7 @@
 import { crossComparisons } from "./cross.ts";
 import type { CellTable, ReportModel, Series, SubjectRow } from "./index.ts";
-import { BASELINE } from "./index.ts";
+import { BASELINE, type TableGroup } from "./index.ts";
+import { valueVerdict } from "./rust.ts";
 
 export const README_START = "<!-- bench:summary:start -->";
 export const README_END = "<!-- bench:summary:end -->";
@@ -16,8 +17,8 @@ const name = (subject: string): string => NAMES[subject] ?? subject;
 const seconds = (ms: number): string => (ms >= 1000 ? `${(ms / 1000).toFixed(2)} s` : ms >= 10 ? `${ms.toFixed(0)} ms` : `${ms.toFixed(1)} ms`);
 const count = (value: number): string => value.toLocaleString("en-US");
 
-function largest(model: ReportModel, series: Series): CellTable | undefined {
-  return model.tables.filter((table) => table.series === series).reduce<CellTable | undefined>((best, table) => (best === undefined || table.cell.utilities * table.cell.files >= best.cell.utilities * best.cell.files ? table : best), undefined);
+function largest(model: ReportModel, series: Series, group: TableGroup = "main"): CellTable | undefined {
+  return model.tables.filter((table) => table.series === series && table.group === group).reduce<CellTable | undefined>((best, table) => (best === undefined || table.cell.utilities * table.cell.files >= best.cell.utilities * best.cell.files ? table : best), undefined);
 }
 
 function row(table: CellTable, subject: string): SubjectRow | undefined {
@@ -32,12 +33,15 @@ function ranked(table: CellTable): SubjectRow[] {
 /** How each tool's out-of-the-box entry changes its build time against its tuned one, at the largest cell. */
 function defaultConfigTakeaway(model: ReportModel): string[] {
   const build = largest(model, "build");
-  if (build === undefined) return [];
+  const defaults = largest(model, "build", "default-config");
+  if (build === undefined || defaults === undefined) return [];
   const ratios = Object.keys(NAMES)
-    .map((subject) => ({ subject, tuned: row(build, subject)?.wall.median, out: row(build, `${subject}-default`)?.wall.median }))
+    .map((subject) => ({ subject, tuned: row(build, subject)?.wall.median, out: row(defaults, `${subject}-default`)?.wall.median }))
     .filter((entry): entry is { subject: string; tuned: number; out: number } => entry.tuned !== undefined && entry.out !== undefined);
   if (ratios.length === 0) return [];
-  return [`- With each tool's out-of-the-box entry instead of the tuned one, the build takes ${joinWords(ratios.map((entry) => `${(entry.out / entry.tuned).toFixed(2)}× as long for ${name(entry.subject)}`))}, so the comparison does not hinge on one tool's configuration.`];
+  const sensitive = ratios.filter((entry) => Math.abs(entry.out / entry.tuned - 1) > 0.1);
+  const conclusion = sensitive.length === 0 ? "so the comparison does not hinge on one tool's configuration" : `so configuration matters for ${joinWords(sensitive.map((entry) => name(entry.subject)))}`;
+  return [`- With each tool's out-of-the-box entry instead of the tuned one, the build takes ${joinWords(ratios.map((entry) => `${(entry.out / entry.tuned).toFixed(2)}× as long for ${name(entry.subject)}`))}, ${conclusion}.`];
 }
 
 /** "1.4× slower", "about the same" for a tie, or nothing for the fastest. */
@@ -80,18 +84,17 @@ function pairTable(model: ReportModel, series: readonly [Series, Series], title:
   return [`${title(ten)} (median of ${fastestTen.wall.n} runs)`, "", "| | +10 classes | +100 classes |", "| --- | --- | --- |", ...order.map((entry) => `| ${name(entry.subject)} | ${cell(ten, entry.subject, fastestTen)} | ${cell(hundred, entry.subject, fastestHundred)} |`), ""];
 }
 
-const VALUE_ROWS = ["Generate the CSS (warm process)", "Add 10 classes to a running engine", "Dev server: save a file with 10 new classes", "Vite production build", "JavaScript heap after generating"];
+const VALUE_ROWS = ["Generate the CSS (warm process)", "Add 10 classes to a running engine", "Dev server: save a file with 10 new classes", "Vite production build", "Resident memory after generating"];
 
 function rustTable(model: ReportModel): string[] {
   const rows = model.rust.value.filter((row) => VALUE_ROWS.includes(row.label) && row.ts !== undefined && row.rs !== undefined);
   if (rows.length === 0) return [];
   const lines = ["**What the Rust engine changes for TeaCSS**", "", "| | TypeScript engine | Rust engine |", "| --- | --- | --- |"];
   for (const row of rows) {
-    const ts = row.ts ?? 0;
-    const rs = row.rs ?? 0;
-    const factor = ts / rs;
-    const note = Math.abs(factor - 1) < 0.05 ? " (about the same)" : factor > 1 ? ` (${factor.toFixed(1)}× ${row.label.startsWith("JavaScript heap") ? "less" : "faster"})` : ` (${(1 / factor).toFixed(1)}× ${row.label.startsWith("JavaScript heap") ? "more" : "slower"})`;
-    lines.push(`| ${row.label} | ${row.format(ts)} | ${row.format(rs)}${note} |`);
+    const verdict = valueVerdict(row);
+    const memory = row.label.startsWith("Resident memory");
+    const note = verdict.factor === undefined ? " (no measurable difference)" : ` (${verdict.factor.toFixed(1)}× ${memory ? (verdict.rustBetter ? "less" : "more") : verdict.rustBetter ? "faster" : "slower"})`;
+    lines.push(`| ${row.label} | ${row.format(row.ts ?? 0)} | ${row.format(row.rs ?? 0)}${note} |`);
   }
   const { identical, compared } = model.rust.identical;
   if (compared > 0) lines.push(`| Same CSS output | | ${identical === compared ? "byte-identical in every measured case" : `${identical} of ${compared} groups identical`} |`);
@@ -191,7 +194,11 @@ function takeaways(model: ReportModel, engine: CellTable | undefined, build: Cel
   }
   const price = priceTakeaway(model);
   if (price !== undefined) points.push(price);
-  points.push("Every tool was given the same classes, and every output was checked before a run counted. The tools emit different colour and size values by design, so this is the time to a correct stylesheet, not to identical bytes.");
+  points.push(
+    model.record.verification === undefined
+      ? "Every tool was given the same classes; their outputs were checked against the paired classes with `bench verify`, separately from this run. The tools emit different colour and size values by design, so this is the time to a correct stylesheet, not to identical bytes."
+      : "Every tool was given the same classes, and before anything was timed each tool's output was checked against them; every timed call that added classes was checked for those classes. The tools emit different colour and size values by design, so this is the time to a correct stylesheet, not to identical bytes.",
+  );
   const environment = model.record.environment;
   const versions = Object.values(model.record.subjects)
     .flatMap((entry) => Object.entries(entry.packages))
