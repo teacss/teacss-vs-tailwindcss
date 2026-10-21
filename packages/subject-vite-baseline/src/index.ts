@@ -29,6 +29,9 @@ export const createSubject: SubjectFactory = (): SubjectClient => ({
   engine: async () => {
     throw new Error("vite-baseline has no engine tier");
   },
+  engineSession: async () => {
+    throw new Error("vite-baseline has no engine tier");
+  },
   prepare: async (workspace, project) => {
     for (const [path, content] of project.files) workspace.write(path, content);
     workspace.write("src/main.js", entryModule(project.modules, undefined));

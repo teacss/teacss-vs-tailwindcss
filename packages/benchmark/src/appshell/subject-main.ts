@@ -27,7 +27,7 @@ async function runTask(request: SubjectRequest, deps: SubjectMainDeps): Promise<
     case "describe":
       return { kind: "describe", versions: await (await loadSubject(request)).describe() };
     case "engine": {
-      const { samples, css } = await runEngineScenario(task.scenario, task.candidates, () => loadSubject(request), deps.clock);
+      const { samples, css } = await runEngineScenario(task, () => loadSubject(request), deps.clock);
       return { kind: "engine", samples, css: task.includeCss ? css : undefined };
     }
     case "build": {

@@ -3,11 +3,24 @@ import { type ResourceUsage, type SubjectId, type SubjectVersions, subjectId } f
 export const CONTRACT_VERSION = 1;
 
 export type Tier = "engine" | "build";
-export type EngineScenario = "cold" | "warm";
+export type EngineScenario = "cold" | "warm" | "incremental-10" | "incremental-100";
+export const ENGINE_SCENARIOS: readonly EngineScenario[] = ["cold", "warm", "incremental-10", "incremental-100"];
+
+/** K for an incremental scenario, undefined for the others. */
+export function incrementalSize(scenario: EngineScenario): number | undefined {
+  return scenario === "incremental-10" ? 10 : scenario === "incremental-100" ? 100 : undefined;
+}
 
 export type SubjectTask =
   | { readonly kind: "describe" }
-  | { readonly kind: "engine"; readonly scenario: EngineScenario; readonly candidates: readonly string[]; readonly includeCss: boolean }
+  | {
+      readonly kind: "engine";
+      readonly scenario: EngineScenario;
+      readonly candidates: readonly string[];
+      /** One group of new candidates per timed call; only the incremental scenarios use it. */
+      readonly extra: readonly (readonly string[])[];
+      readonly includeCss: boolean;
+    }
   | { readonly kind: "build"; readonly modules: readonly string[]; readonly files: Readonly<Record<string, string>>; readonly includeCss: boolean };
 
 export interface SubjectRequest {
@@ -65,10 +78,14 @@ function parseTask(value: unknown): SubjectTask {
   switch (value["kind"]) {
     case "describe":
       return { kind: "describe" };
-    case "engine":
-      if (value["scenario"] !== "cold" && value["scenario"] !== "warm") throw new Error("request: engine scenario is not cold or warm");
+    case "engine": {
+      const scenario = ENGINE_SCENARIOS.find((entry) => entry === value["scenario"]);
+      if (scenario === undefined) throw new Error(`request: engine scenario ${String(value["scenario"])} is not one of ${ENGINE_SCENARIOS.join(", ")}`);
       if (!isStringArray(value["candidates"])) throw new Error("request: engine candidates are not strings");
-      return { kind: "engine", scenario: value["scenario"], candidates: value["candidates"], includeCss: value["includeCss"] === true };
+      const extra = value["extra"] ?? [];
+      if (!Array.isArray(extra) || !extra.every(isStringArray)) throw new Error("request: engine extra is not a list of string lists");
+      return { kind: "engine", scenario, candidates: value["candidates"], extra, includeCss: value["includeCss"] === true };
+    }
     case "build":
       if (!isStringRecord(value["files"])) throw new Error("request: build files are not a string map");
       if (!isStringArray(value["modules"])) throw new Error("request: build modules are not strings");

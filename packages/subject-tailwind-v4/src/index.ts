@@ -36,6 +36,10 @@ export const createSubject: SubjectFactory = (): SubjectClient => ({
     const compiler = await compile(ENGINE_ENTRY, { base: dirname(require.resolve("tailwindcss/package.json")), onDependency: () => {} });
     return { css: compiler.build([...candidates]) };
   },
+  engineSession: async () => {
+    const compiler = await compile(ENGINE_ENTRY, { base: dirname(require.resolve("tailwindcss/package.json")), onDependency: () => {} });
+    return { generate: async (candidates) => ({ css: compiler.build([...candidates]) }) };
+  },
   prepare: async (workspace, project) => {
     for (const [path, content] of project.files) workspace.write(path, content);
     workspace.write("src/style.css", BUILD_ENTRY);

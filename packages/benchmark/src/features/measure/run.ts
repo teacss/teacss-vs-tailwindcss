@@ -1,6 +1,6 @@
 import type { SubjectId } from "@bench/infrastructure";
-import type { EngineScenario, SubjectTask, TaskResult } from "../../contract/index.ts";
-import { type Corpus, candidates, corpusProject, generateCorpus, type Syntax } from "../../corpus/index.ts";
+import { type EngineScenario, incrementalSize, type SubjectTask, type TaskResult } from "../../contract/index.ts";
+import { type Corpus, candidates, corpusProject, extraCases, generateCorpus, type Syntax } from "../../corpus/index.ts";
 import { mulberry32, shuffled } from "../../corpus/prng.ts";
 import type { Cell, CellRecord, Sample } from "../../persistence/index.ts";
 import { WARM_TIMED_ITERATIONS } from "./engine-scenario.ts";
@@ -60,7 +60,7 @@ function jobsFor(plan: RunPlan): Job[] {
       if (tier === "build") jobs.push({ subject, tier, scenario: undefined, samples: 1 });
       else {
         jobs.push({ subject, tier, scenario: "cold", samples: 1 });
-        jobs.push({ subject, tier, scenario: "warm", samples: WARM_TIMED_ITERATIONS });
+        for (const scenario of ["warm", "incremental-10", "incremental-100"] as const) jobs.push({ subject, tier, scenario, samples: WARM_TIMED_ITERATIONS });
       }
     }
   }
@@ -72,7 +72,15 @@ function taskFor(job: Job, corpus: Corpus): SubjectTask {
     const project = corpusProject(corpus, job.subject.syntax);
     return { kind: "build", modules: project.modules, files: Object.fromEntries(project.files), includeCss: false };
   }
-  return { kind: "engine", scenario: job.scenario ?? "cold", candidates: candidates(corpus, job.subject.syntax), includeCss: false };
+  const scenario = job.scenario ?? "cold";
+  const k = incrementalSize(scenario);
+  const extra = k === undefined ? [] : extraCases(corpus, k, WARM_TIMED_ITERATIONS).map((group) => group.map((entry) => entry[job.subject.syntax]));
+  return { kind: "engine", scenario, candidates: candidates(corpus, job.subject.syntax), extra, includeCss: false };
+}
+
+/** Warm and build samples must all match; an incremental sample matches the same call in the other processes. */
+function hashKey(id: string, job: Job, sample: Sample): string {
+  return job.scenario !== undefined && incrementalSize(job.scenario) !== undefined ? `${id}#${sample.index % WARM_TIMED_ITERATIONS}` : id;
 }
 
 function key(job: Job, cell: Cell): string {
@@ -130,8 +138,9 @@ export async function measure(plan: RunPlan, deps: MeasureDeps): Promise<Measure
         const measured = await deps.invoke(job.subject.id, taskFor(job, corpus));
         if (measured.result.kind === "error") throw new RunInvalid(`${id}: ${measured.result.message}`);
         for (const sample of toSamples(job, cell, have, measured)) {
-          const expected = hashes.get(id);
-          if (expected === undefined) hashes.set(id, sample.cssSha256);
+          const hashId = hashKey(id, job, sample);
+          const expected = hashes.get(hashId);
+          if (expected === undefined) hashes.set(hashId, sample.cssSha256);
           else if (expected !== sample.cssSha256) throw new RunInvalid(`${id}: output changed between samples (${expected.slice(0, 12)} then ${sample.cssSha256.slice(0, 12)})`);
           samples.push(sample);
         }

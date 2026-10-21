@@ -46,6 +46,10 @@ export function teacssSubject(engine: "ts" | "rust"): SubjectClient {
       const { css } = await generator.generate(new Set(candidates), { preflights: false, minify: true });
       return { css };
     },
+    engineSession: async () => {
+      const generator = await createGenerator({ presets: [presetStandard()], engine });
+      return { generate: async (candidates) => ({ css: (await generator.generate(new Set(candidates), { preflights: false, minify: true })).css }) };
+    },
     prepare: async (workspace, project) => {
       for (const [path, content] of project.files) workspace.write(path, project.modules.includes(path) ? `${INCLUDE}${content}` : content);
       workspace.write("index.css", CSS_ENTRY);

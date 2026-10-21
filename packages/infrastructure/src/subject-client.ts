@@ -25,6 +25,10 @@ export interface EngineOutput {
   readonly css: string;
 }
 
+export interface EngineSession {
+  generate(candidates: readonly string[]): Promise<EngineOutput>;
+}
+
 export interface ProjectFiles {
   /** The corpus modules in import order; the subject writes the entry module that imports them. */
   readonly modules: readonly string[];
@@ -41,6 +45,8 @@ export interface SubjectClient {
   describe(): Promise<SubjectVersions>;
   /** Candidates to CSS inside this process; a subject without an engine tier throws. */
   engine(input: EngineInput): Promise<EngineOutput>;
+  /** One generator or compiler kept across calls, so a later call pays only for what changed. */
+  engineSession(): Promise<EngineSession>;
   /** Writes the subject's own config and entry beside the project files. */
   prepare(workspace: Workspace, project: ProjectFiles): Promise<void>;
   /** Runs the production build in the prepared workspace and returns its CSS asset. */
