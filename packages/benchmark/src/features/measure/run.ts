@@ -1,8 +1,8 @@
 import type { SubjectId } from "@bench/infrastructure";
 import type { EngineScenario, SubjectTask, TaskResult } from "../../contract/index.ts";
+import { type Corpus, candidates, corpusProject, generateCorpus, type Syntax } from "../../corpus/index.ts";
+import { mulberry32, shuffled } from "../../corpus/prng.ts";
 import type { Cell, CellRecord, Sample } from "../../persistence/index.ts";
-import { type Corpus, candidates, corpusProject, generateCorpus, type Syntax } from "../corpus/index.ts";
-import { mulberry32, shuffled } from "../corpus/prng.ts";
 import { WARM_TIMED_ITERATIONS } from "./engine-scenario.ts";
 
 export type Tier = "engine" | "build";

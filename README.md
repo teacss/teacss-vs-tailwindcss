@@ -51,7 +51,7 @@ four layers, one dependency direction, one process per native runtime.
 | Unit | Layer | Holds |
 | --- | --- | --- |
 | `apps/bench` | shell | `main.ts` (the orchestrator) and `subject.ts` (one measured subject per process) |
-| `packages/benchmark` | product | corpus, measure, verify, report and environment features; the composition root; the process contract; persistence |
+| `packages/benchmark` | product | measure, verify, report, profile and environment features; the shared corpus model and CSS helpers; the composition root; the process contract; persistence |
 | `packages/infrastructure` | foundation | config, logging, clock, processes, workspace, the `SubjectClient` interface and its fakes |
 | `packages/subject-*` | isolation | one measured runtime each behind the `SubjectClient` interface |
 | `results/` | data | raw samples committed with each report |

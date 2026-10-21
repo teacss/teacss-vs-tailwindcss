@@ -1,7 +1,7 @@
-import type { PairedCase } from "../corpus/index.ts";
-import { escapeClass, type ParsedRule, parseRules } from "./css.ts";
+import type { PairedCase } from "../../corpus/index.ts";
+import { escapeClass, type ParsedRule, parseRules } from "../../css/index.ts";
 
-export { escapeClass, parseRules } from "./css.ts";
+export { escapeClass, parseRules } from "../../css/index.ts";
 
 export interface Mismatch {
   readonly candidate: string;

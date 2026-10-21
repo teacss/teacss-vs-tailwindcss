@@ -3,8 +3,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { SubjectId } from "@bench/infrastructure";
 import type { SubjectTask } from "../../contract/index.ts";
+import { candidates, corpusProject, generateCorpus, type Syntax } from "../../corpus/index.ts";
 import type { Cell } from "../../persistence/index.ts";
-import { candidates, corpusProject, generateCorpus, type Syntax } from "../corpus/index.ts";
 import { type ProfileSummary, summarizeProfile } from "./index.ts";
 
 export interface ProfileSubject {

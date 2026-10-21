@@ -4,7 +4,8 @@
 
 ## 第 0 片：方向确认
 
-- [ ] 所有者确认提案的三个待决事项与优先级；提案与规格转为 accepted。
+- [x] 所有者 2026-10-22 以 `/build` 要求实施；提案与规格转为 accepted，待决事项按提案 Status 的默认执行。
+- [x] 结构整理：`corpus` 与 CSS 辅助代码从 features 移到 `packages/benchmark/src/` 的共享位置，Biome 新增「功能不导入功能」规则。
 
 ## 第 1 片（P1）：增量语料与 `engine/incremental`
 
