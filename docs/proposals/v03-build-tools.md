@@ -8,7 +8,7 @@ priority: P1
 
 2026-10-22。所有者确认方向与范围，提案接受。两项决定已定：Bun 组的数字同时也是运行时对比，接受并在报告里写明；Rsbuild 与 Bun 的 dev 层级放到下一个提案。下一步是规格 v03.1 与计划，在 0.9.0-alpha.3 的正式运行结束后写。
 
-尚未做的：全部。前置实验（见 Scope）决定 Bun 组的形态。
+前置实验完成于 2026-10-22（见[计划第 0 片](../plans/v03-build-tools.md)）：四个插件都能在 5 000 × 30 的语料上产出完整样式表，Bun 组不用退化；Bun 的 CSS 打包器会把 Tailwind 的逻辑简写展开成长写，结构校验要认这种等价，写进了规格 v03.1 §Equivalence。规格 v03.1 与计划 v03 已写，规格待接受。
 
 ## Problem
 
@@ -26,7 +26,7 @@ priority: P1
 | `bun` | bun-baseline、teacss-ts-bun、teacss-rs-bun、tailwind-v4-bun | build |
 
 - 报告按组出表，每组用自己的基线算增量。跨工具的绝对毫秒数是打包器之争，放在一张单独的表里并写明它比的是打包器和运行时，不是 CSS 工具。
-- 每个工具用自己文档里的接法，与 main 组的规则一致：TeaCSS 的 Rsbuild 插件走 lightningcss，Tailwind 的走 PostCSS；Bun 两边都是 `Bun.build` 插件。
+- 每个工具用自己文档里的接法，与 main 组的规则一致：TeaCSS 的 Rsbuild 插件用 lightningcss 优化，Tailwind 的 `@rsbuild/plugin-tailwindcss` 建在 `@tailwindcss/webpack` 上并用 Tailwind 自带的 lightningcss 优化，两边都不走 PostCSS；Bun 两边都是 `Bun.build` 插件。
 - Rsbuild 组的被测进程仍是 Node 24.14.1，Rspack 的原生绑定走现有的原生模块检查。
 - Bun 组的被测进程跑在 Bun 运行时里，因为 `Bun.build` 只在 Bun 里有。注册表为每个被测对象记运行时（node 或 bun），Node 版本门禁只管 node 被测；原生模块检查在 Bun 里要换办法，由规格决定。报告在组表上方写明：这一组的差异包含运行时差异。
 - 等价校验、语料、统计规则、采样与轮替全部沿用 v01.1 和 v02.1，不改已有测法，让这份报告与前两份可比。
