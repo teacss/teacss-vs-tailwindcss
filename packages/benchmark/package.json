@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@bench/infrastructure": "workspace:*",
+    "@bench/subject-rsbuild-baseline": "workspace:*",
     "@bench/subject-tailwind-v4": "workspace:*",
     "@bench/subject-teacss": "workspace:*",
     "@bench/subject-vite-baseline": "workspace:*",

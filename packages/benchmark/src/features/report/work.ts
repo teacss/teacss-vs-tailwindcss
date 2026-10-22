@@ -12,11 +12,9 @@ export interface WorkRow {
   readonly msPer100Kb: number;
 }
 
-const BASELINE = "vite-baseline";
-
 /** Spec v02.1 §Report, work produced: what each subject's production build emits at the largest cell. */
 export function workRows(record: Pick<RunRecord, "samples">): WorkRow[] {
-  const builds = record.samples.filter((sample): sample is Extract<Sample, { tier: "build" }> => sample.tier === "build" && sample.subject !== BASELINE && sample.rules !== undefined);
+  const builds = record.samples.filter((sample): sample is Extract<Sample, { tier: "build" }> => sample.tier === "build" && !sample.subject.endsWith("-baseline") && sample.rules !== undefined);
   if (builds.length === 0) return [];
   const largest = builds.reduce((best, sample) => (sample.cell.utilities * sample.cell.files > best.cell.utilities * best.cell.files ? sample : best)).cell;
   const bySubject = new Map<string, Extract<Sample, { tier: "build" }>[]>();

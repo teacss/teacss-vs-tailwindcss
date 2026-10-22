@@ -10,14 +10,18 @@
     "./ts-default": "./src/ts-default.ts",
     "./rs-default": "./src/rs-default.ts",
     "./ts-postcss": "./src/ts-postcss.ts",
-    "./rs-postcss": "./src/rs-postcss.ts"
+    "./rs-postcss": "./src/rs-postcss.ts",
+    "./ts-rsbuild": "./src/ts-rsbuild.ts",
+    "./rs-rsbuild": "./src/rs-rsbuild.ts"
   },
   "dependencies": {
     "@bench/infrastructure": "workspace:*",
+    "@rsbuild/core": "2.2.14",
     "@teacss/core": "0.9.0-alpha.3",
     "@teacss/engine": "0.9.0-alpha.3",
     "@teacss/postcss": "0.9.0-alpha.3",
     "@teacss/preset-standard": "0.9.0-alpha.3",
+    "@teacss/rsbuild": "0.9.0-alpha.3",
     "@teacss/vite": "0.9.0-alpha.3",
     "postcss": "8.5.6",
     "vite": "8.3.4"

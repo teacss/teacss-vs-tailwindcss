@@ -23,12 +23,14 @@ Tailwind 在 Bun 下的 76 个不符全是逻辑简写被展开：`padding-inlin
 
 ## 第 2 片：Rsbuild 组
 
-- [ ] `subject-teacss` 增加 `rsbuild` 变体（导出 `./ts-rsbuild`、`./rs-rsbuild`），依赖 `@rsbuild/core` 与 `@teacss/rsbuild`，`build(workspace)` 按规格 §Tiers 调 `createRsbuild().build()`，引擎由注册表的 `TEACSS_ENGINE` 环境变量选。
-- [ ] `subject-tailwind-v4` 增加 `./rsbuild` 导出，依赖 `@rsbuild/plugin-tailwindcss`。
-- [ ] 新包 `subject-rsbuild-baseline`，与 `subject-vite-baseline` 同构。
-- [ ] 注册表：组 `rsbuild`，层级只有 `build`，原生模块期望含 Rspack 绑定；`DEFAULT_GROUPS` 不变，`--group rsbuild` 可选。
-- [ ] 报告：按组出表已有；`bench verify --group rsbuild` 通过。
-- 验收：5 000 × 30 与 20 000 × 300 校验通过，ts 与 rs 逐字节相同，`--samples 3` 的冒烟运行写出记录并渲染。
+完成于 2026-10-22。
+
+- [x] `subject-teacss` 的 `src/rsbuild.ts`（导出 `./ts-rsbuild`、`./rs-rsbuild`）只导入 `@rsbuild/core` 与 `@teacss/rsbuild`，不加载 Vite；构建按规格 §Tiers 调 `createRsbuild().build()`，入口 `index.css` 由 `src/index.js` 导入，引擎由注册表的 `TEACSS_ENGINE` 选。
+- [x] `subject-tailwind-v4` 的 `src/rsbuild.ts`（导出 `./rsbuild`），依赖 `@rsbuild/plugin-tailwindcss`。
+- [x] 新包 `subject-rsbuild-baseline`，与 `subject-vite-baseline` 同构。
+- [x] 注册表：组 `rsbuild`，层级只有 `build`，每个对象要求加载 `rspack` 绑定；`DEFAULT_GROUPS` 不变。
+- [x] 报告：`groupOf` 认 `-rsbuild` 后缀，每组用自己的基线算增量（`baselineOf`），基线一律不参与排名；校验、产出量与交叉对比都排除任意 `-baseline`。
+- 验收：`bench verify --group rsbuild` 在 5 000 × 30 与 20 000 × 300 通过，ts 与 rs 逐字节相同（1 088 883 字节）；Rust 对象加载了 `teacss-engine` 与 `rspack`；三份已发布报告逐字节重新生成不变；`--samples 3` 冒烟运行写出记录，报告出了 `(rsbuild)` 组表并以 `rsbuild-baseline` 算增量。
 
 ## 第 3 片：Bun 运行时与 Bun 组
 

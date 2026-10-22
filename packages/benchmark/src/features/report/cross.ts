@@ -11,10 +11,8 @@ export interface CrossComparison {
   readonly agreement: Agreement;
 }
 
-const BASELINE = "vite-baseline";
-
 function leader(table: CellTable): string | undefined {
-  return table.rows.filter((row) => row.subject !== BASELINE).sort((left, right) => left.wall.median - right.wall.median)[0]?.subject;
+  return table.rows.filter((row) => !row.subject.endsWith("-baseline")).sort((left, right) => left.wall.median - right.wall.median)[0]?.subject;
 }
 
 type Protocol = Pick<RunRecord, "specRevision" | "v02Revision" | "cells" | "community">;
