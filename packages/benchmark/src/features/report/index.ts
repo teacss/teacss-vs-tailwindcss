@@ -2,6 +2,7 @@ import type { Cell, RunRecord, Sample } from "../../persistence/index.ts";
 import { crossLines } from "./cross.ts";
 import { type RustFindings, rustFindings } from "./rust.ts";
 import { compare, type Summary, summarize, type Verdict } from "./statistics.ts";
+import { buildToolsSection } from "./tools.ts";
 import { type WorkRow, workRows, workTable } from "./work.ts";
 
 export { compare, mannWhitneyU, summarize } from "./statistics.ts";
@@ -142,7 +143,8 @@ function tableMarkdown(table: CellTable): string {
     return `${base} ${row.deltaMs === undefined ? "" : ms(row.deltaMs)} | ${kb(row.cssBytes)} | ${row.cssGzipBytes === undefined ? "" : kb(row.cssGzipBytes)} | ${row.maxRssBytes === undefined ? "" : `${(row.maxRssBytes / 1048576).toFixed(0)} MB`} |`;
   });
   const verdicts = table.verdicts.map((entry) => `- ${verdictText(entry, table.fastest)}`);
-  return [`#### ${table.series}, ${table.cell.utilities} utilities in ${table.cell.files} files${table.group === "main" ? "" : ` (${table.group})`}`, "", header, rule, ...rows, "", `Lowest median: ${table.fastest}.`, ...verdicts, ""].join("\n");
+  const runtime = table.group === "bun" ? ["This group runs in the Bun runtime, so it compares runtimes as well as CSS tools.", ""] : [];
+  return [`#### ${table.series}, ${table.cell.utilities} utilities in ${table.cell.files} files${table.group === "main" ? "" : ` (${table.group})`}`, "", ...runtime, header, rule, ...rows, "", `Lowest median: ${table.fastest}.`, ...verdicts, ""].join("\n");
 }
 
 function verdictParagraph(model: ReportModel, series: Series): string {
@@ -235,7 +237,7 @@ export function renderMarkdown(model: ReportModel, beside?: ReportModel, cross?:
   const lines = [
     `# TeaCSS vs Tailwind CSS v4: run ${record.startedAt}`,
     "",
-    `Protocol: spec v01.1 revision ${record.specRevision}${record.v02Revision === undefined ? "" : ` and v02.1 revision ${record.v02Revision}`}; pair table ${record.pairTableVersion}; seed ${record.seed}; ${record.samplesPerCell} samples per subject and cell; ${model.sampleCount} samples.${record.allowBusy ? " **Recorded with --allow-busy on a loaded machine; see the load column.**" : ""}`,
+    `Protocol: spec v01.1 revision ${record.specRevision}${record.v02Revision === undefined ? "" : ` and v02.1 revision ${record.v02Revision}`}${record.v03Revision === undefined ? "" : ` and v03.1 revision ${record.v03Revision}`}; pair table ${record.pairTableVersion}; seed ${record.seed}; ${record.samplesPerCell} samples per subject and cell; ${model.sampleCount} samples.${record.allowBusy ? " **Recorded with --allow-busy on a loaded machine; see the load column.**" : ""}`,
     "",
     ...verificationLines(
       record,
@@ -251,6 +253,7 @@ export function renderMarkdown(model: ReportModel, beside?: ReportModel, cross?:
     "",
     ...SERIES.flatMap((series) => model.tables.filter((table) => table.series === series).map(tableMarkdown)),
     ...(model.work.length === 0 ? [] : ["## Work produced", "", "What each production build emits at the largest cell. The tools write different values, shorthands and wrappers for the same classes, so the last column is context for the size difference, not a ranking.", "", ...workTable(model.work, {}), ""]),
+    ...buildToolsSection(model.tables),
     ...model.rust.sections,
     ...communityLines(record),
     ...(beside === undefined ? [] : besideLines(beside)),
@@ -295,7 +298,7 @@ export function renderMarkdown(model: ReportModel, beside?: ReportModel, cross?:
     "1. **Why not double?** The Limiter section names the frames where each subject spends its time; a change that does not touch them cannot move the number much.",
     record.v02Revision === undefined
       ? `2. **Was it tuned?** ${packagesRan(record)} with its documented production configuration (spec v01.1 §Subjects); the Rust engine ran with \`TEACSS_ENGINE_STRICT=1\`, so a fallback would have failed the run.`
-      : `2. **Was it tuned?** ${packagesRan(record)}. The \`main\` subjects use each tool's tuned production entry, the \`-default\` subjects the entry its setup guide gives, and the \`-postcss\` subjects its PostCSS integration (spec v02.1 §Configurations); every TeaCSS Rust subject ran with \`TEACSS_ENGINE_STRICT=1\`, so a fallback would have failed the run.`,
+      : `2. **Was it tuned?** ${packagesRan(record)}. The \`main\` subjects use each tool's tuned production entry, the \`-default\` subjects the entry its setup guide gives, and the \`-postcss\` subjects its PostCSS integration (spec v02.1 §Configurations)${Object.keys(record.subjects).some((subject) => subject.endsWith("-rsbuild") || subject.endsWith("-bun")) ? "; the `-rsbuild` and `-bun` subjects use each tool's documented plugin for that build tool, and the `-bun` subjects run in the Bun runtime (spec v03.1 §Subjects)" : ""}; every TeaCSS Rust subject ran with \`TEACSS_ENGINE_STRICT=1\`, so a fallback would have failed the run.`,
     "3. **Did it break limits?** The CSS sizes in the tables bound the work; a median below the time to write that many bytes would be suspect.",
     "4. **Did it error?** A run with any subject error, timeout or fallback writes no record; this record exists, so every sample succeeded.",
     "5. **Does it reproduce?** Each cell holds the stated number of samples per subject, interleaved per round; the tables give the IQR and the p95, and a pair closer than the larger IQR or with p >= 0.01 is reported as no measurable difference.",

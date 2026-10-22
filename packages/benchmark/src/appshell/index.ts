@@ -53,6 +53,7 @@ const USAGE = `bench <command>
 
 const SPEC_REVISION = 3;
 const SPEC_V02_REVISION = 4;
+const SPEC_V03_REVISION = 2;
 /** Spec v01.1 §Run protocol: refuse above this share of the logical cores. */
 const LOAD_SHARE_LIMIT = 0.2;
 
@@ -239,6 +240,8 @@ export async function createApp(deps: AppDeps): Promise<number> {
       version: 1,
       specRevision: SPEC_REVISION,
       v02Revision: SPEC_V02_REVISION,
+      v03Revision: SPEC_V03_REVISION,
+      registrations: Object.fromEntries(chosen.map(([id, registration]) => [id, { group: registration.group, runtime: registration.runtime }])),
       verification,
       pairTableVersion: PAIR_TABLE_VERSION,
       startedAt,

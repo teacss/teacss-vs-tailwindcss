@@ -2,6 +2,7 @@ import { crossComparisons } from "./cross.ts";
 import type { CellTable, ReportModel, Series, SubjectRow } from "./index.ts";
 import { BASELINE, type TableGroup } from "./index.ts";
 import { valueVerdict } from "./rust.ts";
+import { BUILD_TOOLS, buildToolRows, CSS_TOOLS } from "./tools.ts";
 
 export const README_START = "<!-- bench:summary:start -->";
 export const README_END = "<!-- bench:summary:end -->";
@@ -149,6 +150,25 @@ function besideTakeaway(model: ReportModel, beside: ReportModel | undefined): st
   return [`- On ${source}, the same tools come out fastest.`];
 }
 
+/** Spec v03.1 §Report: what TeaCSS and Tailwind each add to a build on the other build tools, and which adds less. */
+function buildToolsTakeaway(model: ReportModel): string[] {
+  const rust = CSS_TOOLS.findIndex((entry) => entry.subject === "teacss-rs");
+  const tailwind = CSS_TOOLS.findIndex((entry) => entry.subject === "tailwind-v4");
+  const parts = buildToolRows(model.tables)
+    .filter((row) => row.group !== "main")
+    .flatMap((row) => {
+      const teacss = row.css[rust];
+      const other = row.css[tailwind];
+      if (teacss === undefined || other === undefined) return [];
+      const suffix = BUILD_TOOLS.find((entry) => entry.group === row.group)?.suffix ?? "";
+      const [winner, loser] = teacss.deltaMs <= other.deltaMs ? ["teacss-rs", "tailwind-v4"] : ["tailwind-v4", "teacss-rs"];
+      const verdict = row.table.fastest === `${winner}${suffix}` ? row.table.verdicts.find((entry) => entry.subject === `${loser}${suffix}`)?.verdict : undefined;
+      const outcome = verdict?.kind === "no-measurable-difference" ? "about the same" : `so ${name(winner)} adds less`;
+      return [`with ${row.tool}, ${name("teacss-rs")} adds ${seconds(teacss.deltaMs)} to the build and ${name("tailwind-v4")} adds ${seconds(other.deltaMs)}, ${outcome}`];
+    });
+  return parts.length === 0 ? [] : [`- On other build tools: ${parts.join("; ")}. The Build tools section of the full report sets them beside Vite.`];
+}
+
 function crossTakeaway(model: ReportModel, cross: ReportModel | undefined): string[] {
   if (cross === undefined) return [];
   const comparisons = crossComparisons(model, cross);
@@ -226,6 +246,7 @@ export function renderReadmeSummary(model: ReportModel, stem: string, beside?: R
     "",
     ...takeaways(model, engine, build),
     ...defaultConfigTakeaway(model),
+    ...buildToolsTakeaway(model),
     ...besideTakeaway(model, beside),
     ...crossTakeaway(model, cross),
     "",
