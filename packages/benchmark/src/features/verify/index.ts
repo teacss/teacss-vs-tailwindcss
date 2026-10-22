@@ -11,25 +11,37 @@ export interface Mismatch {
 export interface CheckResult {
   readonly checked: number;
   readonly mismatches: readonly Mismatch[];
+  /** Cases whose logical shorthand was declared as its `-start` and `-end` longhands (spec v03.1 §Equivalence). */
+  readonly longhandMatches: number;
 }
 
 /** Longhand pairs that mean the logical shorthand the pair table names. */
-const LOGICAL: readonly [longhands: readonly string[], logical: string][] = [
+const PHYSICAL: readonly [longhands: readonly string[], logical: string][] = [
   [["padding-left", "padding-right"], "padding-inline"],
   [["padding-top", "padding-bottom"], "padding-block"],
   [["margin-left", "margin-right"], "margin-inline"],
   [["margin-top", "margin-bottom"], "margin-block"],
 ];
 
-function normalizeProperties(properties: readonly string[]): Set<string> {
+/** A bundler may print a logical shorthand as its two logical longhands. */
+const LOGICAL: readonly [longhands: readonly string[], logical: string][] = ["padding-inline", "padding-block", "margin-inline", "margin-block", "inset-inline", "inset-block"].map((logical) => [[`${logical}-start`, `${logical}-end`], logical]);
+
+function normalizeProperties(properties: readonly string[]): { readonly properties: Set<string>; readonly viaLonghands: boolean } {
   const set = new Set(properties);
-  for (const [longhands, logical] of LOGICAL) {
-    if (longhands.every((property) => set.has(property))) {
-      for (const property of longhands) set.delete(property);
-      set.add(logical);
+  let viaLonghands = false;
+  for (const [table, logicalLonghands] of [
+    [PHYSICAL, false],
+    [LOGICAL, true],
+  ] as const) {
+    for (const [longhands, logical] of table) {
+      if (longhands.every((property) => set.has(property))) {
+        for (const property of longhands) set.delete(property);
+        if (logicalLonghands && !set.has(logical)) viaLonghands = true;
+        set.add(logical);
+      }
     }
   }
-  return set;
+  return { properties: set, viaLonghands };
 }
 
 type ConditionShape = "hover" | "focus" | "active" | "first" | "min-width" | "max-width";
@@ -96,6 +108,7 @@ export function checkStructure(cases: readonly PairedCase[], syntax: "teacss" | 
     }
   }
   const mismatches: Mismatch[] = [];
+  let longhandMatches = 0;
   for (const entry of cases) {
     const candidate = entry[syntax];
     const escaped = escapeClass(candidate);
@@ -104,14 +117,15 @@ export function checkStructure(cases: readonly PairedCase[], syntax: "teacss" | 
       mismatches.push({ candidate, reason: "no rule selects it" });
       continue;
     }
-    const properties = normalizeProperties(matching.flatMap((match) => match.rule.properties));
+    const { properties, viaLonghands } = normalizeProperties(matching.flatMap((match) => match.rule.properties));
     const missing = entry.properties.filter((property) => !properties.has(property));
     if (missing.length > 0) mismatches.push({ candidate, reason: `declares ${sorted([...properties]) || "nothing"}, expected ${sorted(entry.properties)}` });
+    else if (viaLonghands) longhandMatches++;
     const expected = sorted(expectedShapes(entry.conditions));
     const actual = matching.map((match) => sorted(actualShapes(match, escaped)));
     if (!actual.includes(expected)) mismatches.push({ candidate, reason: `conditions ${actual.join(" | ") || "none"}, expected ${expected || "none"}` });
   }
-  return { checked: cases.length, mismatches };
+  return { checked: cases.length, mismatches, longhandMatches };
 }
 
 export interface StrongResult {

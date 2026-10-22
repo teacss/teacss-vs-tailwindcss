@@ -27,7 +27,7 @@ export interface VerifyFinding {
 
 export interface VerifyReport {
   readonly findings: readonly VerifyFinding[];
-  readonly checked: readonly { subject: string; tier: "engine" | "build"; cases: number; cssBytes: number }[];
+  readonly checked: readonly { subject: string; tier: "engine" | "build"; cases: number; cssBytes: number; longhandMatches: number }[];
 }
 
 const STRONG_PAIR: readonly [SubjectId, SubjectId] = ["teacss-ts" as SubjectId, "teacss-rs" as SubjectId];
@@ -40,7 +40,7 @@ function summarize(mismatches: readonly Mismatch[]): string {
 /** Runs spec v01.1 §Equivalence over every subject on one corpus. */
 export async function verifyCorpus(corpus: Corpus, subjects: readonly VerifySubject[], invoke: Invoke): Promise<VerifyReport> {
   const findings: VerifyFinding[] = [];
-  const checked: { subject: string; tier: "engine" | "build"; cases: number; cssBytes: number }[] = [];
+  const checked: { subject: string; tier: "engine" | "build"; cases: number; cssBytes: number; longhandMatches: number }[] = [];
   const hashes = new Map<string, string>();
   for (const subject of subjects) {
     const tiers = subject.tiers.filter((tier): tier is "engine" | "build" => tier !== "dev");
@@ -54,9 +54,12 @@ export async function verifyCorpus(corpus: Corpus, subjects: readonly VerifySubj
         findings.push({ subject: subject.id, tier, check: "structure", detail: "the response carried no css" });
         continue;
       }
-      checked.push({ subject: subject.id, tier, cases: corpus.cases.length, cssBytes: Buffer.byteLength(output.css) });
-      if (subject.id === "vite-baseline") continue;
+      if (subject.id === "vite-baseline") {
+        checked.push({ subject: subject.id, tier, cases: corpus.cases.length, cssBytes: Buffer.byteLength(output.css), longhandMatches: 0 });
+        continue;
+      }
       const structure = checkStructure(corpus.cases, subject.syntax, output.css);
+      checked.push({ subject: subject.id, tier, cases: corpus.cases.length, cssBytes: Buffer.byteLength(output.css), longhandMatches: structure.longhandMatches });
       if (structure.mismatches.length > 0) findings.push({ subject: subject.id, tier, check: "structure", detail: summarize(structure.mismatches) });
     }
   }

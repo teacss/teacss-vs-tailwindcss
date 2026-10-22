@@ -70,6 +70,8 @@ test("a v02 record opens with the method commit and verification, and names conf
   assert.match(markdown, /\*\*Method and verification\.\*\* Commit `c0ffee`\. Before timing anything, every subject was checked on each of the 1 corpus and file layout\(s\) of this run \(7 subject run\(s\), 100 paired case\(s\) in all\) with no difference/);
   assert.match(markdown, /Not measured: vite-baseline, teacss-ts, tailwind-v4, teacss-ts-default, teacss-rs-default, tailwind-v4-default\./);
   assert.match(markdown, /7\. \*\*Did it even happen\?\*\* Before timing, every subject's output on every corpus and file layout was checked/);
+  assert.ok(!markdown.includes("longhands"), "no longhand sentence when no case needed it");
+  assert.match(renderMarkdown(buildReport({ ...v02, verification: { ...v02.verification, longhandCases: 76 } })), /no record\. 76 subject case\(s\) declared a logical shorthand as its two `-start` and `-end` longhands, which counts as the shorthand \(spec v03\.1 §Equivalence\)\./);
   const postcss = { ...v02, subjects: { "teacss-ts-postcss": { packages: {}, local: {} }, "teacss-rs-postcss": { packages: {}, local: {} }, "tailwind-v4-postcss": { packages: {}, local: {} } } };
   assert.ok(!renderMarkdown(buildReport(postcss)).includes("Subset run"), "a full PostCSS round is not a subset");
 });
