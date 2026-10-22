@@ -15,12 +15,12 @@ function leader(table: CellTable): string | undefined {
   return table.rows.filter((row) => !row.subject.endsWith("-baseline")).sort((left, right) => left.wall.median - right.wall.median)[0]?.subject;
 }
 
-type Protocol = Pick<RunRecord, "specRevision" | "v02Revision" | "cells" | "community">;
+type Protocol = Pick<RunRecord, "specRevision" | "v02Revision" | "v03Revision" | "cells" | "community">;
 
 /** Refuses two records that ran different revisions of either spec. */
 export function assertSameProtocol(local: Protocol, other: Protocol): void {
-  if (local.specRevision !== other.specRevision || local.v02Revision !== other.v02Revision) {
-    throw new Error(`the records ran different protocols (v01.1 revision ${local.specRevision} and ${other.specRevision}, v02.1 revision ${local.v02Revision ?? "none"} and ${other.v02Revision ?? "none"})`);
+  if (local.specRevision !== other.specRevision || local.v02Revision !== other.v02Revision || local.v03Revision !== other.v03Revision) {
+    throw new Error(`the records ran different protocols (v01.1 revision ${local.specRevision} and ${other.specRevision}, v02.1 revision ${local.v02Revision ?? "none"} and ${other.v02Revision ?? "none"}, v03.1 revision ${local.v03Revision ?? "none"} and ${other.v03Revision ?? "none"})`);
   }
 }
 

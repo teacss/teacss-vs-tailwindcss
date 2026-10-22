@@ -45,14 +45,16 @@ Tailwind 在 Bun 下的 76 个不符全是逻辑简写被展开：`padding-inlin
 
 ## 第 4 片：报告
 
-- [ ] 记录加 `v03Revision`、被测对象的运行时与组；跨修订拒绝比较沿用。
-- [ ] 「Build tools」表（`features/report`）：最大格上每组一行，基线中位数、各 CSS 工具的中位数与相对基线的增量；标题注明基线列比的是打包器和运行时。
-- [ ] README 每个工具一条要点；`bun` 组的表标题注明运行时。
-- [ ] 审核模板补一节：各组相对基线的增量。
-- 验收：含五个组的冒烟记录渲染正常；前两份正式报告逐字节重新生成不变；单测覆盖表的排序、缺组、旧记录不出表。
+完成于 2026-10-22。
+
+- [x] 记录加 `v03Revision`（当前 2）与 `registrations`（每个被测对象的组与运行时），Bun 版本沿用环境记录；跨修订拒绝比较把 v03.1 也算进去。
+- [x] 「Build tools」一节（`features/report/tools.ts`）：每个构建工具在自己最大的构建格上一行，基线中位数，三个 CSS 工具各自的中位数与相对该基线的增量；说明基线列比的是打包器和运行时，Bun 一行跑在 Bun 运行时里。只有测了 Vite 以外的工具才出现，旧报告不受影响。
+- [x] `bun` 组的每张表上方注明这一组同时比较运行时；协议行写出 v03.1 的修订；检查清单第 2 条在有 Rsbuild 或 Bun 对象时说明它们的接法。
+- [x] README 加一条：在 Rsbuild 和 Bun 上 TeaCSS（Rust）与 Tailwind 各给构建加多少，谁加得少；两者在噪声内时写「about the same」。
+- 审核里「各组相对基线的增量」一节随第 5 片的正式运行手写，审核没有模板文件。
+- 验收：五个组的冒烟记录渲染出 Build tools 一节、Bun 说明与 README 一条；三份已发布报告逐字节重新生成不变；单测覆盖行顺序、各组自己的基线、未测的格留空、只有 Vite 时不出这一节、平局措辞与跨修订拒绝。
 
 ## 第 5 片：正式运行
 
-- [ ] 规格 v03.1 转为 accepted，记录修订。
 - [ ] 安静机器上 `bench run --group main,default-config,postcss,rsbuild,bun`，第三份报告、审核、README。
 - 依赖：teacss-ts 的 Rsbuild 与 Bun 插件版本固定在锁文件里；Bun 版本固定在 `packageManager`。

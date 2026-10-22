@@ -44,6 +44,10 @@ export interface RunRecord {
   readonly specRevision: number;
   /** Revision of spec v02.1; absent in records written before it. */
   readonly v02Revision?: number;
+  /** Revision of spec v03.1; absent in records written before it. */
+  readonly v03Revision?: number;
+  /** Each subject's group and runtime as registered for this run; absent before spec v03.1. */
+  readonly registrations?: Readonly<Record<string, { readonly group: string; readonly runtime: "node" | "bun" }>>;
   /** The equivalence checks run on every cell's corpus before measuring; absent before spec v02.1. */
   /** `longhandCases`: cases matched through a logical shorthand's two longhands, absent when none (spec v03.1 §Equivalence). */
   readonly verification?: { readonly cells: number; readonly cases: number; readonly checks: number; readonly longhandCases?: number };
