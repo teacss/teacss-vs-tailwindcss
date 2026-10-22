@@ -24,14 +24,24 @@ export interface SubjectRow {
   readonly maxRssBytes: number | undefined;
 }
 
-/** Subjects of one configuration are ranked against each other only (spec v02.1 §Configurations). */
-export type TableGroup = "main" | "default-config" | "postcss";
-const GROUP_ORDER: readonly TableGroup[] = ["main", "default-config", "postcss"];
+/** Subjects of one configuration or build tool are ranked against each other only (spec v02.1 §Configurations, v03.1 §Subjects). */
+export type TableGroup = "main" | "default-config" | "postcss" | "rsbuild";
+const GROUP_ORDER: readonly TableGroup[] = ["main", "default-config", "postcss", "rsbuild"];
 
 export function groupOf(subject: string): TableGroup {
   if (subject.endsWith("-default")) return "default-config";
   if (subject.endsWith("-postcss")) return "postcss";
+  if (subject.endsWith("-rsbuild") || subject === "rsbuild-baseline") return "rsbuild";
   return "main";
+}
+
+/** The build with no CSS tool that a group's deltas are measured from. */
+export function baselineOf(group: TableGroup): string {
+  return group === "rsbuild" ? "rsbuild-baseline" : BASELINE;
+}
+
+export function isBaseline(subject: string): boolean {
+  return subject.endsWith("-baseline");
 }
 
 export interface CellTable {
@@ -82,12 +92,13 @@ export function buildReport(record: RunRecord): ReportModel {
       const inCell = samples.filter((sample) => seriesOf(sample) === series && cellKey(sample.cell) === cellKey(cell));
       if (inCell.length === 0) continue;
       const walls = wallsBySubject(inCell);
-      const baseline = series === "build" ? walls.get(BASELINE) : undefined;
-      const baselineMedian = baseline === undefined ? undefined : summarize(baseline).median;
-      const measured = [...walls.keys()].filter((subject) => subject !== BASELINE);
+      const measured = [...walls.keys()].filter((subject) => !isBaseline(subject));
       for (const group of GROUP_ORDER) {
         const subjects = measured.filter((subject) => groupOf(subject) === group);
         if (subjects.length === 0) continue;
+        const baselineId = baselineOf(group);
+        const baseline = series === "build" ? walls.get(baselineId) : undefined;
+        const baselineMedian = baseline === undefined ? undefined : summarize(baseline).median;
         const rows = subjects.map((subject): SubjectRow => {
           const own = inCell.filter((sample) => sample.subject === subject);
           const wall = summarize(walls.get(subject) ?? []);
@@ -101,8 +112,8 @@ export function buildReport(record: RunRecord): ReportModel {
             maxRssBytes: first?.tier === "build" ? Math.max(...own.map((sample) => (sample.tier === "build" ? sample.maxRssBytes : 0))) : undefined,
           };
         });
-        if (baselineMedian !== undefined) rows.push({ subject: BASELINE, wall: summarize(baseline ?? []), cssBytes: 0, cssGzipBytes: 0, deltaMs: 0, maxRssBytes: undefined });
-        const ranked = rows.filter((row) => row.subject !== BASELINE).sort((left, right) => left.wall.median - right.wall.median);
+        if (baselineMedian !== undefined) rows.push({ subject: baselineId, wall: summarize(baseline ?? []), cssBytes: 0, cssGzipBytes: 0, deltaMs: 0, maxRssBytes: undefined });
+        const ranked = rows.filter((row) => !isBaseline(row.subject)).sort((left, right) => left.wall.median - right.wall.median);
         const fastest = ranked[0]?.subject ?? "";
         const verdicts = ranked.slice(1).map((row) => ({ subject: row.subject, verdict: compare(walls.get(fastest) ?? [], walls.get(row.subject) ?? []) }));
         tables.push({ series, cell, group, rows, fastest, verdicts });

@@ -54,7 +54,7 @@ export async function verifyCorpus(corpus: Corpus, subjects: readonly VerifySubj
         findings.push({ subject: subject.id, tier, check: "structure", detail: "the response carried no css" });
         continue;
       }
-      if (subject.id === "vite-baseline") {
+      if (subject.id.endsWith("-baseline")) {
         checked.push({ subject: subject.id, tier, cases: corpus.cases.length, cssBytes: Buffer.byteLength(output.css), longhandMatches: 0 });
         continue;
       }

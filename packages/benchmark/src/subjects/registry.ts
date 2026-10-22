@@ -3,8 +3,8 @@ import { subjectId } from "@bench/infrastructure";
 import type { NativeExpectation, Tier } from "../contract/index.ts";
 import type { Syntax } from "../corpus/index.ts";
 
-/** `main` is spec v01.1's production setup; `default-config` and `postcss` are spec v02.1 §Configurations. */
-export type SubjectGroup = "main" | "default-config" | "postcss";
+/** `main` is spec v01.1's production setup; `default-config` and `postcss` are spec v02.1 §Configurations; `rsbuild` is spec v03.1 §Subjects. */
+export type SubjectGroup = "main" | "default-config" | "postcss" | "rsbuild";
 export const DEFAULT_GROUPS: readonly SubjectGroup[] = ["main", "default-config"];
 
 export interface SubjectRegistration {
@@ -25,9 +25,10 @@ const TEACSS_TS = { required: [], forbidden: ["teacss-engine", "tailwindcss-oxid
 const TEACSS_RS = { required: ["teacss-engine"], forbidden: ["tailwindcss-oxide"] };
 const TAILWIND = { required: ["tailwindcss-oxide"], forbidden: ["teacss-engine"] };
 const STRICT = { TEACSS_ENGINE_STRICT: "1" };
+const RSPACK = "rspack";
 
 /**
- * Spec v01.1 §Subjects and v02.1 §Configurations. `TEACSS_ENGINE_STRICT=1` turns a Rust fallback into
+ * Spec v01.1 §Subjects, v02.1 §Configurations and v03.1 §Subjects. `TEACSS_ENGINE_STRICT=1` turns a Rust fallback into
  * a failure. The engine tier does not depend on configuration, so the configuration variants skip it.
  */
 export function productionRegistry(): SubjectRegistry {
@@ -43,5 +44,9 @@ export function productionRegistry(): SubjectRegistry {
     [subjectId("teacss-ts-postcss"), entry("@bench/subject-teacss/ts-postcss", "teacss", ["build"], "postcss", TEACSS_TS, { ...STRICT, TEACSS_ENGINE: "ts" })],
     [subjectId("teacss-rs-postcss"), entry("@bench/subject-teacss/rs-postcss", "teacss", ["build"], "postcss", TEACSS_RS, { ...STRICT, TEACSS_ENGINE: "rust" })],
     [subjectId("tailwind-v4-postcss"), entry("@bench/subject-tailwind-v4/postcss", "tailwind", ["build"], "postcss", TAILWIND)],
+    [subjectId("rsbuild-baseline"), entry("@bench/subject-rsbuild-baseline", "tailwind", ["build"], "rsbuild", { required: [RSPACK], forbidden: ["teacss-engine", "tailwindcss-oxide"] })],
+    [subjectId("teacss-ts-rsbuild"), entry("@bench/subject-teacss/ts-rsbuild", "teacss", ["build"], "rsbuild", { ...TEACSS_TS, required: [RSPACK] }, { ...STRICT, TEACSS_ENGINE: "ts" })],
+    [subjectId("teacss-rs-rsbuild"), entry("@bench/subject-teacss/rs-rsbuild", "teacss", ["build"], "rsbuild", { ...TEACSS_RS, required: [...TEACSS_RS.required, RSPACK] }, { ...STRICT, TEACSS_ENGINE: "rust" })],
+    [subjectId("tailwind-v4-rsbuild"), entry("@bench/subject-tailwind-v4/rsbuild", "tailwind", ["build"], "rsbuild", { ...TAILWIND, required: [...TAILWIND.required, RSPACK] })],
   ]);
 }
