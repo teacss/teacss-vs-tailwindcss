@@ -30,7 +30,14 @@ export interface VerifyReport {
   readonly checked: readonly { subject: string; tier: "engine" | "build"; cases: number; cssBytes: number; longhandMatches: number }[];
 }
 
-const STRONG_PAIR: readonly [SubjectId, SubjectId] = ["teacss-ts" as SubjectId, "teacss-rs" as SubjectId];
+/** Every `teacss-ts…` subject is paired with its `teacss-rs…` twin in the same group (spec v03.1 §Equivalence). */
+function strongPairs(subjects: readonly VerifySubject[]): [string, string][] {
+  const ids = new Set<string>(subjects.map((subject) => subject.id));
+  return [...ids]
+    .filter((id) => id.startsWith("teacss-ts"))
+    .map((id): [string, string] => [id, id.replace(/^teacss-ts/, "teacss-rs")])
+    .filter(([, twin]) => ids.has(twin));
+}
 
 function summarize(mismatches: readonly Mismatch[]): string {
   const shown = mismatches.slice(0, 5).map((mismatch) => `${mismatch.candidate}: ${mismatch.reason}`);
@@ -63,10 +70,12 @@ export async function verifyCorpus(corpus: Corpus, subjects: readonly VerifySubj
       if (structure.mismatches.length > 0) findings.push({ subject: subject.id, tier, check: "structure", detail: summarize(structure.mismatches) });
     }
   }
-  for (const tier of ["engine", "build"] as const) {
-    const left = hashes.get(`${STRONG_PAIR[0]}/${tier}`);
-    const right = hashes.get(`${STRONG_PAIR[1]}/${tier}`);
-    if (left !== undefined && right !== undefined && left !== right) findings.push({ subject: STRONG_PAIR.join(" vs "), tier, check: "strong", detail: `sha256 ${left.slice(0, 12)} vs ${right.slice(0, 12)}` });
+  for (const pair of strongPairs(subjects)) {
+    for (const tier of ["engine", "build"] as const) {
+      const left = hashes.get(`${pair[0]}/${tier}`);
+      const right = hashes.get(`${pair[1]}/${tier}`);
+      if (left !== undefined && right !== undefined && left !== right) findings.push({ subject: pair.join(" vs "), tier, check: "strong", detail: `sha256 ${left.slice(0, 12)} vs ${right.slice(0, 12)}` });
+    }
   }
   return { findings, checked };
 }

@@ -25,6 +25,11 @@ function command(file: string, args: readonly string[], cwd: string): string {
   }
 }
 
+/** The Bun on the PATH, which runs the Bun subjects (spec v03.1 §Subjects). */
+export function bunVersion(root: string): string {
+  return command("bun", ["--version"], root);
+}
+
 export function captureEnvironment(root: string): EnvironmentRecord {
   const lockfile = join(root, "bun.lock");
   return {
@@ -34,7 +39,7 @@ export function captureEnvironment(root: string): EnvironmentRecord {
     memoryBytes: totalmem(),
     os: `${platform()} ${release()}`,
     node: nodeVersion,
-    bun: command("bun", ["--version"], root),
+    bun: bunVersion(root),
     lockfileSha256: existsSync(lockfile) ? createHash("sha256").update(readFileSync(lockfile)).digest("hex") : "none",
     commit: command("git", ["rev-parse", "HEAD"], root),
   };

@@ -34,11 +34,14 @@ Tailwind 在 Bun 下的 76 个不符全是逻辑简写被展开：`padding-inlin
 
 ## 第 3 片：Bun 运行时与 Bun 组
 
-- [ ] 原型（半天）：在 Bun 里包一层 `process.dlopen`，加载 `@teacss/engine` 看能否记到 `.node` 路径；结果写进规格 §Native modules，决定走哪条路。
-- [ ] 注册表与进程：`SubjectRegistration.runtime`（`node` 或 `bun`），`runProcess` 按运行时选可执行文件；Node 版本门禁只管 node 被测；被测入口 `apps/bench/src/subject.ts` 在 Bun 下不注册 `node:module` 的解析钩子；环境记录带 Bun 版本。
-- [ ] 被测包：`subject-teacss` 增加 `./ts-bun`、`./rs-bun`，`subject-tailwind-v4` 增加 `./bun`，新包 `subject-bun-baseline`；`build` 按规格 §Tiers 调 `Bun.build`。
-- [ ] 原生模块：Bun 被测按规格 §Native modules 上报；`checkNativeModules` 不变。
-- 验收：同第 2 片，另加记录里 Bun 被测的运行时版本正确，`bench subjects` 显示运行时。
+完成于 2026-10-22。
+
+- [x] 原型：Bun 1.4.3 里 `process.report` 存在但不列 `.node`；包一层 `process.dlopen` 能记到 Rust 引擎、Oxide，TS 引擎一个也没有，无需替代。两个运行时的 `maxRSS` 都以 KB 计；Bun 的 CPU 剖析能被现有汇总读出。写进规格 v03.1 修订 2。
+- [x] 注册表与进程：`SubjectRegistration.runtime`（`node` 或 `bun`），`runProcess` 的 `executable`，Bun 被测由 PATH 上的 `bun` 运行；`bench run` 在选中 Bun 被测且 `bun --version` 不等于 `packageManager` 时拒绝（`--allow-bun-mismatch` 放行）；被测入口在 Bun 下不注册模块钩子，并改为命名空间导入，因为 Bun 对 `registerHooks` 的具名导入直接报错。
+- [x] 被测包：`subject-teacss` 的 `src/bun.ts`（`./ts-bun`、`./rs-bun`），`subject-tailwind-v4` 的 `src/bun.ts`（`./bun`），新包 `subject-bun-baseline`；构建按规格 §Tiers 调 `Bun.build`，`minify: true`。
+- [x] 原生模块：`trackNativeLoads()` 在被测进程开头安装，Node 下什么也不做。
+- [x] 强等价按组配对：每个 `teacss-ts…` 与同组的 `teacss-rs…` 比对，现有的 default-config 与 postcss 组也因此多了这项检查。
+- 验收：`bench verify --group bun` 在 5 000 × 30 与 20 000 × 300 通过，ts 与 rs 逐字节相同，Tailwind 分别有 76 与 339 个用例经逻辑长写匹配；现有三组在 5 000 × 30 仍通过；三份已发布报告逐字节重新生成不变；`--group rsbuild,bun --samples 3` 的冒烟运行（含剖析）写出记录，报告出了 `(rsbuild)` 与 `(bun)` 组表。
 
 ## 第 4 片：报告
 

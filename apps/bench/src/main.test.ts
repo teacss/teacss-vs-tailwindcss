@@ -25,7 +25,26 @@ test("bench subjects reaches every production subject through its own process", 
   const lines = result.stdout.trim().split("\n");
   assert.deepEqual(
     lines.map((line) => line.split(":")[0]),
-    ["vite-baseline", "teacss-ts", "teacss-rs", "tailwind-v4", "teacss-ts-default", "teacss-rs-default", "tailwind-v4-default", "teacss-ts-postcss", "teacss-rs-postcss", "tailwind-v4-postcss", "rsbuild-baseline", "teacss-ts-rsbuild", "teacss-rs-rsbuild", "tailwind-v4-rsbuild"],
+    [
+      "vite-baseline",
+      "teacss-ts",
+      "teacss-rs",
+      "tailwind-v4",
+      "teacss-ts-default",
+      "teacss-rs-default",
+      "tailwind-v4-default",
+      "teacss-ts-postcss",
+      "teacss-rs-postcss",
+      "tailwind-v4-postcss",
+      "rsbuild-baseline",
+      "teacss-ts-rsbuild",
+      "teacss-rs-rsbuild",
+      "tailwind-v4-rsbuild",
+      "bun-baseline",
+      "teacss-ts-bun",
+      "teacss-rs-bun",
+      "tailwind-v4-bun",
+    ],
   );
   assert.match(lines[0] ?? "", /vite@8\.3\.4/);
 });

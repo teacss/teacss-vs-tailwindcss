@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { subjectId } from "@bench/infrastructure";
+import { generateCorpus } from "../../corpus/index.ts";
 import { countOutput } from "../../css/index.ts";
 import { checkNativeModules, checkStructure, escapeClass, parseRules } from "./index.ts";
+import { verifyCorpus } from "./run.ts";
 
 const cases = [
   { teacss: "p:4", tailwind: "p-4", properties: ["padding"], conditions: [] },
@@ -78,4 +81,15 @@ test("containsClass needs the class to end at a selector boundary", async () => 
   assert.equal(containsClass(".a .p\\:4\\@hover{x:y}", "p:4@hover"), true);
   assert.equal(containsClass(":is(.p-1){x:y}", "p-1"), true);
   assert.equal(containsClass(".p-1", "p-1"), true);
+});
+
+test("each teacss-ts subject is checked byte for byte against its teacss-rs twin in the same group", async () => {
+  const subject = (id: string) => ({ id: subjectId(id), syntax: "teacss" as const, tiers: ["build"] as const, natives: { required: [], forbidden: [] } });
+  const subjects = ["teacss-ts", "teacss-rs", "teacss-ts-bun", "teacss-rs-bun", "teacss-ts-rsbuild"].map(subject);
+  const hashes: Record<string, string> = { "teacss-ts": "same", "teacss-rs": "same", "teacss-ts-bun": "aaaa", "teacss-rs-bun": "bbbb", "teacss-ts-rsbuild": "cccc" };
+  const report = await verifyCorpus(generateCorpus({ seed: 1, utilities: 5, files: 1 }), subjects, async (id) => ({ css: "", cssSha256: hashes[id] ?? "", nativeModules: [] }));
+  assert.deepEqual(
+    report.findings.filter((finding) => finding.check === "strong").map((finding) => `${finding.subject} ${finding.tier}`),
+    ["teacss-ts-bun vs teacss-rs-bun build"],
+  );
 });

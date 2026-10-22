@@ -7,7 +7,8 @@
     ".": "./src/index.ts",
     "./default": "./src/default.ts",
     "./postcss": "./src/postcss.ts",
-    "./rsbuild": "./src/rsbuild.ts"
+    "./rsbuild": "./src/rsbuild.ts",
+    "./bun": "./src/bun.ts"
   },
   "dependencies": {
     "@bench/infrastructure": "workspace:*",
@@ -17,8 +18,12 @@
     "@tailwindcss/oxide": "4.3.3",
     "@tailwindcss/postcss": "4.3.3",
     "@tailwindcss/vite": "4.3.3",
+    "bun-plugin-tailwind": "0.1.2",
     "postcss": "8.5.6",
     "tailwindcss": "4.3.3",
     "vite": "8.3.4"
+  },
+  "devDependencies": {
+    "@types/bun": "1.4.3"
   }
 }

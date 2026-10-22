@@ -2,7 +2,25 @@ import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import process from "node:process";
 
+const dlopened = new Set<string>();
+let tracking = false;
+
+/**
+ * Bun's `process.report` lists no addons, so a Bun process records every `process.dlopen` instead
+ * (spec v03.1 §Native modules). Call it before any tool code loads; under Node it does nothing.
+ */
+export function trackNativeLoads(): void {
+  if (tracking || process.versions["bun"] === undefined) return;
+  tracking = true;
+  const original = process.dlopen;
+  process.dlopen = function (this: unknown, ...args: Parameters<typeof process.dlopen>) {
+    dlopened.add(args[1]);
+    return original.apply(this, args);
+  } as typeof process.dlopen;
+}
+
 function nativePaths(): string[] {
+  if (tracking) return [...dlopened];
   const report: unknown = process.report?.getReport();
   if (typeof report !== "object" || report === null || !("sharedObjects" in report)) return [];
   const shared = report.sharedObjects;

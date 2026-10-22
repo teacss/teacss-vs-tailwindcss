@@ -23,7 +23,7 @@ after(() => rmSync(dir, { recursive: true, force: true }));
 
 const fake = subjectId("fake");
 const fakeModule = import.meta.resolve("@bench/infrastructure/test-support/fake-subject");
-const registration = { env: {}, syntax: "teacss" as const, tiers: ["engine", "dev", "build"] as const, group: "main" as const, natives: { required: [], forbidden: [] } };
+const registration = { env: {}, syntax: "teacss" as const, tiers: ["engine", "dev", "build"] as const, group: "main" as const, natives: { required: [], forbidden: [] }, runtime: "node" as const };
 const registry = new Map([[fake, { ...registration, module: fakeModule }]]);
 const env: Record<string, string> = {};
 for (const [key, value] of Object.entries(process.env)) if (value !== undefined) env[key] = value;

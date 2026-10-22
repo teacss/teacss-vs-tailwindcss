@@ -25,19 +25,20 @@ export interface SubjectRow {
 }
 
 /** Subjects of one configuration or build tool are ranked against each other only (spec v02.1 §Configurations, v03.1 §Subjects). */
-export type TableGroup = "main" | "default-config" | "postcss" | "rsbuild";
-const GROUP_ORDER: readonly TableGroup[] = ["main", "default-config", "postcss", "rsbuild"];
+export type TableGroup = "main" | "default-config" | "postcss" | "rsbuild" | "bun";
+const GROUP_ORDER: readonly TableGroup[] = ["main", "default-config", "postcss", "rsbuild", "bun"];
 
 export function groupOf(subject: string): TableGroup {
   if (subject.endsWith("-default")) return "default-config";
   if (subject.endsWith("-postcss")) return "postcss";
   if (subject.endsWith("-rsbuild") || subject === "rsbuild-baseline") return "rsbuild";
+  if (subject.endsWith("-bun") || subject === "bun-baseline") return "bun";
   return "main";
 }
 
 /** The build with no CSS tool that a group's deltas are measured from. */
 export function baselineOf(group: TableGroup): string {
-  return group === "rsbuild" ? "rsbuild-baseline" : BASELINE;
+  return group === "rsbuild" || group === "bun" ? `${group}-baseline` : BASELINE;
 }
 
 export function isBaseline(subject: string): boolean {
