@@ -152,7 +152,7 @@ export async function createApp(deps: AppDeps): Promise<number> {
     },
     verify: async (invocation) => {
       const corpus = typeof invocation.options.get("community") === "string" ? communityCorpus(await communityPool(String(invocation.options.get("community"))), integerOption(invocation, "utilities", 5_000), integerOption(invocation, "files", 30), integerOption(invocation, "seed", DEFAULT_SEED)) : corpusOf(invocation);
-      const findings = await verifyOn(corpus, chosenSubjects(invocation, registry), true);
+      const { findings } = await verifyOn(corpus, chosenSubjects(invocation, registry), true);
       deps.stdout(findings === 0 ? "verify: ok\n" : `verify: ${findings} finding(s)\n`);
       return findings === 0 ? 0 : 1;
     },
@@ -179,15 +179,17 @@ export async function createApp(deps: AppDeps): Promise<number> {
     // The corpus hash covers the classes, not how they are split into files, and the build tier sees the split.
     const corpora = new Map(cells.map((cell) => corpusFor(cell)).map((corpus) => [`${corpus.hash}:${corpus.parameters.files}`, corpus]));
     let checks = 0;
+    let longhandCases = 0;
     for (const corpus of corpora.values()) {
-      const findings = await verifyOn(corpus, chosen, false);
+      const { findings, longhandMatches } = await verifyOn(corpus, chosen, false);
+      longhandCases += longhandMatches;
       if (findings > 0) {
         deps.stdout(`run: refused, ${findings} equivalence finding(s) on corpus ${corpus.hash.slice(0, 12)}; nothing was measured\n`);
         return 1;
       }
       checks += chosen.length;
     }
-    const verification = { cells: corpora.size, cases: [...corpora.values()].reduce((sum, corpus) => sum + corpus.cases.length, 0), checks };
+    const verification = { cells: corpora.size, cases: [...corpora.values()].reduce((sum, corpus) => sum + corpus.cases.length, 0), checks, ...(longhandCases > 0 ? { longhandCases } : {}) };
     const startedAt = new Date().toISOString();
     const subjects: Record<string, SubjectVersions> = {};
     for (const [id] of chosen) {
@@ -276,8 +278,8 @@ export async function createApp(deps: AppDeps): Promise<number> {
     }
     return 0;
   };
-  /** Spec v01.1 §Equivalence on one corpus; prints every finding and returns how many there were. */
-  async function verifyOn(corpus: Corpus, chosen: readonly [SubjectId, SubjectRegistration][], verbose: boolean): Promise<number> {
+  /** Spec v01.1 §Equivalence on one corpus; prints every finding and returns how many there were, and how many cases matched through logical longhands. */
+  async function verifyOn(corpus: Corpus, chosen: readonly [SubjectId, SubjectRegistration][], verbose: boolean): Promise<{ findings: number; longhandMatches: number }> {
     deps.stdout(`verify corpus ${corpus.hash.slice(0, 12)} (${corpus.parameters.utilities} utilities, ${corpus.parameters.files} files)\n`);
     const subjects = chosen.map(([id, registration]) => ({ id, syntax: registration.syntax, tiers: registration.tiers, natives: registration.natives }));
     const report = await verifyCorpus(corpus, subjects, async (subject, task) => {
@@ -288,9 +290,9 @@ export async function createApp(deps: AppDeps): Promise<number> {
       if (verbose) deps.stdout(`  ${subject} ${task.kind}: ${result.kind === "engine" ? `${result.samples[0]?.cssBytes ?? 0}` : `${result.cssBytes}`} bytes, native ${response.nativeModules.join(", ") || "none"}\n`);
       return { css: result.css, cssSha256, nativeModules: response.nativeModules };
     });
-    if (verbose) for (const entry of report.checked) deps.stdout(`  ok ${entry.subject} ${entry.tier}: ${entry.cases} cases in ${entry.cssBytes} bytes\n`);
+    if (verbose) for (const entry of report.checked) deps.stdout(`  ok ${entry.subject} ${entry.tier}: ${entry.cases} cases in ${entry.cssBytes} bytes${entry.longhandMatches > 0 ? `, ${entry.longhandMatches} through logical longhands` : ""}\n`);
     for (const finding of report.findings) deps.stdout(`  FAIL ${finding.subject} ${finding.tier} ${finding.check}: ${finding.detail}\n`);
-    return report.findings.length;
+    return { findings: report.findings.length, longhandMatches: report.checked.reduce((sum, entry) => sum + entry.longhandMatches, 0) };
   }
 
   /** Reads the repository list, asks Tailwind which of its utilities each tree uses, and keeps the translatable ones. */

@@ -15,9 +15,11 @@ Tailwind 在 Bun 下的 76 个不符全是逻辑简写被展开：`padding-inlin
 
 ## 第 1 片：结构校验认逻辑简写的长写
 
-- [ ] `packages/benchmark/src/features/verify`：期望属性是 `padding-inline`、`margin-inline`、`inset-inline`、`padding-block`、`margin-block`、`inset-block` 之一时，两个 `-start`、`-end` 长写同时出现且条件相同也算匹配；校验结果带「经长写匹配的用例数」，`bench verify` 与报告的校验摘要打印它。
-- [ ] 测试：简写匹配、长写匹配、只出现一个长写不匹配、计数正确；现有三份记录的校验结果不变。
-- 验收：`bench verify` 在 5 000 × 30 对现有十个被测对象的结论与之前相同，计数为 0。
+完成于 2026-10-22。
+
+- [x] `features/verify`：期望属性是 `padding-inline`、`margin-inline`、`inset-inline`、`padding-block`、`margin-block`、`inset-block` 之一时，两个 `-start`、`-end` 长写同时出现也算匹配；`CheckResult.longhandMatches` 计数，`bench verify` 逐个被测打印，`bench run` 把总数记进 `verification.longhandCases`（为 0 时不写），报告的校验句在有计数时加一句。
+- [x] 测试：简写匹配不计数、长写匹配计数、只有一个长写不匹配；报告在无计数时不出现这句，有计数时出现。
+- 验收：`bench verify` 在 5 000 × 30 对现有十个被测对象通过，计数为 0；三份已发布报告逐字节重新生成不变；前置实验里 Bun 的 Tailwind 产物从 76 个不符变为 0 个不符、76 个经长写匹配。
 
 ## 第 2 片：Rsbuild 组
 

@@ -29,6 +29,17 @@ test("both syntaxes pass the structural check, longhand pairs counting as the lo
   assert.deepEqual(checkStructure(cases, "tailwind", tailwindCss).mismatches, []);
 });
 
+test("a logical shorthand printed as its -start and -end longhands matches and is counted; one longhand alone does not", () => {
+  const inline = [{ teacss: "p-x:4", tailwind: "px-4", properties: ["padding-inline"], conditions: [] }];
+  const shorthand = checkStructure(inline, "tailwind", ".px-4{padding-inline:1px}");
+  assert.deepEqual([shorthand.mismatches, shorthand.longhandMatches], [[], 0]);
+  const longhands = checkStructure(inline, "tailwind", ".px-4{padding-inline-start:1px;padding-inline-end:1px}");
+  assert.deepEqual([longhands.mismatches, longhands.longhandMatches], [[], 1]);
+  const half = checkStructure(inline, "tailwind", ".px-4{padding-inline-start:1px}");
+  assert.deepEqual([half.mismatches.map((mismatch) => mismatch.reason), half.longhandMatches], [["declares padding-inline-start, expected padding-inline"], 0]);
+  assert.equal(checkStructure(cases, "teacss", teacssCss).longhandMatches, 0);
+});
+
 test("a merged selector list keeps each selector's own pseudo-classes", () => {
   const merged = [
     { teacss: "p:4@hover", tailwind: "hover:p-4", properties: ["padding"], conditions: ["hover"] },
