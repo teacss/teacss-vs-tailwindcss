@@ -5,7 +5,7 @@ import { version as nodeVersion } from "node:process";
 import { type Invocation, parseInvocation, type SubjectId, type SubjectVersions, subjectId } from "@bench/infrastructure";
 import { buildCommunityPool, type CommunityPool, type CommunityRepository, communityCorpus } from "../corpus/community.ts";
 import { type Corpus, DEFAULT_SEED, generateCorpus, PAIR_TABLE_VERSION, profileCorpus } from "../corpus/index.ts";
-import { captureEnvironment, loadShare } from "../features/environment/index.ts";
+import { bunVersion, captureEnvironment, loadShare } from "../features/environment/index.ts";
 import { measure, type Tier } from "../features/measure/run.ts";
 import { installFresh, measurePrice, type PriceRecord, teacssEntries } from "../features/price/index.ts";
 import { profileSubjects } from "../features/profile/run.ts";
@@ -39,10 +39,10 @@ const USAGE = `bench <command>
   run         measure the scale matrix and write results/<time>-<host>.json
               --utilities <a,b,c> (1000,5000,20000)  --files <a,b,c> (3,30,300)
               --samples <n> (30)  --tier engine|dev|build|all (all)  --subjects <a,b>
-              --group main,default-config,postcss (main,default-config)
+              --group main,default-config,postcss,rsbuild,bun (main,default-config)
               --seed <n>  --out <dir> (results)  --allow-busy  --no-profile  --no-price
               --install-runs <n> (3)  --configs <dir>  --community <list.json>
-              --allow-node-mismatch
+              --allow-node-mismatch  --allow-bun-mismatch
   price       what each tool ships, loads and installs, and what the native engine can serve
               --subjects <a,b>  --install-runs <n> (3)  --configs <dir> (../teacss-ts/examples)
   report      render a results file as Markdown and a JSON summary
@@ -97,7 +97,7 @@ function chosenSubjects(invocation: Invocation, registry: SubjectRegistry): [Sub
     const groupOption = invocation.options.get("group");
     const groups = typeof groupOption === "string" ? groupOption.split(",") : DEFAULT_GROUPS;
     const chosen = [...registry].filter(([, registration]) => groups.includes(registration.group));
-    if (chosen.length === 0) throw new Error(`--group: no subject in ${groups.join(", ")}; groups are main, default-config, postcss`);
+    if (chosen.length === 0) throw new Error(`--group: no subject in ${groups.join(", ")}; groups are main, default-config, postcss, rsbuild, bun`);
     return chosen;
   }
   const names = wanted.split(",");
@@ -170,6 +170,11 @@ export async function createApp(deps: AppDeps): Promise<number> {
       return 3;
     }
     const chosen = chosenSubjects(invocation, registry);
+    const pinnedBun = /^bun@(.+)$/.exec(String((JSON.parse(readFileSync(join(deps.cwd, "package.json"), "utf8")) as { packageManager?: unknown }).packageManager ?? ""))?.[1];
+    if (chosen.some(([, registration]) => registration.runtime === "bun") && pinnedBun !== undefined && bunVersion(deps.cwd) !== pinnedBun && !invocation.options.has("allow-bun-mismatch")) {
+      deps.stdout(`run: refused, the Bun on the PATH is ${bunVersion(deps.cwd)} but packageManager pins ${pinnedBun}; the Bun subjects run under it. Switch Bun or pass --allow-bun-mismatch to record the run anyway\n`);
+      return 3;
+    }
     const cells = integerList(invocation, "utilities", [1_000, 5_000, 20_000]).flatMap((utilities) => integerList(invocation, "files", [3, 30, 300]).map((files) => ({ utilities, files })));
     const seed = integerOption(invocation, "seed", DEFAULT_SEED);
     const community = typeof invocation.options.get("community") === "string" ? await communityPool(String(invocation.options.get("community"))) : undefined;

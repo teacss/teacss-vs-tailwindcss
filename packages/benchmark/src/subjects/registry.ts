@@ -3,8 +3,8 @@ import { subjectId } from "@bench/infrastructure";
 import type { NativeExpectation, Tier } from "../contract/index.ts";
 import type { Syntax } from "../corpus/index.ts";
 
-/** `main` is spec v01.1's production setup; `default-config` and `postcss` are spec v02.1 §Configurations; `rsbuild` is spec v03.1 §Subjects. */
-export type SubjectGroup = "main" | "default-config" | "postcss" | "rsbuild";
+/** `main` is spec v01.1's production setup; `default-config` and `postcss` are spec v02.1 §Configurations; `rsbuild` and `bun` are spec v03.1 §Subjects. */
+export type SubjectGroup = "main" | "default-config" | "postcss" | "rsbuild" | "bun";
 export const DEFAULT_GROUPS: readonly SubjectGroup[] = ["main", "default-config"];
 
 export interface SubjectRegistration {
@@ -17,6 +17,8 @@ export interface SubjectRegistration {
   readonly tiers: readonly Tier[];
   readonly group: SubjectGroup;
   readonly natives: NativeExpectation;
+  /** `bun` runs the subject process under the Bun on the PATH, which `packageManager` pins (spec v03.1 §Subjects). */
+  readonly runtime: "node" | "bun";
 }
 
 export type SubjectRegistry = ReadonlyMap<SubjectId, SubjectRegistration>;
@@ -32,7 +34,7 @@ const RSPACK = "rspack";
  * a failure. The engine tier does not depend on configuration, so the configuration variants skip it.
  */
 export function productionRegistry(): SubjectRegistry {
-  const entry = (module: string, syntax: Syntax, tiers: readonly Tier[], group: SubjectGroup, natives: NativeExpectation, env: Readonly<Record<string, string>> = {}): SubjectRegistration => ({ module: import.meta.resolve(module), env, syntax, tiers, group, natives });
+  const entry = (module: string, syntax: Syntax, tiers: readonly Tier[], group: SubjectGroup, natives: NativeExpectation, env: Readonly<Record<string, string>> = {}, runtime: "node" | "bun" = "node"): SubjectRegistration => ({ module: import.meta.resolve(module), env, syntax, tiers, group, natives, runtime });
   return new Map<SubjectId, SubjectRegistration>([
     [subjectId("vite-baseline"), entry("@bench/subject-vite-baseline", "tailwind", ["build"], "main", { required: [], forbidden: ["teacss-engine", "tailwindcss-oxide"] })],
     [subjectId("teacss-ts"), entry("@bench/subject-teacss/ts", "teacss", ["engine", "dev", "build"], "main", TEACSS_TS, STRICT)],
@@ -48,5 +50,9 @@ export function productionRegistry(): SubjectRegistry {
     [subjectId("teacss-ts-rsbuild"), entry("@bench/subject-teacss/ts-rsbuild", "teacss", ["build"], "rsbuild", { ...TEACSS_TS, required: [RSPACK] }, { ...STRICT, TEACSS_ENGINE: "ts" })],
     [subjectId("teacss-rs-rsbuild"), entry("@bench/subject-teacss/rs-rsbuild", "teacss", ["build"], "rsbuild", { ...TEACSS_RS, required: [...TEACSS_RS.required, RSPACK] }, { ...STRICT, TEACSS_ENGINE: "rust" })],
     [subjectId("tailwind-v4-rsbuild"), entry("@bench/subject-tailwind-v4/rsbuild", "tailwind", ["build"], "rsbuild", { ...TAILWIND, required: [...TAILWIND.required, RSPACK] })],
+    [subjectId("bun-baseline"), entry("@bench/subject-bun-baseline", "tailwind", ["build"], "bun", { required: [], forbidden: ["teacss-engine", "tailwindcss-oxide"] }, {}, "bun")],
+    [subjectId("teacss-ts-bun"), entry("@bench/subject-teacss/ts-bun", "teacss", ["build"], "bun", TEACSS_TS, { ...STRICT, TEACSS_ENGINE: "ts" }, "bun")],
+    [subjectId("teacss-rs-bun"), entry("@bench/subject-teacss/rs-bun", "teacss", ["build"], "bun", TEACSS_RS, { ...STRICT, TEACSS_ENGINE: "rust" }, "bun")],
+    [subjectId("tailwind-v4-bun"), entry("@bench/subject-tailwind-v4/bun", "tailwind", ["build"], "bun", TAILWIND, {}, "bun")],
   ]);
 }

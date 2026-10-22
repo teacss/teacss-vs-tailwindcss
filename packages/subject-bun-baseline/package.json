@@ -1,0 +1,15 @@
+{
+  "name": "@bench/subject-bun-baseline",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@bench/infrastructure": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "1.4.3"
+  }
+}

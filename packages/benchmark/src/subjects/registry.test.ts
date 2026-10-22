@@ -6,7 +6,29 @@ import { productionRegistry } from "./registry.ts";
 
 test("every production subject resolves to a module file and declares its tiers, group and native expectations", () => {
   const registry = productionRegistry();
-  assert.deepEqual([...registry.keys()], ["vite-baseline", "teacss-ts", "teacss-rs", "tailwind-v4", "teacss-ts-default", "teacss-rs-default", "tailwind-v4-default", "teacss-ts-postcss", "teacss-rs-postcss", "tailwind-v4-postcss", "rsbuild-baseline", "teacss-ts-rsbuild", "teacss-rs-rsbuild", "tailwind-v4-rsbuild"]);
+  assert.deepEqual(
+    [...registry.keys()],
+    [
+      "vite-baseline",
+      "teacss-ts",
+      "teacss-rs",
+      "tailwind-v4",
+      "teacss-ts-default",
+      "teacss-rs-default",
+      "tailwind-v4-default",
+      "teacss-ts-postcss",
+      "teacss-rs-postcss",
+      "tailwind-v4-postcss",
+      "rsbuild-baseline",
+      "teacss-ts-rsbuild",
+      "teacss-rs-rsbuild",
+      "tailwind-v4-rsbuild",
+      "bun-baseline",
+      "teacss-ts-bun",
+      "teacss-rs-bun",
+      "tailwind-v4-bun",
+    ],
+  );
   for (const [id, registration] of registry) {
     assert.ok(registration.module.startsWith("file://"), `${id}: ${registration.module}`);
     assert.ok(existsSync(fileURLToPath(registration.module)), `${id}: ${registration.module}`);
@@ -17,4 +39,6 @@ test("every production subject resolves to a module file and declares its tiers,
   assert.equal(registry.get("teacss-ts-postcss" as never)?.env["TEACSS_ENGINE"], "ts");
   assert.deepEqual(registry.get("teacss-rs-rsbuild" as never)?.natives.required, ["teacss-engine", "rspack"]);
   assert.equal(registry.get("teacss-rs-rsbuild" as never)?.group, "rsbuild");
+  assert.equal(registry.get("teacss-rs-bun" as never)?.runtime, "bun");
+  assert.equal(registry.get("teacss-rs" as never)?.runtime, "node");
 });

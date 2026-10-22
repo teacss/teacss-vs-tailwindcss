@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
 import { basename } from "node:path";
 import { gzipSync } from "node:zlib";
-import { type Clock, createWorkspace, duplicateNativeModules, loadedNativeModules, ownResourceUsage, type SubjectClient, type SubjectFactory, systemClock } from "@bench/infrastructure";
+import { type Clock, createWorkspace, duplicateNativeModules, loadedNativeModules, ownResourceUsage, type SubjectClient, type SubjectFactory, systemClock, trackNativeLoads } from "@bench/infrastructure";
 import { CONTRACT_VERSION, parseSubjectRequest, type SubjectRequest, type SubjectResponse, type TaskResult } from "../contract/index.ts";
 import { countOutput } from "../css/index.ts";
 import { connectDevIo, runDevScenario } from "../features/measure/dev-scenario.ts";
@@ -81,6 +81,7 @@ async function runTask(request: SubjectRequest, deps: SubjectMainDeps): Promise<
 
 /** The subject process: one request on stdin, one response on stdout. Only this process imports a subject. */
 export async function subjectMain(stdin: string, deps: SubjectMainDeps = { clock: systemClock }): Promise<SubjectMainResult> {
+  trackNativeLoads();
   let request: SubjectRequest;
   try {
     request = parseSubjectRequest(JSON.parse(stdin));

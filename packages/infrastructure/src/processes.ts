@@ -11,7 +11,9 @@ export interface ProcessResult {
 }
 
 export interface ProcessOptions {
-  /** Flags for the Node binary itself, before the entry. */
+  /** The runtime binary; this process's own Node by default. */
+  readonly executable?: string | undefined;
+  /** Flags for the runtime binary itself, before the entry. */
   readonly nodeArgs?: readonly string[];
   readonly args: readonly string[];
   readonly cwd: string;
@@ -22,7 +24,7 @@ export interface ProcessOptions {
 
 export function runProcess(entry: string, options: ProcessOptions): Promise<ProcessResult> {
   return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [...(options.nodeArgs ?? []), entry, ...options.args], { cwd: options.cwd, env: options.env, stdio: ["pipe", "pipe", "pipe"] });
+    const child = spawn(options.executable ?? process.execPath, [...(options.nodeArgs ?? []), entry, ...options.args], { cwd: options.cwd, env: options.env, stdio: ["pipe", "pipe", "pipe"] });
     const started = systemClock.now();
     const stdout: Buffer[] = [];
     const stderr: Buffer[] = [];
