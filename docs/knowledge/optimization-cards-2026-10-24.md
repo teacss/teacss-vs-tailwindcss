@@ -12,6 +12,38 @@ The profiles were captured outside the timed run, one process each, on the same 
 
 Both owners merge to master only; nothing is published while the owner is away. Merged fixes are re-measured in a separate "unreleased" lane that never enters an official report.
 
+## Outcomes
+
+| Card | Owner | Outcome | Evidence |
+| --- | --- | --- | --- |
+| T1 | teacss-ts | Waiting for the owner. teacss-ts measured about 18 ms, not 30, and only with both changes: dev CSS off lightningcss by default (which also changes how users' own CSS is processed in dev) and the font `url()`s moved out of the generated sheet. | teacss-ts `docs/plans/perf-iteration-loop.md` §6 |
+| T2 | teacss-ts | Not changed. The 20 ms window merges two invalidations 11 to 16 ms apart into one regeneration; at 0 ms dev +10 was slower (112 to 114 ms against 96 to 98). | teacss-ts #930 |
+| T3 | teacss-ts | Merged (teacss-ts #929) and accepted in the unreleased lane below. | below |
+| T4 | teacss-ts | Not merged. A lazy `consola` moved a fresh-process 1 000 x 3 import and build from 163.1 to 160.2 ms, within the noise and short of the 8 ms target. | teacss-ts #930, branch `perf/lazy-consola` |
+| R1, R2 | teacss-rs | Queued for the owner's go-ahead. | |
+
+### T3 in the unreleased lane
+
+The unreleased lane compares published TeaCSS 0.9.0 with teacss-ts master `4797acce`, linked through `bun run bench:link`. Between the two, the only source change is #929 (`packages-engine/runtime/src/internal/bundled-assets.ts`); #928 is a dev-only lockfile bump. The method:
+
+- the two lanes alternated three times, after the machine was quiet for two minutes;
+- each lane and cell got 30 fresh-process Vite builds (spec v01.1 revision 4), on Node 24.14.1;
+- the runs inside the lane used `--allow-busy`, because each run's own load check saw the previous run;
+- the raw records are in [`unreleased-2026-10-24-t3/`](unreleased-2026-10-24-t3/).
+
+These numbers are labelled unreleased and never enter an official report.
+
+| Cell | Subject | Published 0.9.0 | teacss-ts master | Change |
+| --- | --- | --- | --- | --- |
+| 20 000 x 300 | teacss-rs | 482.2 ms (IQR 6.4) | 468.7 ms (IQR 7.5) | -13.5 ms, Cliff's delta 0.98 |
+| 20 000 x 3 | teacss-rs | 430.5 ms | 420.0 ms | -10.5 ms |
+| 1 000 x 300 | teacss-rs | 350.7 ms | 346.1 ms | no measurable difference |
+| 1 000 x 3 | teacss-rs | 296.4 ms | 292.6 ms | no measurable difference |
+| 20 000 x 300 | teacss-ts | 1 067.6 ms | 1 048.5 ms | -19.1 ms |
+| 1 000 x 3 | teacss-ts | 385.0 ms | 373.3 ms | -11.6 ms |
+
+The Vite baseline did not move (229.1 against 230.6 ms at 20 000 x 300). Every cell kept its hash: `f4ea28ce…` and `ee274f23…`, the same for both engines. T3's acceptance asked for at least 10 ms off the Vite build at 20 000 x 300 with the hashes unchanged, and it got 13.5 ms.
+
 ## Where the time goes
 
 **The dev round** at 20 000 utilities in 300 files, +10 classes. TeaCSS (Rust) takes 100.4 ms (IQR 3.2, range 93.7 to 130.1, n = 30); Tailwind takes 322.5 ms. A Vite debug trace of 20 rounds splits TeaCSS's round, counted from the moment the new module is fetched:
