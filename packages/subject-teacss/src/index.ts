@@ -14,8 +14,8 @@ const PACKAGES = ["@teacss/core", "@teacss/preset-standard", "@teacss/vite", "vi
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 
 /** The engine core loads is the one beside core, which differs from this package's own when core is linked to a checkout. */
-function resolved() {
-  const packages = PACKAGES.map((name) => resolvePackage(name, HERE));
+function resolved(variant: TeacssVariant = "production") {
+  const packages = [...PACKAGES, ...(variant === "postcss" ? ["@teacss/postcss"] : [])].map((name) => resolvePackage(name, HERE));
   const core = packages[0];
   if (core === undefined) throw new Error("@teacss/core is not resolved");
   return [...packages, resolvePackage("@teacss/engine", core.dir)];
@@ -91,7 +91,7 @@ export function teacssSubject(engine: "ts" | "rust", variant: TeacssVariant = "p
   return {
     id: subjectId(`${engine === "ts" ? "teacss-ts" : "teacss-rs"}${variant === "production" ? "" : `-${variant}`}`),
     describe: async () => {
-      const packages = resolved();
+      const packages = resolved(variant);
       const engineDir = packages.find((entry) => entry.name === "@teacss/engine");
       const native = engine === "rust" && engineDir !== undefined ? nativeArtifact(engineDir) : undefined;
       return { ...describePackages(packages), ...(native === undefined ? {} : { native }) };
