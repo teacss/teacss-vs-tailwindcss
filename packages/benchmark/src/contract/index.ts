@@ -73,7 +73,18 @@ export interface DevSample {
 export type TaskResult =
   | { readonly kind: "describe"; readonly versions: SubjectVersions }
   | { readonly kind: "engine"; readonly samples: readonly EngineSample[]; readonly output: OutputCounts; readonly css: string | undefined }
-  | { readonly kind: "build"; readonly cssBytes: number; readonly cssGzipBytes: number; readonly cssSha256: string; readonly output: OutputCounts; readonly css: string | undefined }
+  | {
+      readonly kind: "build";
+      readonly cssBytes: number;
+      readonly cssGzipBytes: number;
+      readonly cssSha256: string;
+      readonly output: OutputCounts;
+      readonly css: string | undefined;
+      /** The process's usage when the tool's build returned, before the harness hashed, compressed and counted its output. */
+      readonly usageAtBuild: ResourceUsage;
+      /** From the build's return to the response: the harness's own work, which the orchestrator takes off the process time. */
+      readonly afterBuildMs: number;
+    }
   | { readonly kind: "dev"; readonly samples: readonly DevSample[] }
   | { readonly kind: "native-load"; readonly wallMs: number }
   | { readonly kind: "coverage"; readonly results: readonly CoverageResult[] }
@@ -205,8 +216,8 @@ function parseResult(value: unknown): TaskResult {
       if (!Array.isArray(value["samples"])) throw new Error("response: engine samples are not an array");
       return { kind: "engine", samples: value["samples"].map(parseSample), output: parseCounts(value["output"]), css: optionalCss(value["css"]) };
     case "build":
-      if (typeof value["cssBytes"] !== "number" || typeof value["cssGzipBytes"] !== "number" || typeof value["cssSha256"] !== "string") throw new Error("response: build result shape");
-      return { kind: "build", cssBytes: value["cssBytes"], cssGzipBytes: value["cssGzipBytes"], cssSha256: value["cssSha256"], output: parseCounts(value["output"]), css: optionalCss(value["css"]) };
+      if (typeof value["cssBytes"] !== "number" || typeof value["cssGzipBytes"] !== "number" || typeof value["cssSha256"] !== "string" || typeof value["afterBuildMs"] !== "number") throw new Error("response: build result shape");
+      return { kind: "build", cssBytes: value["cssBytes"], cssGzipBytes: value["cssGzipBytes"], cssSha256: value["cssSha256"], output: parseCounts(value["output"]), css: optionalCss(value["css"]), usageAtBuild: parseUsage(value["usageAtBuild"]), afterBuildMs: value["afterBuildMs"] };
     case "dev":
       if (!Array.isArray(value["samples"])) throw new Error("response: dev samples are not an array");
       return {
