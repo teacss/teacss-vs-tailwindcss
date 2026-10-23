@@ -39,6 +39,7 @@ v4. `CLAUDE.md` points here.
 | `docs/adrs/` | Architecture decision records, with an index |
 | `docs/knowledge/` | Evidence and background, with an index |
 | `docs/reports/` | Generated reports, one per published run |
+| `docs/articles/` | Plain-language write-ups of a published report, with an index |
 
 Add, remove or rename a document and update its index in the same change.
 
