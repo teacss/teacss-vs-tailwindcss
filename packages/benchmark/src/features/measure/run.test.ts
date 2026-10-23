@@ -14,7 +14,7 @@ const plan: RunPlan = { seed: 1, corpusFor: (cell) => generateCorpus({ seed: 1, 
 
 function fakeMeasured(task: SubjectTask, hash = "same"): Measured {
   const usage = { cpuUserMs: 1, cpuSystemMs: 1, maxRssBytes: 1 };
-  if (task.kind === "build") return { result: { kind: "build", cssBytes: 10, cssGzipBytes: 5, cssSha256: hash, output: { rules: 1, declarations: 2 }, css: undefined }, nativeModules: [], usage, wallMs: 7 };
+  if (task.kind === "build") return { result: { kind: "build", cssBytes: 10, cssGzipBytes: 5, cssSha256: hash, output: { rules: 1, declarations: 2 }, css: undefined, usageAtBuild: { cpuUserMs: 0.5, cpuSystemMs: 0.25, maxRssBytes: 1 }, afterBuildMs: 2 }, nativeModules: [], usage, wallMs: 7 };
   if (task.kind === "dev") return { result: { kind: "dev", samples: task.extra.map((group) => ({ wallMs: 5, polls: 2, cssBytes: 10, cssSha256: group.join(",") })) }, nativeModules: [], usage, wallMs: 9 };
   if (task.kind !== "engine") throw new Error("unexpected task");
   const count = task.scenario === "cold" ? 1 : WARM_TIMED_ITERATIONS;
@@ -48,6 +48,12 @@ test("every subject and tier reaches its sample count, interleaved round by roun
   assert.equal(count("engine", "alpha", "incremental-100"), WARM_TIMED_ITERATIONS);
   assert.deepEqual(calls.slice(0, 6).sort(), ["alpha/build", "alpha/engine/cold", "alpha/engine/incremental-10", "alpha/engine/incremental-100", "alpha/engine/warm", "beta/build"]);
   assert.notDeepEqual(calls.slice(0, 6), calls.slice(6, 12));
+});
+
+test("a build sample ends when the tool's build returned: the harness's own work and usage after it are left out", async () => {
+  const output = await measure({ ...plan, tiers: ["build"], subjects: [subjects[1] ?? subjects[0]!] }, { invoke: async (_, task) => fakeMeasured(task), loadShare: () => 0.1, progress: () => {} });
+  const build = output.samples.find((sample) => sample.tier === "build");
+  assert.deepEqual(build?.tier === "build" ? [build.wallMs, build.cpuUserMs, build.cpuSystemMs] : [], [5, 0.5, 0.25]);
 });
 
 test("incremental calls get distinct new classes per call and the same ones in every process", async () => {

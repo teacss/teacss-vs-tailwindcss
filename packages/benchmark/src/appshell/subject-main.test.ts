@@ -24,6 +24,9 @@ test("describe, engine and build answer through the fake module", async () => {
   assert.equal(build.exitCode, 0);
   const parsed = parseSubjectResponse(JSON.parse(build.stdout));
   assert.equal(parsed.result.kind === "build" && parsed.result.cssBytes, ".built{}".length);
+  // The fake clock steps 1 ms per read: once when the build returns, once when the response is assembled.
+  assert.equal(parsed.result.kind === "build" && parsed.result.afterBuildMs, 1);
+  assert.ok(parsed.result.kind === "build" && parsed.result.usageAtBuild.cpuUserMs <= parsed.usage.cpuUserMs);
 });
 
 test("a subject that throws yields an error result and exit code 1", async () => {

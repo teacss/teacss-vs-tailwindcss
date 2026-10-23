@@ -25,6 +25,9 @@ async function loadSubject(request: SubjectRequest): Promise<SubjectClient> {
   return subject;
 }
 
+/** When the last build in this process returned; `subjectMain` measures the harness's work from there. */
+let builtAt: bigint | undefined;
+
 async function runTask(request: SubjectRequest, deps: SubjectMainDeps): Promise<TaskResult> {
   const { task } = request;
   switch (task.kind) {
@@ -71,7 +74,9 @@ async function runTask(request: SubjectRequest, deps: SubjectMainDeps): Promise<
       try {
         await subject.prepare(workspace, { modules: task.modules, files: new Map(Object.entries(task.files)) });
         const { css } = await subject.build(workspace);
-        return { kind: "build", cssBytes: Buffer.byteLength(css), cssGzipBytes: gzipSync(css).byteLength, cssSha256: createHash("sha256").update(css).digest("hex"), output: countOutput(css), css: task.includeCss ? css : undefined };
+        const usageAtBuild = ownResourceUsage();
+        builtAt = deps.clock.now();
+        return { kind: "build", cssBytes: Buffer.byteLength(css), cssGzipBytes: gzipSync(css).byteLength, cssSha256: createHash("sha256").update(css).digest("hex"), output: countOutput(css), css: task.includeCss ? css : undefined, usageAtBuild, afterBuildMs: 0 };
       } finally {
         workspace.remove();
       }
@@ -96,6 +101,10 @@ export async function subjectMain(stdin: string, deps: SubjectMainDeps = { clock
   }
   const duplicates = duplicateNativeModules();
   if (result.kind !== "error" && duplicates.length > 0) result = { kind: "error", message: duplicates.join("; "), stack: undefined };
-  const response: SubjectResponse = { version: CONTRACT_VERSION, sentAt: Date.now(), subject: request.subject, nativeModules: loadedNativeModules(), usage: ownResourceUsage(), result };
+  const nativeModules = loadedNativeModules();
+  const usage = ownResourceUsage();
+  // Spec v01.1 §Run protocol, revision 4: the harness's hashing, counting, cleanup and native check come off the build's time.
+  if (result.kind === "build" && builtAt !== undefined) result = { ...result, afterBuildMs: Number(deps.clock.now() - builtAt) / 1e6 };
+  const response: SubjectResponse = { version: CONTRACT_VERSION, sentAt: Date.now(), subject: request.subject, nativeModules, usage, result };
   return { stdout: `${JSON.stringify(response)}\n`, exitCode: result.kind === "error" ? 1 : 0 };
 }
