@@ -16,11 +16,13 @@ Both owners merge to master only; nothing is published while the owner is away. 
 
 | Card | Owner | Outcome | Evidence |
 | --- | --- | --- | --- |
-| T1 | teacss-ts | Waiting for the owner. teacss-ts measured about 18 ms, not 30, and only with both changes: dev CSS off lightningcss by default (which also changes how users' own CSS is processed in dev) and the font `url()`s moved out of the generated sheet. | teacss-ts `docs/plans/perf-iteration-loop.md` §6 |
+| T1 | teacss-ts | Merged (teacss-ts #933) and accepted in the unreleased lane below, short of its number: dev +10 at 20 000 x 300 went from 102.8 to 77.7 ms, against a target of 70. By default the dev server now keeps Vite's PostCSS transformer, and the generated sheet writes its font URLs as `URL(…)`, so Vite's fast path skips it. Most of what is left is the easing guard over the generated sheet, about 5 ms per save, which teacss-ts kept. | below |
 | T2 | teacss-ts | Not changed. The 20 ms window merges two invalidations 11 to 16 ms apart into one regeneration; at 0 ms dev +10 was slower (112 to 114 ms against 96 to 98). | teacss-ts #930 |
 | T3 | teacss-ts | Merged (teacss-ts #929) and accepted in the unreleased lane below. | below |
 | T4 | teacss-ts | Not merged. A lazy `consola` moved a fresh-process 1 000 x 3 import and build from 163.1 to 160.2 ms, within the noise and short of the 8 ms target. | teacss-ts #930, branch `perf/lazy-consola` |
-| R1, R2 | teacss-rs | Queued for the owner's go-ahead. | |
+| R1 | teacss-rs | Measured, not changed. 300 near-empty `updateModule` calls take 0.07 ms in total, so batching saves under 0.1 ms per build. The 27 ms is extraction itself (`extract_code`, mostly the scanner's masking passes), not the NAPI crossing. That would be a separate scanner card. | teacss-rs v06.1 实施记录 |
+| R2 | teacss-rs | Merged (teacss-rs #467) and accepted in the unreleased lane below: dev +10 at 20 000 x 300 went from 104.5 to 99.6 ms. | below |
+| F13.11 | teacss-rs | Merged (teacss-rs #468): a memo hit reuses the JavaScript strings it already handed over. teacss-rs measured `generate` on a memo hit going from 1.13 to 0.43 ms at 1 000 classes. No benchmark cell takes the memo path, so the lane below shows no effect. | below |
 
 ### T3 in the unreleased lane
 
@@ -43,6 +45,57 @@ These numbers are labelled unreleased and never enter an official report.
 | 1 000 x 3 | teacss-ts | 385.0 ms | 373.3 ms | -11.6 ms |
 
 The Vite baseline did not move (229.1 against 230.6 ms at 20 000 x 300). Every cell kept its hash: `f4ea28ce…` and `ee274f23…`, the same for both engines. T3's acceptance asked for at least 10 ms off the Vite build at 20 000 x 300 with the hashes unchanged, and it got 13.5 ms.
+
+### T1 in the unreleased lane
+
+This lane compares published TeaCSS 0.9.0 with teacss-ts master `9f76c490`, linked through `bun run bench:link link --ts`. That master holds T3 (#929) and T1 (#933); #932 only bumps dev dependencies. The method is the T3 lane's:
+
+- three alternations after two quiet minutes, Node 24.14.1;
+- each lane and cell got 30 fresh-process samples, in the dev tier (TeaCSS on both engines, and Tailwind as a control) and the build tier;
+- after the last linked round, `bench verify` passed on all five groups at 20 000 x 300;
+- the raw records are in [`unreleased-2026-10-24-t1/`](unreleased-2026-10-24-t1/).
+
+| Cell | Scenario | Subject | Published 0.9.0 | teacss-ts master | Change |
+| --- | --- | --- | --- | --- | --- |
+| 20 000 x 300 | dev +10 | teacss-rs | 102.8 ms (IQR 8.4) | 77.7 ms (IQR 5.2) | -25.1 ms, Cliff's delta 0.92 |
+| 20 000 x 300 | dev +100 | teacss-rs | 103.8 ms | 78.6 ms | -25.2 ms, Cliff's delta 0.95 |
+| 20 000 x 3 | dev +10 | teacss-rs | 94.7 ms | 70.9 ms | -23.8 ms, within the noise (published IQR 48.8) |
+| 20 000 x 300 | dev +10 | teacss-ts | 256.0 ms | 237.4 ms | -18.5 ms, within the noise |
+| 1 000 x 3 | dev +10 | teacss-rs | 33.8 ms | 30.0 ms | no measurable difference |
+| 20 000 x 300 | dev +10 | tailwind-v4 | 322.6 ms | 324.7 ms | no measurable difference |
+| 20 000 x 300 | build | teacss-rs | 509.2 ms (IQR 19.6) | 481.6 ms (IQR 5.4) | -27.6 ms, Cliff's delta 0.97 |
+| 20 000 x 300 | build | vite-baseline | 242.9 ms | 236.5 ms | no measurable difference |
+
+Each of the three linked rounds put teacss-rs's dev +10 between 77.6 and 78.2 ms. Each published round put it between 101.1 and 109.3 ms. Tailwind's control did not move, so the machine stayed steady between lanes.
+
+Two caveats on the build row:
+
+- The published lane's Vite baseline ran about 6 ms higher in two of its three rounds. Net of the baseline, the build gain is about 21 ms.
+- The gain includes T3's 13.5 ms, and this lane cannot separate T1 from T3.
+
+The build hashes did not change: `ee274f23…` and `f4ea28ce…`, the same for both engines. T1 met every acceptance check except the number. It reached 77.7 ms against the target of 70 or less; teacss-ts's own harness measured 76.
+
+### R2 and F13.11 in the unreleased lane
+
+This lane compares the published `@teacss/engine` 0.9.0 with teacss-rs master `b7794da8`, built in `packages/engine` and linked through `bun run bench:link link --rs`. That master holds R2 (#467) and F13.11 (#468). Every other TeaCSS package stays at its published 0.9.0. The method is the T1 lane's, with the engine tier added. The raw records are in [`unreleased-2026-10-24-rs/`](unreleased-2026-10-24-rs/).
+
+| Cell | Scenario | Subject | Published 0.9.0 | teacss-rs master | Change |
+| --- | --- | --- | --- | --- | --- |
+| 20 000 x 300 | dev +10 | teacss-rs | 104.5 ms (IQR 3.3) | 99.6 ms (IQR 4.4) | -4.9 ms, Cliff's delta 0.60 |
+| 20 000 x 3 | dev +10 | teacss-rs | 97.1 ms | 91.1 ms | -6.0 ms, Cliff's delta 0.83 |
+| 20 000 x 3 | dev +100 | teacss-rs | 99.8 ms | 94.2 ms | -5.6 ms, Cliff's delta 0.82 |
+| 20 000 x 300 | dev +100 | teacss-rs | 106.1 ms | 102.6 ms | -3.5 ms, within the noise |
+| 1 000 x 3 | dev +10 | teacss-rs | 34.0 ms | 33.3 ms | no measurable difference |
+| 20 000 x 300 | engine, warm | teacss-rs | 52.4 ms | 53.1 ms | no measurable difference |
+| 20 000 x 300 | engine, +10 | teacss-rs | 17.6 ms | 17.4 ms | no measurable difference |
+| 20 000 x 300 | build | teacss-rs | 509.4 ms | 507.6 ms | no measurable difference |
+| 20 000 x 300 | dev +10 | tailwind-v4 | 328.9 ms | 328.4 ms | no measurable difference |
+
+- **R2** saves 5 to 6 ms per dev save at 20 000 classes, against an acceptance of at least 3 ms. The engine tier does not move, because R2 changes the facade's dev path, not generation.
+- **F13.11** shows up in no cell. Every engine and dev cell regenerates after a change, and the memo hit it speeds up is not one of the measured scenarios.
+- **Output.** The CSS hashes match between the two lanes in all 60 subject, tier and cell combinations. Both engines produce the same CSS in all 28 linked pairs. `bench verify` passed on all five groups.
+
+The published lane in this run, and in the T1 lane, measured teacss-rs's 20 000 x 300 Vite build at 509 ms, against 492 ms in the third official report. The Vite baseline moved the same way (243 against 233 ms). The machine was about 4 % slower that day, so compare numbers only within a lane.
 
 ## Where the time goes
 
