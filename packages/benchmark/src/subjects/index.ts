@@ -1,6 +1,6 @@
 import { type ProcessResult, runProcess, type SubjectId } from "@bench/infrastructure";
 import { CONTRACT_VERSION, parseSubjectResponse, type SubjectRequest, type SubjectResponse, type SubjectTask } from "../contract/index.ts";
-import type { SubjectRegistry } from "./registry.ts";
+import type { SubjectRegistration, SubjectRegistry } from "./registry.ts";
 
 export { productionRegistry, type SubjectRegistration, type SubjectRegistry } from "./registry.ts";
 
@@ -11,6 +11,18 @@ export interface SubjectProcessDeps {
   readonly env: Readonly<Record<string, string>>;
   readonly timeoutMs: number;
   readonly nodeArgs?: readonly string[];
+  /** Node's compile cache directory for build and dev tasks (spec v01.1 revision 5). */
+  readonly compileCache?: string;
+}
+
+/**
+ * The `vite` and `rsbuild` CLIs turn on Node's compile cache before loading anything, so build
+ * and dev tasks of every Node subject get it. Bun has no such CLI and honours the variable itself,
+ * so Bun subjects, and engine and other tasks, run without one.
+ */
+export function subjectEnv(task: SubjectTask, runtime: SubjectRegistration["runtime"], env: Readonly<Record<string, string>>, compileCache: string | undefined): Record<string, string> {
+  const { NODE_COMPILE_CACHE: _cache, NODE_DISABLE_COMPILE_CACHE: _disabled, ...rest } = env;
+  return compileCache !== undefined && runtime === "node" && (task.kind === "build" || task.kind === "dev") ? { ...rest, NODE_COMPILE_CACHE: compileCache } : rest;
 }
 
 export class SubjectProcessError extends Error {
@@ -33,7 +45,15 @@ export async function invokeSubject(registry: SubjectRegistry, subject: SubjectI
   const registration = registry.get(subject);
   if (registration === undefined) throw new Error(`${subject}: not a registered subject (${[...registry.keys()].join(", ") || "none registered"})`);
   const request: SubjectRequest = { version: CONTRACT_VERSION, sentAt: Date.now(), subject, module: registration.module, task };
-  const process = await runProcess(deps.subjectEntry, { executable: registration.runtime === "bun" ? "bun" : undefined, nodeArgs: deps.nodeArgs ?? [], args: [], cwd: deps.cwd, env: { ...deps.env, ...registration.env }, stdin: JSON.stringify(request), timeoutMs: deps.timeoutMs });
+  const process = await runProcess(deps.subjectEntry, {
+    executable: registration.runtime === "bun" ? "bun" : undefined,
+    nodeArgs: deps.nodeArgs ?? [],
+    args: [],
+    cwd: deps.cwd,
+    env: { ...subjectEnv(task, registration.runtime, deps.env, deps.compileCache), ...registration.env },
+    stdin: JSON.stringify(request),
+    timeoutMs: deps.timeoutMs,
+  });
   if (process.signal !== null) throw new SubjectProcessError(subject, `killed by ${process.signal} after ${deps.timeoutMs} ms`, process);
   let parsed: unknown;
   try {
