@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { after, test } from "node:test";
 import { subjectId } from "@bench/infrastructure";
 import { createApp } from "../appshell/index.ts";
-import { invokeSubject, SubjectProcessError } from "./index.ts";
+import { invokeSubject, SubjectProcessError, subjectEnv } from "./index.ts";
 
 const dir = mkdtempSync(join(tmpdir(), "bench-subject-entry-"));
 const subjectEntry = join(dir, "subject.mjs");
@@ -28,6 +28,16 @@ const registry = new Map([[fake, { ...registration, module: fakeModule }]]);
 const env: Record<string, string> = {};
 for (const [key, value] of Object.entries(process.env)) if (value !== undefined) env[key] = value;
 const deps = { subjectEntry, cwd: process.cwd(), env, timeoutMs: 30_000 };
+
+test("build and dev tasks of Node subjects get the compile cache, Bun subjects and other tasks run without one", () => {
+  const shell = { PATH: "/bin", NODE_COMPILE_CACHE: "/elsewhere", NODE_DISABLE_COMPILE_CACHE: "1" };
+  const build = { kind: "build", modules: [], files: {}, includeCss: false } as const;
+  assert.deepEqual(subjectEnv(build, "node", shell, "/cache"), { PATH: "/bin", NODE_COMPILE_CACHE: "/cache" });
+  assert.deepEqual(subjectEnv(build, "bun", shell, "/cache"), { PATH: "/bin" });
+  assert.deepEqual(subjectEnv({ kind: "dev", size: 10, modules: [], files: {}, corpusClasses: [], extra: [] }, "node", shell, "/cache"), { PATH: "/bin", NODE_COMPILE_CACHE: "/cache" });
+  assert.deepEqual(subjectEnv({ kind: "engine", scenario: "cold", candidates: [], extra: [], includeCss: false }, "node", shell, "/cache"), { PATH: "/bin" });
+  assert.deepEqual(subjectEnv(build, "node", shell, undefined), { PATH: "/bin" });
+});
 
 test("a subject process answers describe, engine and build and reports no native module", async () => {
   const describe = await invokeSubject(registry, fake, { kind: "describe" }, deps);

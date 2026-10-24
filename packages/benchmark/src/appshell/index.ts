@@ -1,5 +1,6 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { version as nodeVersion } from "node:process";
 import { type Invocation, parseInvocation, type SubjectId, type SubjectVersions, subjectId } from "@bench/infrastructure";
@@ -51,8 +52,8 @@ const USAGE = `bench <command>
               --cross <ci.json>  add the same run from a second machine as a cross-check
 `;
 
-const SPEC_REVISION = 4;
-const SPEC_V02_REVISION = 4;
+const SPEC_REVISION = 5;
+const SPEC_V02_REVISION = 5;
 const SPEC_V03_REVISION = 2;
 /** Spec v01.1 §Run protocol: refuse above this share of the logical cores. */
 const LOAD_SHARE_LIMIT = 0.2;
@@ -115,7 +116,8 @@ function corpusOf(invocation: Invocation) {
 export async function createApp(deps: AppDeps): Promise<number> {
   const registry = deps.registry ?? productionRegistry();
   const invocation = parseInvocation(deps.argv);
-  const processDeps = { subjectEntry: deps.subjectEntry, cwd: deps.cwd, env: deps.env, timeoutMs: SUBJECT_TIMEOUT_MS };
+  const compileCache = join(tmpdir(), "bench-compile-cache");
+  const processDeps = { subjectEntry: deps.subjectEntry, cwd: deps.cwd, env: deps.env, timeoutMs: SUBJECT_TIMEOUT_MS, compileCache };
   const commands: Record<string, (invocation: Invocation) => Promise<number>> = {
     help: async () => {
       deps.stdout(USAGE);
@@ -181,6 +183,8 @@ export async function createApp(deps: AppDeps): Promise<number> {
     const community = typeof invocation.options.get("community") === "string" ? await communityPool(String(invocation.options.get("community"))) : undefined;
     const corpusFor = (cell: Cell): Corpus => (community === undefined ? generateCorpus({ seed, utilities: cell.utilities, files: cell.files }) : communityCorpus(community, cell.utilities, cell.files, seed));
     const plan = { seed, corpusFor, cells, tiers: tiersOf(invocation), subjects: chosen.map(([id, registration]) => ({ id, syntax: registration.syntax, tiers: registration.tiers, natives: registration.natives })), samplesPerCell: integerOption(invocation, "samples", 30) };
+    // Spec v01.1 revision 5: every run starts from an empty compile cache, which verification then fills.
+    rmSync(compileCache, { recursive: true, force: true });
     // Spec v01.1 §Equivalence: every distinct corpus is checked on every subject before anything is timed.
     // The corpus hash covers the classes, not how they are split into files, and the build tier sees the split.
     const corpora = new Map(cells.map((cell) => corpusFor(cell)).map((corpus) => [`${corpus.hash}:${corpus.parameters.files}`, corpus]));
