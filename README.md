@@ -144,10 +144,13 @@ report refuses records that ran a different spec revision or corpus:
 bun run bench:report results/<local>.json --cross <ci-record>.json --readme README.md
 ```
 
-To measure unreleased TeaCSS builds, link a built teacss-ts checkout first:
+To measure unreleased TeaCSS builds, link a built teacss-ts checkout, or a
+built teacss-rs engine (`npm run build && npm run build:ts` in its
+`packages/engine`) under the published TeaCSS packages. One link at a time:
 
 ```sh
 bun run bench:link link --ts ../teacss-ts   # bench:link status shows where each package resolves
+bun run bench:link link --rs ../teacss-rs   # every @teacss/engine the subjects reach, published packages otherwise
 bun run bench:link unlink
 ```
 
