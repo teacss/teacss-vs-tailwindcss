@@ -24,6 +24,8 @@ Both owners merge to master only; nothing is published while the owner is away. 
 | R2 | teacss-rs | Merged (teacss-rs #467) and accepted in the unreleased lane below: dev +10 at 20 000 x 300 went from 104.5 to 99.6 ms. | below |
 | F13.11 | teacss-rs | Merged (teacss-rs #468): a memo hit reuses the JavaScript strings it already handed over. teacss-rs measured `generate` on a memo hit going from 1.13 to 0.43 ms at 1 000 classes. No benchmark cell takes the memo path, so the lane below shows no effect. | below |
 
+TeaCSS 0.9.1 ships T1, T3, R2 and F13.11. Its official round, the [fourth official report](../reports/2026-10-24T04-01-33-mac.md), confirms the lanes below. At 20 000 x 300, teacss-rs's dev +10 went from 100.4 to 70.1 ms, the -25 ms of T1 plus the -5 ms of R2. That meets T1's target of 70 ms or less, which T1 alone missed. teacss-rs's Vite build went from 491.6 to 479.7 ms, and the build hashes did not change.
+
 ### T3 in the unreleased lane
 
 The unreleased lane compares published TeaCSS 0.9.0 with teacss-ts master `4797acce`, linked through `bun run bench:link`. Between the two, the only source change is #929 (`packages-engine/runtime/src/internal/bundled-assets.ts`); #928 is a dev-only lockfile bump. The method:
