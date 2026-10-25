@@ -139,3 +139,10 @@ test("a sample whose process loaded a forbidden native binary invalidates the ru
   const strict = { ...plan, tiers: ["build"] as const, subjects: [{ ...subjects[1]!, natives: { required: [], forbidden: ["teacss-engine"] } }] };
   await assert.rejects(measure(strict, { invoke: async (_subject, task) => ({ ...fakeMeasured(task), nativeModules: ["teacss-engine.darwin-arm64.node"] }), loadShare: () => 0, progress: () => {} }), (error: unknown) => error instanceof RunInvalid && /loaded teacss-engine/.test(error.message));
 });
+
+test("a cell whose load share exceeds the busy limit invalidates the run", async () => {
+  const shares = [0.1, 0.6];
+  await assert.rejects(measure({ ...plan, tiers: ["build"] }, { invoke: async (_subject, task) => fakeMeasured(task), loadShare: () => shares.shift() ?? 0.1, progress: () => {}, busyLimit: 0.5 }), (error: unknown) => error instanceof RunInvalid && /load reached 60%/.test(error.message));
+  const output = await measure({ ...plan, tiers: ["build"] }, { invoke: async (_subject, task) => fakeMeasured(task), loadShare: () => 0.6, progress: () => {} });
+  assert.ok(output.cells.length > 0);
+});

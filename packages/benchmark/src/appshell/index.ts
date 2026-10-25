@@ -52,11 +52,13 @@ const USAGE = `bench <command>
               --cross <ci.json>  add the same run from a second machine as a cross-check
 `;
 
-const SPEC_REVISION = 7;
+const SPEC_REVISION = 8;
 const SPEC_V02_REVISION = 6;
 const SPEC_V03_REVISION = 2;
 /** Spec v01.1 §Run protocol: refuse above this share of the logical cores. */
 const LOAD_SHARE_LIMIT = 0.2;
+/** Spec v01.1 revision 8: the share no cell may exceed during a run; every published run so far stayed at or below 42 %. */
+const RUN_LOAD_SHARE_LIMIT = 0.5;
 
 const SUBJECT_TIMEOUT_MS = 10 * 60_000;
 
@@ -220,6 +222,7 @@ export async function createApp(deps: AppDeps): Promise<number> {
       },
       loadShare,
       progress: (message) => deps.stdout(`  ${message}\n`),
+      busyLimit: allowBusy ? undefined : RUN_LOAD_SHARE_LIMIT,
     });
     const largest = plan.cells.reduce((best, cell) => (cell.utilities * cell.files >= best.utilities * best.files ? cell : best));
     const limiters = invocation.options.has("no-profile")
