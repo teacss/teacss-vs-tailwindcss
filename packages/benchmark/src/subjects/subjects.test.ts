@@ -29,14 +29,14 @@ const env: Record<string, string> = {};
 for (const [key, value] of Object.entries(process.env)) if (value !== undefined) env[key] = value;
 const deps = { subjectEntry, cwd: process.cwd(), env, timeoutMs: 30_000 };
 
-test("build and dev tasks of Node subjects get the compile cache, Bun subjects and other tasks run without one", () => {
-  const shell = { PATH: "/bin", NODE_COMPILE_CACHE: "/elsewhere", NODE_DISABLE_COMPILE_CACHE: "1" };
+test("build and dev tasks of Node subjects get the compile cache and the CLI's NODE_ENV, Bun subjects and other tasks get neither", () => {
+  const shell = { PATH: "/bin", NODE_COMPILE_CACHE: "/elsewhere", NODE_DISABLE_COMPILE_CACHE: "1", NODE_ENV: "test" };
   const build = { kind: "build", modules: [], files: {}, includeCss: false } as const;
-  assert.deepEqual(subjectEnv(build, "node", shell, "/cache"), { PATH: "/bin", NODE_COMPILE_CACHE: "/cache" });
+  assert.deepEqual(subjectEnv(build, "node", shell, "/cache"), { PATH: "/bin", NODE_ENV: "production", NODE_COMPILE_CACHE: "/cache" });
   assert.deepEqual(subjectEnv(build, "bun", shell, "/cache"), { PATH: "/bin" });
-  assert.deepEqual(subjectEnv({ kind: "dev", size: 10, modules: [], files: {}, corpusClasses: [], extra: [] }, "node", shell, "/cache"), { PATH: "/bin", NODE_COMPILE_CACHE: "/cache" });
+  assert.deepEqual(subjectEnv({ kind: "dev", size: 10, modules: [], files: {}, corpusClasses: [], extra: [] }, "node", shell, "/cache"), { PATH: "/bin", NODE_ENV: "development", NODE_COMPILE_CACHE: "/cache" });
   assert.deepEqual(subjectEnv({ kind: "engine", scenario: "cold", candidates: [], extra: [], includeCss: false }, "node", shell, "/cache"), { PATH: "/bin" });
-  assert.deepEqual(subjectEnv(build, "node", shell, undefined), { PATH: "/bin" });
+  assert.deepEqual(subjectEnv(build, "node", shell, undefined), { PATH: "/bin", NODE_ENV: "production" });
 });
 
 test("a subject process answers describe, engine and build and reports no native module", async () => {

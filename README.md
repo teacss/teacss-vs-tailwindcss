@@ -11,10 +11,12 @@ Five published runs; the latest (2026-10-25) measures TeaCSS 0.9.3 across
 Vite, PostCSS, Rsbuild and Bun. It is the first run under spec revision 5,
 which gives every Node build and dev the compile cache that the `vite` and
 `rsbuild` CLIs turn on, so its build and dev numbers are not comparable with
-the earlier runs. The CSS is byte-for-byte the same as 0.9.0. 0.9.3 makes the
-TypeScript engine's dev server about a third slower at 20,000 classes: 231 ms
-on 0.9.1 against 307 ms on 0.9.3, measured side by side
-([what changed in 0.9.2 and 0.9.3](docs/articles/teacss-0.9.3.md)). Two
+the earlier runs. The CSS is byte-for-byte the same as 0.9.0. An earlier
+version of this paragraph called a slower TypeScript-engine dev server a 0.9.3
+regression. It is a harness bias: before 0.9.3 the TypeScript engine's dev
+server ran in a mode `vite dev` users never get, so every earlier TypeScript
+dev number was too fast. Spec revision 6 fixes it, and this round is being
+rerun ([what changed in 0.9.2 and 0.9.3](docs/articles/teacss-0.9.3.md)). Two
 articles explain the 0.9.0 round in plain language:
 [the TypeScript engine against the Rust engine](docs/articles/teacss-0.9.0-ts-vs-rust.md)
 and [TeaCSS against Tailwind CSS v4](docs/articles/teacss-0.9.0-vs-tailwind-v4.md).

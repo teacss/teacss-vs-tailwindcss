@@ -16,13 +16,15 @@ export interface SubjectProcessDeps {
 }
 
 /**
- * The `vite` and `rsbuild` CLIs turn on Node's compile cache before loading anything, so build
- * and dev tasks of every Node subject get it. Bun has no such CLI and honours the variable itself,
- * so Bun subjects, and engine and other tasks, run without one.
+ * What the `vite` and `rsbuild` CLIs set before they load a config, so before any plugin is created:
+ * Node's compile cache (spec v01.1 revision 5) and `NODE_ENV`, `development` for a dev server and
+ * `production` for a build (revision 6). Bun has no such CLI and honours both variables itself, so
+ * Bun subjects, and engine and other tasks, run with neither.
  */
 export function subjectEnv(task: SubjectTask, runtime: SubjectRegistration["runtime"], env: Readonly<Record<string, string>>, compileCache: string | undefined): Record<string, string> {
-  const { NODE_COMPILE_CACHE: _cache, NODE_DISABLE_COMPILE_CACHE: _disabled, ...rest } = env;
-  return compileCache !== undefined && runtime === "node" && (task.kind === "build" || task.kind === "dev") ? { ...rest, NODE_COMPILE_CACHE: compileCache } : rest;
+  const { NODE_COMPILE_CACHE: _cache, NODE_DISABLE_COMPILE_CACHE: _disabled, NODE_ENV: _mode, ...rest } = env;
+  if (runtime !== "node" || (task.kind !== "build" && task.kind !== "dev")) return rest;
+  return { ...rest, NODE_ENV: task.kind === "dev" ? "development" : "production", ...(compileCache === undefined ? {} : { NODE_COMPILE_CACHE: compileCache }) };
 }
 
 export class SubjectProcessError extends Error {
