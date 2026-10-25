@@ -9,3 +9,4 @@
 | [unreleased-2026-10-24-t3](unreleased-2026-10-24-t3/) | T3 未发布通道的六份原始记录：发布版 0.9.0 与 teacss-ts master `4797acce` 交替各三次。 |
 | [unreleased-2026-10-24-t1](unreleased-2026-10-24-t1/) | T1 未发布通道的十二份原始记录：发布版 0.9.0 与 teacss-ts master `9f76c490` 交替各三次，dev 与 build 两层。 |
 | [unreleased-2026-10-24-rs](unreleased-2026-10-24-rs/) | R2 与 F13.11 未发布通道的十八份原始记录：发布版 `@teacss/engine` 0.9.0 与 teacss-rs master `b7794da8` 交替各三次，engine、dev 与 build 三层。 |
+| [unreleased-2026-10-24-p14](unreleased-2026-10-24-p14/) | P14 未发布通道的十二份原始记录（协议修订 5）：发布版 `@teacss/engine` 0.9.1 与 teacss-rs master `1f47de97` 交替各三次，dev 与 Vite、Rsbuild 构建两层；无可测差异。 |

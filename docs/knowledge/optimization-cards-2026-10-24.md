@@ -23,8 +23,23 @@ Both owners merge to master only; nothing is published while the owner is away. 
 | R1 | teacss-rs | Measured, not changed. 300 near-empty `updateModule` calls take 0.07 ms in total, so batching saves under 0.1 ms per build. The 27 ms is extraction itself (`extract_code`, mostly the scanner's masking passes), not the NAPI crossing. That would be a separate scanner card. | teacss-rs v06.1 实施记录 |
 | R2 | teacss-rs | Merged (teacss-rs #467) and accepted in the unreleased lane below: dev +10 at 20 000 x 300 went from 104.5 to 99.6 ms. | below |
 | F13.11 | teacss-rs | Merged (teacss-rs #468): a memo hit reuses the JavaScript strings it already handed over. teacss-rs measured `generate` on a memo hit going from 1.13 to 0.43 ms at 1 000 classes. No benchmark cell takes the memo path, so the lane below shows no effect. | below |
+| P14 | teacss-rs | Merged (teacss-rs #476 to #479), not published. Faster extraction and safelist scanning. teacss-rs measured the facade's extraction going from 15.1 to 11.4 ms at 300 modules. The lane below finds no measurable effect on any end-to-end dev or build cell. | below |
+| B5, B6 | teacss-ts | Shipped in 0.9.2 (B5, the compile cache from inside the plugins) and 0.9.3 (B6, a lazily loaded `@teacss/vite` entry). The `vite`, `rsbuild` and `astro` CLIs already enable the cache, so spec revision 5 gives it to every Node subject and neither change can show in this benchmark. B6 slowed the TypeScript engine's dev rounds: see the [fifth official report's audit](../reports/2026-10-25T07-25-49-mac.audit.md). | |
 
 TeaCSS 0.9.1 ships T1, T3, R2 and F13.11. Its official round, the [fourth official report](../reports/2026-10-24T04-01-33-mac.md), confirms the lanes below. At 20 000 x 300, teacss-rs's dev +10 went from 100.4 to 70.1 ms, the -25 ms of T1 plus the -5 ms of R2. That meets T1's target of 70 ms or less, which T1 alone missed. teacss-rs's Vite build went from 491.6 to 479.7 ms, and the build hashes did not change.
+
+### P14 in the unreleased lane
+
+This lane ran under spec revision 5. It compares the published `@teacss/engine` 0.9.1 with teacss-rs master `1f47de97`, linked through `bun run bench:link link --rs`. The method is the lanes' usual one, in the dev tier and in the Vite and Rsbuild build tiers. The raw records are in [`unreleased-2026-10-24-p14/`](unreleased-2026-10-24-p14/).
+
+| Cell | Scenario | Subject | Published | teacss-rs master | Change |
+| --- | --- | --- | --- | --- | --- |
+| 20 000 x 300 | Vite build | teacss-rs | 410.2 ms (IQR 10.1) | 405.8 ms (IQR 8.9) | -4.4 ms, within the noise |
+| 20 000 x 3 | Vite build | teacss-rs | 354.2 ms | 347.4 ms | -6.7 ms, within the noise |
+| 20 000 x 300 | Rsbuild build | teacss-rs | 470.4 ms | 470.8 ms | no measurable difference |
+| 20 000 x 300 | dev +10 | teacss-rs | 72.1 ms | 71.3 ms | no measurable difference |
+
+teacss-rs expected 3 to 4 ms off a 20 000 x 300 build, which is below what these cells can resolve. The hashes did not change, and `bench verify` passed on all five groups.
 
 ### T3 in the unreleased lane
 
