@@ -3,11 +3,7 @@ import { createRequire } from "node:module";
 import { dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { type CoverageResult, type DevServer, describePackages, nativeArtifact, type ResolvedPackage, resolvePackage, type SubjectClient, subjectId, type Workspace } from "@bench/infrastructure";
-import { createGenerator } from "@teacss/core";
-import { pluginTeacss as pluginTeacssPostcss } from "@teacss/postcss";
-import presetStandard from "@teacss/preset-standard";
-import { pluginTeacss } from "@teacss/vite";
-import { build, createServer, type InlineConfig, type PluginOption } from "vite";
+import type { InlineConfig, PluginOption } from "vite";
 
 const require = createRequire(import.meta.url);
 const PACKAGES = ["@teacss/core", "@teacss/preset-standard", "@teacss/vite", "vite"];
@@ -29,6 +25,7 @@ async function viteBuild(workspace: Workspace, setup: Pick<InlineConfig, "plugin
   const previous = process.cwd();
   process.chdir(workspace.dir);
   try {
+    const { build } = await import("vite");
     await build({ root: workspace.dir, configFile: false, logLevel: "silent", ...setup });
   } finally {
     process.chdir(previous);
@@ -42,6 +39,7 @@ async function viteBuild(workspace: Workspace, setup: Pick<InlineConfig, "plugin
 
 async function startDevServer(workspace: Workspace, plugins: PluginOption[]): Promise<DevServer> {
   process.chdir(workspace.dir);
+  const { createServer } = await import("vite");
   const server = await createServer({ root: workspace.dir, configFile: false, logLevel: "silent", plugins, server: { port: 0, host: "127.0.0.1" } });
   await server.listen();
   const origin = server.resolvedUrls?.local[0]?.replace(/\/$/, "");
@@ -87,7 +85,11 @@ export type TeacssVariant = "production" | "default" | "postcss";
  * registration sets `TEACSS_ENGINE`.
  */
 export function teacssSubject(engine: "ts" | "rust", variant: TeacssVariant = "production"): SubjectClient {
-  const viteSetup = (): Pick<InlineConfig, "plugins" | "css"> => ({ plugins: [pluginTeacss(undefined, { engine })] });
+  const viteSetup = async (): Promise<Pick<InlineConfig, "plugins" | "css">> => ({ plugins: [(await import("@teacss/vite")).pluginTeacss(undefined, { engine })] });
+  const generator = async () => {
+    const [{ createGenerator }, { default: presetStandard }] = await Promise.all([import("@teacss/core"), import("@teacss/preset-standard")]);
+    return createGenerator({ presets: [presetStandard()], engine });
+  };
   return {
     id: subjectId(`${engine === "ts" ? "teacss-ts" : "teacss-rs"}${variant === "production" ? "" : `-${variant}`}`),
     describe: async () => {
@@ -97,13 +99,12 @@ export function teacssSubject(engine: "ts" | "rust", variant: TeacssVariant = "p
       return { ...describePackages(packages), ...(native === undefined ? {} : { native }) };
     },
     engine: async ({ candidates }) => {
-      const generator = await createGenerator({ presets: [presetStandard()], engine });
-      const { css } = await generator.generate(new Set(candidates), { preflights: false, minify: true });
+      const { css } = await (await generator()).generate(new Set(candidates), { preflights: false, minify: true });
       return { css };
     },
     engineSession: async () => {
-      const generator = await createGenerator({ presets: [presetStandard()], engine });
-      return { generate: async (candidates) => ({ css: (await generator.generate(new Set(candidates), { preflights: false, minify: true })).css }) };
+      const session = await generator();
+      return { generate: async (candidates) => ({ css: (await session.generate(new Set(candidates), { preflights: false, minify: true })).css }) };
     },
     prepare: async (workspace, project) => {
       for (const [path, content] of project.files) workspace.write(path, project.modules.includes(path) ? `${INCLUDE}${content}` : content);
@@ -112,10 +113,10 @@ export function teacssSubject(engine: "ts" | "rust", variant: TeacssVariant = "p
       const stylesheet = variant === "postcss" ? "../index.css" : "virtual:teacss.css";
       workspace.write("src/main.js", `${INCLUDE}${project.modules.map((module) => `import "./${module.replace(/^src\//, "")}";`).join("\n")}\nimport "${stylesheet}";\n`);
     },
-    build: async (workspace) => ({ css: await viteBuild(workspace, variant === "postcss" ? { css: { postcss: { plugins: [pluginTeacssPostcss({ cwd: workspace.dir })] } } } : viteSetup()) }),
+    build: async (workspace) => ({ css: await viteBuild(workspace, variant === "postcss" ? { css: { postcss: { plugins: [(await import("@teacss/postcss")).pluginTeacss({ cwd: workspace.dir })] } } } : await viteSetup()) }),
     devServer: async (workspace) => {
       if (variant === "postcss") throw new Error("the PostCSS round has no dev tier");
-      return startDevServer(workspace, viteSetup().plugins ?? []);
+      return startDevServer(workspace, (await viteSetup()).plugins ?? []);
     },
     moduleHeader: INCLUDE,
     extract: async () => [],
