@@ -252,11 +252,14 @@ export interface NativeExpectation {
   readonly required: readonly string[];
   /** Prefixes it must not have loaded. */
   readonly forbidden: readonly string[];
+  /** Prefixes a build or dev process must also have loaded, such as a scanner the engine tier never calls. */
+  readonly requiredToBuild?: readonly string[];
 }
 
-export function checkNativeModules(loaded: readonly string[], expectation: NativeExpectation): string[] {
+export function checkNativeModules(loaded: readonly string[], expectation: NativeExpectation, tier: Tier): string[] {
   const problems: string[] = [];
-  for (const prefix of expectation.required) if (!loaded.some((name) => name.startsWith(prefix))) problems.push(`did not load ${prefix}`);
+  const required = tier === "engine" ? expectation.required : [...expectation.required, ...(expectation.requiredToBuild ?? [])];
+  for (const prefix of required) if (!loaded.some((name) => name.startsWith(prefix))) problems.push(`did not load ${prefix}`);
   for (const prefix of expectation.forbidden) if (loaded.some((name) => name.startsWith(prefix))) problems.push(`loaded ${prefix}`);
   return problems;
 }

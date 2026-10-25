@@ -56,7 +56,7 @@ export async function verifyCorpus(corpus: Corpus, subjects: readonly VerifySubj
       const task: SubjectTask = tier === "engine" ? { kind: "engine", scenario: "cold", candidates: candidates(corpus, subject.syntax), extra: [], includeCss: true } : { kind: "build", modules: project.modules, files: Object.fromEntries(project.files), includeCss: true };
       const output = await invoke(subject.id, task);
       hashes.set(`${subject.id}/${tier}`, output.cssSha256);
-      for (const problem of checkNativeModules(output.nativeModules, subject.natives)) findings.push({ subject: subject.id, tier, check: "native", detail: problem });
+      for (const problem of checkNativeModules(output.nativeModules, subject.natives, tier)) findings.push({ subject: subject.id, tier, check: "native", detail: problem });
       if (output.css === undefined) {
         findings.push({ subject: subject.id, tier, check: "structure", detail: "the response carried no css" });
         continue;

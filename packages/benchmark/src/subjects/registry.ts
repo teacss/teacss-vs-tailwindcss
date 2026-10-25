@@ -25,7 +25,7 @@ export type SubjectRegistry = ReadonlyMap<SubjectId, SubjectRegistration>;
 
 const TEACSS_TS = { required: [], forbidden: ["teacss-engine", "tailwindcss-oxide"] };
 const TEACSS_RS = { required: ["teacss-engine"], forbidden: ["tailwindcss-oxide"] };
-const TAILWIND = { required: ["tailwindcss-oxide"], forbidden: ["teacss-engine"] };
+const TAILWIND = { required: [], requiredToBuild: ["tailwindcss-oxide"], forbidden: ["teacss-engine"] };
 const STRICT = { TEACSS_ENGINE_STRICT: "1" };
 const RSPACK = "rspack";
 
@@ -49,7 +49,7 @@ export function productionRegistry(): SubjectRegistry {
     [subjectId("rsbuild-baseline"), entry("@bench/subject-rsbuild-baseline", "tailwind", ["build"], "rsbuild", { required: [RSPACK], forbidden: ["teacss-engine", "tailwindcss-oxide"] })],
     [subjectId("teacss-ts-rsbuild"), entry("@bench/subject-teacss/ts-rsbuild", "teacss", ["build"], "rsbuild", { ...TEACSS_TS, required: [RSPACK] }, { ...STRICT, TEACSS_ENGINE: "ts" })],
     [subjectId("teacss-rs-rsbuild"), entry("@bench/subject-teacss/rs-rsbuild", "teacss", ["build"], "rsbuild", { ...TEACSS_RS, required: [...TEACSS_RS.required, RSPACK] }, { ...STRICT, TEACSS_ENGINE: "rust" })],
-    [subjectId("tailwind-v4-rsbuild"), entry("@bench/subject-tailwind-v4/rsbuild", "tailwind", ["build"], "rsbuild", { ...TAILWIND, required: [...TAILWIND.required, RSPACK] })],
+    [subjectId("tailwind-v4-rsbuild"), entry("@bench/subject-tailwind-v4/rsbuild", "tailwind", ["build"], "rsbuild", { ...TAILWIND, required: [RSPACK] })],
     [subjectId("bun-baseline"), entry("@bench/subject-bun-baseline", "tailwind", ["build"], "bun", { required: [], forbidden: ["teacss-engine", "tailwindcss-oxide"] }, {}, "bun")],
     [subjectId("teacss-ts-bun"), entry("@bench/subject-teacss/ts-bun", "teacss", ["build"], "bun", TEACSS_TS, { ...STRICT, TEACSS_ENGINE: "ts" }, "bun")],
     [subjectId("teacss-rs-bun"), entry("@bench/subject-teacss/rs-bun", "teacss", ["build"], "bun", TEACSS_RS, { ...STRICT, TEACSS_ENGINE: "rust" }, "bun")],

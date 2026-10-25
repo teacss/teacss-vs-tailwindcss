@@ -66,8 +66,10 @@ test("a missing selector, a missing property and a wrong condition are each name
 });
 
 test("native module expectations name what was missing or forbidden", () => {
-  assert.deepEqual(checkNativeModules(["teacss-engine.darwin-arm64.node", "fsevents.node"], { required: ["teacss-engine"], forbidden: ["tailwindcss-oxide"] }), []);
-  assert.deepEqual(checkNativeModules(["fsevents.node"], { required: ["teacss-engine"], forbidden: ["fsevents"] }), ["did not load teacss-engine", "loaded fsevents"]);
+  assert.deepEqual(checkNativeModules(["teacss-engine.darwin-arm64.node", "fsevents.node"], { required: ["teacss-engine"], forbidden: ["tailwindcss-oxide"] }, "engine"), []);
+  assert.deepEqual(checkNativeModules(["fsevents.node"], { required: ["teacss-engine"], forbidden: ["fsevents"] }, "build"), ["did not load teacss-engine", "loaded fsevents"]);
+  assert.deepEqual(checkNativeModules(["lightningcss.node"], { required: [], requiredToBuild: ["tailwindcss-oxide"], forbidden: [] }, "engine"), []);
+  assert.deepEqual(checkNativeModules(["lightningcss.node"], { required: [], requiredToBuild: ["tailwindcss-oxide"], forbidden: [] }, "dev"), ["did not load tailwindcss-oxide"]);
 });
 
 test("countOutput counts style rules and their declarations, inside at-rules too", () => {

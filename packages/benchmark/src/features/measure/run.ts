@@ -179,7 +179,7 @@ export async function measure(plan: RunPlan, deps: MeasureDeps): Promise<Measure
         deps.progress(`${id} round ${round} (${have}/${plan.samplesPerCell})`);
         const measured = await deps.invoke(job.subject.id, taskFor(job, corpus));
         if (measured.result.kind === "error") throw new RunInvalid(`${id}: ${measured.result.message}`);
-        const nativeProblems = checkNativeModules(measured.nativeModules, job.subject.natives);
+        const nativeProblems = checkNativeModules(measured.nativeModules, job.subject.natives, job.tier);
         if (nativeProblems.length > 0) throw new RunInvalid(`${id}: ${nativeProblems.join("; ")}`);
         for (const sample of toSamples(job, cell, have, measured)) {
           const hashId = hashKey(id, job, sample);
