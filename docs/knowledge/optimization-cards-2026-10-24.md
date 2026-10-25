@@ -25,8 +25,25 @@ Both owners merge to master only; nothing is published while the owner is away. 
 | F13.11 | teacss-rs | Merged (teacss-rs #468): a memo hit reuses the JavaScript strings it already handed over. teacss-rs measured `generate` on a memo hit going from 1.13 to 0.43 ms at 1 000 classes. No benchmark cell takes the memo path, so the lane below shows no effect. | below |
 | P14 | teacss-rs | Merged (teacss-rs #476 to #479), not published. Faster extraction and safelist scanning. teacss-rs measured the facade's extraction going from 15.1 to 11.4 ms at 300 modules. The lane below finds no measurable effect on any end-to-end dev or build cell. | below |
 | B5, B6 | teacss-ts | Shipped in 0.9.2 (B5, the compile cache from inside the plugins) and 0.9.3 (B6, a lazily loaded `@teacss/vite` entry). The `vite`, `rsbuild` and `astro` CLIs already enable the cache, so spec revision 5 gives it to every Node subject and neither change can show in this benchmark. B6 also exposed a harness bias: `@teacss/vite` up to 0.9.2 read `NODE_ENV` when the harness created it, before Vite set it, so the TypeScript engine's dev rounds ran in TeaCSS's build mode. Spec revision 6 sets `NODE_ENV` as the CLIs do; see the correction in the [fifth official report's audit](../reports/2026-10-25T07-25-49-mac.audit.md). | |
+| B7 | teacss-ts | Merged (teacss-ts #953), not published. In dev mode each generate cloned every matched rule and variant again for the preflight payload; it now clones each source rule, shortcut and variant once per payload. Accepted in the lane below: the TypeScript engine's dev +10 at 20 000 x 300 went from 295.3 to 262.6 ms. | below |
 
 TeaCSS 0.9.1 ships T1, T3, R2 and F13.11. Its official round, the [fourth official report](../reports/2026-10-24T04-01-33-mac.md), confirms the lanes below. At 20 000 x 300, teacss-rs's dev +10 went from 100.4 to 70.1 ms, the -25 ms of T1 plus the -5 ms of R2. That meets T1's target of 70 ms or less, which T1 alone missed. teacss-rs's Vite build went from 491.6 to 479.7 ms, and the build hashes did not change.
+
+### B7 in the unreleased lane
+
+This lane ran under spec revision 6. It compares published TeaCSS 0.9.3 with teacss-ts master `71410d6d`, linked through `bun run bench:link link --ts`, in the dev and Vite build tiers. The raw records are in [`unreleased-2026-10-25-ctx/`](unreleased-2026-10-25-ctx/).
+
+| Cell | Scenario | Subject | Published 0.9.3 | teacss-ts master | Change |
+| --- | --- | --- | --- | --- | --- |
+| 20 000 x 300 | dev +10 | teacss-ts | 295.3 ms (IQR 15.4) | 262.6 ms (IQR 31.2) | -32.6 ms, Cliff's delta 0.72 |
+| 20 000 x 300 | dev +100 | teacss-ts | 305.7 ms | 271.9 ms | -33.8 ms, Cliff's delta 0.85 |
+| 20 000 x 3 | dev +100 | teacss-ts | 298.6 ms | 264.1 ms | -34.5 ms, Cliff's delta 0.88 |
+| 1 000 x 3 | dev +10 | teacss-ts | 52.5 ms | 50.1 ms | no measurable difference |
+| 20 000 x 300 | dev +10 | teacss-rs | 70.5 ms | 71.1 ms | no measurable difference |
+| 20 000 x 300 | Vite build | teacss-ts | 996.3 ms | 1 000.4 ms | no measurable difference |
+| 20 000 x 300 | dev +10 | tailwind-v4 | 325.0 ms | 324.6 ms | no measurable difference |
+
+The change only touches the TypeScript engine's dev mode, and only that moved. The build hashes did not change, and `bench verify` passed on all five groups.
 
 ### P14 in the unreleased lane
 
