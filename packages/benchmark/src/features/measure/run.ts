@@ -38,6 +38,8 @@ export interface MeasureDeps {
   readonly invoke: MeasureInvoke;
   readonly loadShare: () => number;
   readonly progress: (message: string) => void;
+  /** A load share above this at either end of a cell invalidates the run (spec v01.1 revision 8); none for `--allow-busy`. */
+  readonly busyLimit?: number | undefined;
 }
 
 export interface MeasureOutput {
@@ -191,7 +193,10 @@ export async function measure(plan: RunPlan, deps: MeasureDeps): Promise<Measure
         collected.set(id, have + job.samples);
       }
     }
-    cells.push({ cell, corpusHash: corpus.hash, loadShareBefore, loadShareAfter: deps.loadShare() });
+    const loadShareAfter = deps.loadShare();
+    const busiest = Math.max(loadShareBefore, loadShareAfter);
+    if (deps.busyLimit !== undefined && busiest > deps.busyLimit) throw new RunInvalid(`${cell.utilities}x${cell.files}: the one-minute load reached ${(busiest * 100).toFixed(0)}% of the cores during the run (limit ${(deps.busyLimit * 100).toFixed(0)}%)`);
+    cells.push({ cell, corpusHash: corpus.hash, loadShareBefore, loadShareAfter });
   }
   return { cells, samples };
 }
