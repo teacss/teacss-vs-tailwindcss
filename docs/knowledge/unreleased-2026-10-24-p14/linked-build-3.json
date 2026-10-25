@@ -1,0 +1,5516 @@
+{
+  "version": 1,
+  "specRevision": 5,
+  "v02Revision": 5,
+  "v03Revision": 2,
+  "registrations": {
+    "vite-baseline": {
+      "group": "main",
+      "runtime": "node"
+    },
+    "teacss-ts": {
+      "group": "main",
+      "runtime": "node"
+    },
+    "teacss-rs": {
+      "group": "main",
+      "runtime": "node"
+    },
+    "tailwind-v4": {
+      "group": "main",
+      "runtime": "node"
+    },
+    "rsbuild-baseline": {
+      "group": "rsbuild",
+      "runtime": "node"
+    },
+    "teacss-rs-rsbuild": {
+      "group": "rsbuild",
+      "runtime": "node"
+    },
+    "tailwind-v4-rsbuild": {
+      "group": "rsbuild",
+      "runtime": "node"
+    }
+  },
+  "verification": {
+    "cells": 4,
+    "cases": 42000,
+    "checks": 28
+  },
+  "pairTableVersion": 1,
+  "startedAt": "2026-10-24T12:42:38.024Z",
+  "finishedAt": "2026-10-24T12:44:55.914Z",
+  "seed": 20261021,
+  "samplesPerCell": 10,
+  "allowBusy": true,
+  "environment": {
+    "host": "mac",
+    "cpu": "Apple M2 Max",
+    "cores": 12,
+    "memoryBytes": 68719476736,
+    "os": "darwin 27.0.0",
+    "node": "v24.14.1",
+    "bun": "1.4.3",
+    "lockfileSha256": "044cb39dd1c90f3be41fdc60c36526a478dfe1ed55f018fe02f54df36cbe2896",
+    "commit": "a7b9000cfbf423f8e2102e56cf3d566cb8318f1f"
+  },
+  "subjects": {
+    "vite-baseline": {
+      "packages": {
+        "vite": "8.3.4"
+      },
+      "local": {}
+    },
+    "teacss-ts": {
+      "packages": {
+        "@teacss/core": "0.9.1",
+        "@teacss/preset-standard": "0.9.1",
+        "@teacss/vite": "0.9.1",
+        "vite": "8.3.4",
+        "@teacss/engine": "0.9.1"
+      },
+      "local": {
+        "@teacss/engine": "/Users/billgo/Codehub/teacss/teacss-rs/packages/engine"
+      }
+    },
+    "teacss-rs": {
+      "packages": {
+        "@teacss/core": "0.9.1",
+        "@teacss/preset-standard": "0.9.1",
+        "@teacss/vite": "0.9.1",
+        "vite": "8.3.4",
+        "@teacss/engine": "0.9.1"
+      },
+      "local": {
+        "@teacss/engine": "/Users/billgo/Codehub/teacss/teacss-rs/packages/engine"
+      },
+      "native": {
+        "package": "@teacss/engine-darwin-arm64",
+        "file": "teacss-engine.darwin-arm64.node",
+        "path": "/Users/billgo/Codehub/teacss/teacss-rs/packages/engine/node_modules/@teacss/engine-darwin-arm64/teacss-engine.darwin-arm64.node",
+        "bytes": 8772112,
+        "platformPackages": 8
+      }
+    },
+    "tailwind-v4": {
+      "packages": {
+        "tailwindcss": "4.3.3",
+        "@tailwindcss/vite": "4.3.3",
+        "@tailwindcss/node": "4.3.3",
+        "@tailwindcss/oxide": "4.3.3",
+        "vite": "8.3.4"
+      },
+      "local": {},
+      "native": {
+        "package": "@tailwindcss/oxide-darwin-arm64",
+        "file": "tailwindcss-oxide.darwin-arm64.node",
+        "path": "/Users/billgo/Codehub/teacss/teacss-vs-tailwindcss/node_modules/.bun/@tailwindcss+oxide-darwin-arm64@4.3.3/node_modules/@tailwindcss/oxide-darwin-arm64/tailwindcss-oxide.darwin-arm64.node",
+        "bytes": 2926752,
+        "platformPackages": 12
+      }
+    },
+    "rsbuild-baseline": {
+      "packages": {
+        "@rsbuild/core": "2.2.14"
+      },
+      "local": {}
+    },
+    "teacss-rs-rsbuild": {
+      "packages": {
+        "@teacss/rsbuild": "0.9.1",
+        "@teacss/core": "0.9.1",
+        "@teacss/preset-standard": "0.9.1",
+        "@rsbuild/core": "2.2.14",
+        "@teacss/engine": "0.9.1"
+      },
+      "local": {
+        "@teacss/engine": "/Users/billgo/Codehub/teacss/teacss-rs/packages/engine"
+      },
+      "native": {
+        "package": "@teacss/engine-darwin-arm64",
+        "file": "teacss-engine.darwin-arm64.node",
+        "path": "/Users/billgo/Codehub/teacss/teacss-rs/packages/engine/node_modules/@teacss/engine-darwin-arm64/teacss-engine.darwin-arm64.node",
+        "bytes": 8772112,
+        "platformPackages": 8
+      }
+    },
+    "tailwind-v4-rsbuild": {
+      "packages": {
+        "tailwindcss": "4.3.3",
+        "@rsbuild/plugin-tailwindcss": "2.0.3",
+        "@tailwindcss/oxide": "4.3.3",
+        "@rsbuild/core": "2.2.14"
+      },
+      "local": {},
+      "native": {
+        "package": "@tailwindcss/oxide-darwin-arm64",
+        "file": "tailwindcss-oxide.darwin-arm64.node",
+        "path": "/Users/billgo/Codehub/teacss/teacss-vs-tailwindcss/node_modules/.bun/@tailwindcss+oxide-darwin-arm64@4.3.3/node_modules/@tailwindcss/oxide-darwin-arm64/tailwindcss-oxide.darwin-arm64.node",
+        "bytes": 2926752,
+        "platformPackages": 12
+      }
+    }
+  },
+  "cells": [
+    {
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "corpusHash": "6be7686299fe383c2474b18c7d5b5542acdb63d006154be9e2358e77b2f2e69d",
+      "loadShareBefore": 0.1800537109375,
+      "loadShareAfter": 0.18929036458333334
+    },
+    {
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "corpusHash": "6be7686299fe383c2474b18c7d5b5542acdb63d006154be9e2358e77b2f2e69d",
+      "loadShareBefore": 0.18929036458333334,
+      "loadShareAfter": 0.1951904296875
+    },
+    {
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "corpusHash": "23e93eba9abba9d044808909dfd9e484e5b3a1ef3787154466030b9a5e554e6c",
+      "loadShareBefore": 0.1951904296875,
+      "loadShareAfter": 0.20625813802083334
+    },
+    {
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "corpusHash": "23e93eba9abba9d044808909dfd9e484e5b3a1ef3787154466030b9a5e554e6c",
+      "loadShareBefore": 0.20625813802083334,
+      "loadShareAfter": 0.24141438802083334
+    }
+  ],
+  "samples": [
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 0,
+      "wallMs": 246.91574999999997,
+      "cpuUserMs": 312.722,
+      "cpuSystemMs": 68.068,
+      "maxRssBytes": 203079680,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 0,
+      "wallMs": 253.181083,
+      "cpuUserMs": 344.976,
+      "cpuSystemMs": 66.582,
+      "maxRssBytes": 224657408,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 0,
+      "wallMs": 308.381958,
+      "cpuUserMs": 443.964,
+      "cpuSystemMs": 60.511,
+      "maxRssBytes": 230277120,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 0,
+      "wallMs": 239.419083,
+      "cpuUserMs": 296.273,
+      "cpuSystemMs": 65.522,
+      "maxRssBytes": 189726720,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 0,
+      "wallMs": 228.42754100000002,
+      "cpuUserMs": 268.887,
+      "cpuSystemMs": 64.3,
+      "maxRssBytes": 175816704,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 0,
+      "wallMs": 151.17654100000001,
+      "cpuUserMs": 158.756,
+      "cpuSystemMs": 45.027,
+      "maxRssBytes": 126730240,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 0,
+      "wallMs": 123.40358300000001,
+      "cpuUserMs": 118.644,
+      "cpuSystemMs": 41.133,
+      "maxRssBytes": 124076032,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 1,
+      "wallMs": 122.92899999999999,
+      "cpuUserMs": 118.004,
+      "cpuSystemMs": 41.195,
+      "maxRssBytes": 124076032,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 1,
+      "wallMs": 237.559083,
+      "cpuUserMs": 292.138,
+      "cpuSystemMs": 66.376,
+      "maxRssBytes": 192987136,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 1,
+      "wallMs": 143.034793,
+      "cpuUserMs": 151.388,
+      "cpuSystemMs": 46.737,
+      "maxRssBytes": 121307136,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 1,
+      "wallMs": 241.23904199999998,
+      "cpuUserMs": 314.012,
+      "cpuSystemMs": 66.7,
+      "maxRssBytes": 198672384,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 1,
+      "wallMs": 259.529626,
+      "cpuUserMs": 347.513,
+      "cpuSystemMs": 70.95,
+      "maxRssBytes": 224083968,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 1,
+      "wallMs": 320.043916,
+      "cpuUserMs": 450.029,
+      "cpuSystemMs": 73.216,
+      "maxRssBytes": 229867520,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 1,
+      "wallMs": 232.21641599999998,
+      "cpuUserMs": 267.187,
+      "cpuSystemMs": 65.799,
+      "maxRssBytes": 181878784,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 2,
+      "wallMs": 123.353375,
+      "cpuUserMs": 120.416,
+      "cpuSystemMs": 41,
+      "maxRssBytes": 123682816,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 2,
+      "wallMs": 257.38966600000003,
+      "cpuUserMs": 356.286,
+      "cpuSystemMs": 70.055,
+      "maxRssBytes": 209436672,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 2,
+      "wallMs": 151.64300100000003,
+      "cpuUserMs": 158.892,
+      "cpuSystemMs": 45.841,
+      "maxRssBytes": 126271488,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 2,
+      "wallMs": 241.30395900000002,
+      "cpuUserMs": 315.828,
+      "cpuSystemMs": 67.59,
+      "maxRssBytes": 199131136,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 2,
+      "wallMs": 235.75508299999998,
+      "cpuUserMs": 306.235,
+      "cpuSystemMs": 65.406,
+      "maxRssBytes": 183451648,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 2,
+      "wallMs": 232.1765,
+      "cpuUserMs": 267.111,
+      "cpuSystemMs": 64.482,
+      "maxRssBytes": 181272576,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 2,
+      "wallMs": 313.260126,
+      "cpuUserMs": 441.446,
+      "cpuSystemMs": 66.36,
+      "maxRssBytes": 232456192,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 3,
+      "wallMs": 311.363,
+      "cpuUserMs": 442.346,
+      "cpuSystemMs": 68.242,
+      "maxRssBytes": 230686720,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 3,
+      "wallMs": 147.246958,
+      "cpuUserMs": 152.185,
+      "cpuSystemMs": 46.011,
+      "maxRssBytes": 123322368,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 3,
+      "wallMs": 126.16291700000001,
+      "cpuUserMs": 119.282,
+      "cpuSystemMs": 41.729,
+      "maxRssBytes": 123682816,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 3,
+      "wallMs": 241.080459,
+      "cpuUserMs": 300.28,
+      "cpuSystemMs": 67.057,
+      "maxRssBytes": 208928768,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 3,
+      "wallMs": 253.87845900000002,
+      "cpuUserMs": 359.61,
+      "cpuSystemMs": 70.86,
+      "maxRssBytes": 209747968,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 3,
+      "wallMs": 235.570958,
+      "cpuUserMs": 269.742,
+      "cpuSystemMs": 60.475,
+      "maxRssBytes": 181501952,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 3,
+      "wallMs": 237.682375,
+      "cpuUserMs": 292.114,
+      "cpuSystemMs": 67.674,
+      "maxRssBytes": 187744256,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 4,
+      "wallMs": 249.070875,
+      "cpuUserMs": 317.595,
+      "cpuSystemMs": 70.169,
+      "maxRssBytes": 204079104,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 4,
+      "wallMs": 226.276876,
+      "cpuUserMs": 266.54,
+      "cpuSystemMs": 63.089,
+      "maxRssBytes": 175915008,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 4,
+      "wallMs": 234.35262400000002,
+      "cpuUserMs": 304.859,
+      "cpuSystemMs": 64.335,
+      "maxRssBytes": 183910400,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 4,
+      "wallMs": 150.314459,
+      "cpuUserMs": 159.314,
+      "cpuSystemMs": 46.413,
+      "maxRssBytes": 126566400,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 4,
+      "wallMs": 310.708793,
+      "cpuUserMs": 446.557,
+      "cpuSystemMs": 71.3,
+      "maxRssBytes": 220692480,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 4,
+      "wallMs": 248.04620900000003,
+      "cpuUserMs": 345.831,
+      "cpuSystemMs": 68.756,
+      "maxRssBytes": 205520896,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 4,
+      "wallMs": 120.59533300000001,
+      "cpuUserMs": 118.223,
+      "cpuSystemMs": 37.614,
+      "maxRssBytes": 123944960,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 5,
+      "wallMs": 313.235,
+      "cpuUserMs": 451.476,
+      "cpuSystemMs": 60.772,
+      "maxRssBytes": 230326272,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 5,
+      "wallMs": 232.93420799999998,
+      "cpuUserMs": 271.557,
+      "cpuSystemMs": 57.54,
+      "maxRssBytes": 182566912,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 5,
+      "wallMs": 121.65474999999999,
+      "cpuUserMs": 120.651,
+      "cpuSystemMs": 37.815,
+      "maxRssBytes": 124698624,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 5,
+      "wallMs": 143.8765,
+      "cpuUserMs": 155.364,
+      "cpuSystemMs": 41.764,
+      "maxRssBytes": 127336448,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 5,
+      "wallMs": 255.79362499999996,
+      "cpuUserMs": 345.713,
+      "cpuSystemMs": 69.763,
+      "maxRssBytes": 223248384,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 5,
+      "wallMs": 249.95133400000003,
+      "cpuUserMs": 312.916,
+      "cpuSystemMs": 70.725,
+      "maxRssBytes": 205094912,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 5,
+      "wallMs": 230.791542,
+      "cpuUserMs": 299.335,
+      "cpuSystemMs": 64.647,
+      "maxRssBytes": 183353344,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 6,
+      "wallMs": 236.81362399999998,
+      "cpuUserMs": 292.865,
+      "cpuSystemMs": 65.847,
+      "maxRssBytes": 188809216,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 6,
+      "wallMs": 151.707251,
+      "cpuUserMs": 161.809,
+      "cpuSystemMs": 42.62,
+      "maxRssBytes": 127483904,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 6,
+      "wallMs": 312.138583,
+      "cpuUserMs": 445.03,
+      "cpuSystemMs": 60.689,
+      "maxRssBytes": 233619456,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 6,
+      "wallMs": 231.80620900000002,
+      "cpuUserMs": 265.191,
+      "cpuSystemMs": 62.475,
+      "maxRssBytes": 183369728,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 6,
+      "wallMs": 252.82600000000002,
+      "cpuUserMs": 360.897,
+      "cpuSystemMs": 72.201,
+      "maxRssBytes": 206815232,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 6,
+      "wallMs": 123.82391700000001,
+      "cpuUserMs": 119.215,
+      "cpuSystemMs": 40.287,
+      "maxRssBytes": 124174336,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 6,
+      "wallMs": 239.29483400000004,
+      "cpuUserMs": 298.543,
+      "cpuSystemMs": 69.227,
+      "maxRssBytes": 209649664,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 7,
+      "wallMs": 126.24312599999999,
+      "cpuUserMs": 121.324,
+      "cpuSystemMs": 41.086,
+      "maxRssBytes": 122732544,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 7,
+      "wallMs": 239.93429199999997,
+      "cpuUserMs": 301.841,
+      "cpuSystemMs": 65.609,
+      "maxRssBytes": 209223680,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 7,
+      "wallMs": 314.285626,
+      "cpuUserMs": 450.852,
+      "cpuSystemMs": 73.88,
+      "maxRssBytes": 220528640,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 7,
+      "wallMs": 239.778832,
+      "cpuUserMs": 295.318,
+      "cpuSystemMs": 68.017,
+      "maxRssBytes": 189628416,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 7,
+      "wallMs": 253.69970800000002,
+      "cpuUserMs": 358.921,
+      "cpuSystemMs": 67.691,
+      "maxRssBytes": 209518592,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 7,
+      "wallMs": 149.078375,
+      "cpuUserMs": 156.903,
+      "cpuSystemMs": 45.981,
+      "maxRssBytes": 126763008,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 7,
+      "wallMs": 228.76133399999998,
+      "cpuUserMs": 263.223,
+      "cpuSystemMs": 64.012,
+      "maxRssBytes": 182140928,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 8,
+      "wallMs": 252.081792,
+      "cpuUserMs": 355.994,
+      "cpuSystemMs": 68.43,
+      "maxRssBytes": 210878464,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 8,
+      "wallMs": 230.409667,
+      "cpuUserMs": 264.86,
+      "cpuSystemMs": 61.858,
+      "maxRssBytes": 181747712,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 8,
+      "wallMs": 245.94204100000002,
+      "cpuUserMs": 311.482,
+      "cpuSystemMs": 71.279,
+      "maxRssBytes": 204652544,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 8,
+      "wallMs": 145.458542,
+      "cpuUserMs": 152.646,
+      "cpuSystemMs": 44.516,
+      "maxRssBytes": 122322944,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 8,
+      "wallMs": 240.91750100000002,
+      "cpuUserMs": 290.021,
+      "cpuSystemMs": 68.614,
+      "maxRssBytes": 189186048,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 8,
+      "wallMs": 311.549958,
+      "cpuUserMs": 448.187,
+      "cpuSystemMs": 70.525,
+      "maxRssBytes": 220643328,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 8,
+      "wallMs": 123.71779199999999,
+      "cpuUserMs": 119.998,
+      "cpuSystemMs": 40.929,
+      "maxRssBytes": 124616704,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 9,
+      "wallMs": 236.28916600000002,
+      "cpuUserMs": 289.544,
+      "cpuSystemMs": 69.326,
+      "maxRssBytes": 188858368,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 9,
+      "wallMs": 150.83575,
+      "cpuUserMs": 158.178,
+      "cpuSystemMs": 46.064,
+      "maxRssBytes": 127238144,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 9,
+      "wallMs": 124.94266700000001,
+      "cpuUserMs": 121.127,
+      "cpuSystemMs": 41.51,
+      "maxRssBytes": 124485632,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 9,
+      "wallMs": 317.193542,
+      "cpuUserMs": 453.891,
+      "cpuSystemMs": 71.107,
+      "maxRssBytes": 231768064,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 9,
+      "wallMs": 251.99091700000002,
+      "cpuUserMs": 315.522,
+      "cpuSystemMs": 67.353,
+      "maxRssBytes": 204931072,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 9,
+      "wallMs": 226.39216699999997,
+      "cpuUserMs": 266.987,
+      "cpuSystemMs": 58.092,
+      "maxRssBytes": 181583872,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 3
+      },
+      "index": 9,
+      "wallMs": 253.40662500000002,
+      "cpuUserMs": 344.915,
+      "cpuSystemMs": 70.915,
+      "maxRssBytes": 223248384,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 0,
+      "wallMs": 282.734249,
+      "cpuUserMs": 339.916,
+      "cpuSystemMs": 119.66,
+      "maxRssBytes": 211468288,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 0,
+      "wallMs": 287.40558300000004,
+      "cpuUserMs": 354.198,
+      "cpuSystemMs": 146.457,
+      "maxRssBytes": 218611712,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 0,
+      "wallMs": 290.357751,
+      "cpuUserMs": 384.463,
+      "cpuSystemMs": 169.749,
+      "maxRssBytes": 222265344,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 0,
+      "wallMs": 160.714084,
+      "cpuUserMs": 149.587,
+      "cpuSystemMs": 100.464,
+      "maxRssBytes": 141819904,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 0,
+      "wallMs": 362.77441699999997,
+      "cpuUserMs": 507.634,
+      "cpuSystemMs": 127.543,
+      "maxRssBytes": 254836736,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 0,
+      "wallMs": 283.880125,
+      "cpuUserMs": 312.907,
+      "cpuSystemMs": 152.148,
+      "maxRssBytes": 216236032,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 0,
+      "wallMs": 179.474916,
+      "cpuUserMs": 173.916,
+      "cpuSystemMs": 92.867,
+      "maxRssBytes": 147030016,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 1,
+      "wallMs": 286.57608300000004,
+      "cpuUserMs": 340.933,
+      "cpuSystemMs": 143.834,
+      "maxRssBytes": 218464256,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 1,
+      "wallMs": 267.772208,
+      "cpuUserMs": 326.743,
+      "cpuSystemMs": 144.036,
+      "maxRssBytes": 205012992,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 1,
+      "wallMs": 290.532375,
+      "cpuUserMs": 396.307,
+      "cpuSystemMs": 165.335,
+      "maxRssBytes": 224575488,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 1,
+      "wallMs": 160.466709,
+      "cpuUserMs": 154.879,
+      "cpuSystemMs": 96.843,
+      "maxRssBytes": 140705792,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 1,
+      "wallMs": 183.45945799999998,
+      "cpuUserMs": 177.017,
+      "cpuSystemMs": 93.626,
+      "maxRssBytes": 151044096,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 1,
+      "wallMs": 290.475,
+      "cpuUserMs": 320.594,
+      "cpuSystemMs": 115.977,
+      "maxRssBytes": 215793664,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 1,
+      "wallMs": 361.07029300000005,
+      "cpuUserMs": 500.31,
+      "cpuSystemMs": 127.182,
+      "maxRssBytes": 253378560,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 2,
+      "wallMs": 285.053167,
+      "cpuUserMs": 340.083,
+      "cpuSystemMs": 120.643,
+      "maxRssBytes": 210927616,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 2,
+      "wallMs": 282.805292,
+      "cpuUserMs": 357.514,
+      "cpuSystemMs": 145.469,
+      "maxRssBytes": 212615168,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 2,
+      "wallMs": 292.85062500000004,
+      "cpuUserMs": 392.83,
+      "cpuSystemMs": 168.916,
+      "maxRssBytes": 222773248,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 2,
+      "wallMs": 360.668042,
+      "cpuUserMs": 500.094,
+      "cpuSystemMs": 126.398,
+      "maxRssBytes": 253132800,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 2,
+      "wallMs": 280.279917,
+      "cpuUserMs": 309.328,
+      "cpuSystemMs": 153.416,
+      "maxRssBytes": 215334912,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 2,
+      "wallMs": 178.482167,
+      "cpuUserMs": 172.915,
+      "cpuSystemMs": 96.378,
+      "maxRssBytes": 145375232,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 2,
+      "wallMs": 162.283667,
+      "cpuUserMs": 153.256,
+      "cpuSystemMs": 102.246,
+      "maxRssBytes": 140296192,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 3,
+      "wallMs": 286.88291599999997,
+      "cpuUserMs": 351.993,
+      "cpuSystemMs": 146.607,
+      "maxRssBytes": 218824704,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 3,
+      "wallMs": 365.36375,
+      "cpuUserMs": 499.475,
+      "cpuSystemMs": 128.046,
+      "maxRssBytes": 255000576,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 3,
+      "wallMs": 161.981917,
+      "cpuUserMs": 150.784,
+      "cpuSystemMs": 100.274,
+      "maxRssBytes": 141180928,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 3,
+      "wallMs": 292.16829199999995,
+      "cpuUserMs": 331.571,
+      "cpuSystemMs": 122.677,
+      "maxRssBytes": 220643328,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 3,
+      "wallMs": 304.400917,
+      "cpuUserMs": 386.94,
+      "cpuSystemMs": 166.848,
+      "maxRssBytes": 238960640,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 3,
+      "wallMs": 175.732292,
+      "cpuUserMs": 170.846,
+      "cpuSystemMs": 92.592,
+      "maxRssBytes": 144785408,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 3,
+      "wallMs": 266.39333400000004,
+      "cpuUserMs": 325.34,
+      "cpuSystemMs": 152.065,
+      "maxRssBytes": 205045760,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 4,
+      "wallMs": 180.350249,
+      "cpuUserMs": 174.21,
+      "cpuSystemMs": 96.039,
+      "maxRssBytes": 148865024,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 4,
+      "wallMs": 291.75029199999994,
+      "cpuUserMs": 404.446,
+      "cpuSystemMs": 169.098,
+      "maxRssBytes": 225148928,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 4,
+      "wallMs": 156.56745800000002,
+      "cpuUserMs": 150.474,
+      "cpuSystemMs": 100.763,
+      "maxRssBytes": 140296192,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 4,
+      "wallMs": 285.99025,
+      "cpuUserMs": 352.323,
+      "cpuSystemMs": 145.108,
+      "maxRssBytes": 218677248,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 4,
+      "wallMs": 274.731334,
+      "cpuUserMs": 307.171,
+      "cpuSystemMs": 150.82,
+      "maxRssBytes": 213336064,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 4,
+      "wallMs": 282.25316699999996,
+      "cpuUserMs": 342.178,
+      "cpuSystemMs": 120.272,
+      "maxRssBytes": 211124224,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 4,
+      "wallMs": 378.142083,
+      "cpuUserMs": 516.604,
+      "cpuSystemMs": 128.195,
+      "maxRssBytes": 274284544,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 5,
+      "wallMs": 306.736292,
+      "cpuUserMs": 385.445,
+      "cpuSystemMs": 169.861,
+      "maxRssBytes": 239157248,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 5,
+      "wallMs": 287.600542,
+      "cpuUserMs": 343.352,
+      "cpuSystemMs": 141.235,
+      "maxRssBytes": 219021312,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 5,
+      "wallMs": 291.211208,
+      "cpuUserMs": 327.072,
+      "cpuSystemMs": 122.051,
+      "maxRssBytes": 222199808,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 5,
+      "wallMs": 265.577499,
+      "cpuUserMs": 323.184,
+      "cpuSystemMs": 147.962,
+      "maxRssBytes": 200687616,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 5,
+      "wallMs": 382.088751,
+      "cpuUserMs": 518.799,
+      "cpuSystemMs": 131.826,
+      "maxRssBytes": 280231936,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 5,
+      "wallMs": 158.627542,
+      "cpuUserMs": 151.974,
+      "cpuSystemMs": 99.614,
+      "maxRssBytes": 140181504,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 5,
+      "wallMs": 179.4335,
+      "cpuUserMs": 171.85,
+      "cpuSystemMs": 92.259,
+      "maxRssBytes": 146423808,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 6,
+      "wallMs": 176.27833299999998,
+      "cpuUserMs": 166.733,
+      "cpuSystemMs": 77.858,
+      "maxRssBytes": 140918784,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 6,
+      "wallMs": 382.841083,
+      "cpuUserMs": 529.053,
+      "cpuSystemMs": 132.471,
+      "maxRssBytes": 282591232,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 6,
+      "wallMs": 273.310083,
+      "cpuUserMs": 308.149,
+      "cpuSystemMs": 151.562,
+      "maxRssBytes": 214122496,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 6,
+      "wallMs": 279.357374,
+      "cpuUserMs": 353.242,
+      "cpuSystemMs": 140.103,
+      "maxRssBytes": 218071040,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 6,
+      "wallMs": 160.39774999999997,
+      "cpuUserMs": 153.014,
+      "cpuSystemMs": 99.944,
+      "maxRssBytes": 141803520,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 6,
+      "wallMs": 287.511666,
+      "cpuUserMs": 344.566,
+      "cpuSystemMs": 119.083,
+      "maxRssBytes": 218660864,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 6,
+      "wallMs": 301.97641600000003,
+      "cpuUserMs": 383.235,
+      "cpuSystemMs": 168.188,
+      "maxRssBytes": 239960064,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 7,
+      "wallMs": 173.75845800000002,
+      "cpuUserMs": 169.385,
+      "cpuSystemMs": 91.391,
+      "maxRssBytes": 143015936,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 7,
+      "wallMs": 361.759667,
+      "cpuUserMs": 500.622,
+      "cpuSystemMs": 124.02,
+      "maxRssBytes": 254607360,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 7,
+      "wallMs": 158.397458,
+      "cpuUserMs": 150.749,
+      "cpuSystemMs": 98.841,
+      "maxRssBytes": 140525568,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 7,
+      "wallMs": 289.435875,
+      "cpuUserMs": 323.871,
+      "cpuSystemMs": 121.576,
+      "maxRssBytes": 223739904,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 7,
+      "wallMs": 273.138667,
+      "cpuUserMs": 308.755,
+      "cpuSystemMs": 155.502,
+      "maxRssBytes": 213794816,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 7,
+      "wallMs": 288.33333300000004,
+      "cpuUserMs": 355.834,
+      "cpuSystemMs": 144.909,
+      "maxRssBytes": 215777280,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 7,
+      "wallMs": 291.58404199999995,
+      "cpuUserMs": 389.968,
+      "cpuSystemMs": 173.275,
+      "maxRssBytes": 222740480,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 8,
+      "wallMs": 289.105166,
+      "cpuUserMs": 344.711,
+      "cpuSystemMs": 122.745,
+      "maxRssBytes": 210911232,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 8,
+      "wallMs": 177.519125,
+      "cpuUserMs": 171.775,
+      "cpuSystemMs": 93.392,
+      "maxRssBytes": 146669568,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 8,
+      "wallMs": 294.920167,
+      "cpuUserMs": 392.117,
+      "cpuSystemMs": 173.424,
+      "maxRssBytes": 221085696,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 8,
+      "wallMs": 284.141125,
+      "cpuUserMs": 351.73,
+      "cpuSystemMs": 144.741,
+      "maxRssBytes": 216530944,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 8,
+      "wallMs": 388.35804099999996,
+      "cpuUserMs": 524.978,
+      "cpuSystemMs": 132.714,
+      "maxRssBytes": 277315584,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 8,
+      "wallMs": 277.66991800000005,
+      "cpuUserMs": 333.379,
+      "cpuSystemMs": 141.888,
+      "maxRssBytes": 206913536,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 8,
+      "wallMs": 166.15087599999998,
+      "cpuUserMs": 154.932,
+      "cpuSystemMs": 105.738,
+      "maxRssBytes": 139902976,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 9,
+      "wallMs": 162.555291,
+      "cpuUserMs": 154.667,
+      "cpuSystemMs": 101.301,
+      "maxRssBytes": 141180928,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 9,
+      "wallMs": 182.980916,
+      "cpuUserMs": 174.975,
+      "cpuSystemMs": 98.428,
+      "maxRssBytes": 145915904,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 9,
+      "wallMs": 307.538709,
+      "cpuUserMs": 390.046,
+      "cpuSystemMs": 167.84,
+      "maxRssBytes": 242188288,
+      "cssBytes": 155000,
+      "cssGzipBytes": 18372,
+      "cssSha256": "77460246c7d6c84623ea716ac55af2de4a3b15d0f35f83e3851a210abed347c0",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1567,
+      "declarations": 1794
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 9,
+      "wallMs": 266.021209,
+      "cpuUserMs": 327.212,
+      "cpuSystemMs": 142.95,
+      "maxRssBytes": 205537280,
+      "cssBytes": 152409,
+      "cssGzipBytes": 17231,
+      "cssSha256": "472e7c5ceab64df009cc92dec301c4ba0b2604e9292a1e5758c21014a656bf08",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 1566,
+      "declarations": 1713
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 9,
+      "wallMs": 354.91987500000005,
+      "cpuUserMs": 498.65,
+      "cpuSystemMs": 122.325,
+      "maxRssBytes": 255197184,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 9,
+      "wallMs": 278.80899900000003,
+      "cpuUserMs": 340.534,
+      "cpuSystemMs": 112.099,
+      "maxRssBytes": 212205568,
+      "cssBytes": 103444,
+      "cssGzipBytes": 12841,
+      "cssSha256": "ee274f23b219ccd88189f8a1ef22f467bfcab7cdcb6982f5d701ae15c81ef007",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 928,
+      "declarations": 1186
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 1000,
+        "files": 300
+      },
+      "index": 9,
+      "wallMs": 285.833583,
+      "cpuUserMs": 358.627,
+      "cpuSystemMs": 145.091,
+      "maxRssBytes": 219021312,
+      "cssBytes": 108633,
+      "cssGzipBytes": 15053,
+      "cssSha256": "012d7826104ddb3d1e4837cca2aec5febcce7b72227c2a6b2d844fc71d2c7691",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 930,
+      "declarations": 1347
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 0,
+      "wallMs": 152.74558399999998,
+      "cpuUserMs": 163.432,
+      "cpuSystemMs": 47.525,
+      "maxRssBytes": 131186688,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 0,
+      "wallMs": 342.75862500000005,
+      "cpuUserMs": 583.682,
+      "cpuSystemMs": 72.81,
+      "maxRssBytes": 263258112,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 0,
+      "wallMs": 145.411416,
+      "cpuUserMs": 140.48,
+      "cpuSystemMs": 43.225,
+      "maxRssBytes": 133529600,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 0,
+      "wallMs": 1121.4052909999998,
+      "cpuUserMs": 1810.305,
+      "cpuSystemMs": 155.618,
+      "maxRssBytes": 790970368,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 0,
+      "wallMs": 951.784418,
+      "cpuUserMs": 1495.647,
+      "cpuSystemMs": 104.521,
+      "maxRssBytes": 478134272,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 0,
+      "wallMs": 437.59875100000005,
+      "cpuUserMs": 737.683,
+      "cpuSystemMs": 86.588,
+      "maxRssBytes": 399163392,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 0,
+      "wallMs": 703.9712079999999,
+      "cpuUserMs": 993.589,
+      "cpuSystemMs": 120.191,
+      "maxRssBytes": 613613568,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 1,
+      "wallMs": 1125.812084,
+      "cpuUserMs": 1569.142,
+      "cpuSystemMs": 153.733,
+      "maxRssBytes": 878264320,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 1,
+      "wallMs": 950.026583,
+      "cpuUserMs": 1455.495,
+      "cpuSystemMs": 114.285,
+      "maxRssBytes": 532889600,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 1,
+      "wallMs": 157.52545800000001,
+      "cpuUserMs": 167.153,
+      "cpuSystemMs": 50.047,
+      "maxRssBytes": 136544256,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 1,
+      "wallMs": 143.215875,
+      "cpuUserMs": 138.523,
+      "cpuSystemMs": 42.566,
+      "maxRssBytes": 134135808,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 1,
+      "wallMs": 440.059833,
+      "cpuUserMs": 747.444,
+      "cpuSystemMs": 93.985,
+      "maxRssBytes": 378765312,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 1,
+      "wallMs": 359.246666,
+      "cpuUserMs": 572.443,
+      "cpuSystemMs": 81.154,
+      "maxRssBytes": 268435456,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 1,
+      "wallMs": 726.3025409999999,
+      "cpuUserMs": 979.928,
+      "cpuSystemMs": 120.237,
+      "maxRssBytes": 626245632,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 2,
+      "wallMs": 347.549667,
+      "cpuUserMs": 574.697,
+      "cpuSystemMs": 75.38,
+      "maxRssBytes": 266928128,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 2,
+      "wallMs": 145.997542,
+      "cpuUserMs": 139.035,
+      "cpuSystemMs": 41.934,
+      "maxRssBytes": 133332992,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 2,
+      "wallMs": 713.7598330000001,
+      "cpuUserMs": 1013.799,
+      "cpuSystemMs": 116.188,
+      "maxRssBytes": 625770496,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 2,
+      "wallMs": 1121.0715010000001,
+      "cpuUserMs": 1561.866,
+      "cpuSystemMs": 149.669,
+      "maxRssBytes": 871120896,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 2,
+      "wallMs": 155.589042,
+      "cpuUserMs": 166.153,
+      "cpuSystemMs": 46.102,
+      "maxRssBytes": 136282112,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 2,
+      "wallMs": 437.021542,
+      "cpuUserMs": 723.507,
+      "cpuSystemMs": 92.711,
+      "maxRssBytes": 373997568,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 2,
+      "wallMs": 936.8442089999999,
+      "cpuUserMs": 1435.151,
+      "cpuSystemMs": 115.36,
+      "maxRssBytes": 534347776,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 3,
+      "wallMs": 139.131417,
+      "cpuUserMs": 138.994,
+      "cpuSystemMs": 38.552,
+      "maxRssBytes": 131874816,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 3,
+      "wallMs": 1143.117417,
+      "cpuUserMs": 1759.674,
+      "cpuSystemMs": 147.866,
+      "maxRssBytes": 847855616,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 3,
+      "wallMs": 967.416,
+      "cpuUserMs": 1528.932,
+      "cpuSystemMs": 119.384,
+      "maxRssBytes": 477773824,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 3,
+      "wallMs": 706.257125,
+      "cpuUserMs": 998.311,
+      "cpuSystemMs": 120.835,
+      "maxRssBytes": 610156544,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 3,
+      "wallMs": 439.94583300000005,
+      "cpuUserMs": 739.693,
+      "cpuSystemMs": 91.442,
+      "maxRssBytes": 397639680,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 3,
+      "wallMs": 156.048292,
+      "cpuUserMs": 168.227,
+      "cpuSystemMs": 46.461,
+      "maxRssBytes": 135577600,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 3,
+      "wallMs": 351.86041700000004,
+      "cpuUserMs": 598.245,
+      "cpuSystemMs": 74.583,
+      "maxRssBytes": 264208384,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 4,
+      "wallMs": 154.402708,
+      "cpuUserMs": 165.861,
+      "cpuSystemMs": 46.234,
+      "maxRssBytes": 135446528,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 4,
+      "wallMs": 149.907542,
+      "cpuUserMs": 138.927,
+      "cpuSystemMs": 43.347,
+      "maxRssBytes": 132251648,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 4,
+      "wallMs": 969.247625,
+      "cpuUserMs": 1442.893,
+      "cpuSystemMs": 118.674,
+      "maxRssBytes": 530333696,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 4,
+      "wallMs": 350.900167,
+      "cpuUserMs": 587.538,
+      "cpuSystemMs": 77.597,
+      "maxRssBytes": 263913472,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 4,
+      "wallMs": 439.60008300000004,
+      "cpuUserMs": 739.987,
+      "cpuSystemMs": 89.821,
+      "maxRssBytes": 370868224,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 4,
+      "wallMs": 703.365125,
+      "cpuUserMs": 991.218,
+      "cpuSystemMs": 120.777,
+      "maxRssBytes": 613285888,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 4,
+      "wallMs": 1139.602042,
+      "cpuUserMs": 1766.233,
+      "cpuSystemMs": 150.009,
+      "maxRssBytes": 800030720,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 5,
+      "wallMs": 145.238542,
+      "cpuUserMs": 139.7,
+      "cpuSystemMs": 40.027,
+      "maxRssBytes": 132694016,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 5,
+      "wallMs": 715.971376,
+      "cpuUserMs": 975.037,
+      "cpuSystemMs": 118.631,
+      "maxRssBytes": 622919680,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 5,
+      "wallMs": 428.250416,
+      "cpuUserMs": 721.004,
+      "cpuSystemMs": 83.23,
+      "maxRssBytes": 372572160,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 5,
+      "wallMs": 1165.50425,
+      "cpuUserMs": 1694.509,
+      "cpuSystemMs": 140.466,
+      "maxRssBytes": 825032704,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 5,
+      "wallMs": 349.108542,
+      "cpuUserMs": 589.551,
+      "cpuSystemMs": 75.942,
+      "maxRssBytes": 262995968,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 5,
+      "wallMs": 945.6807079999999,
+      "cpuUserMs": 1490.423,
+      "cpuSystemMs": 116.812,
+      "maxRssBytes": 505020416,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 5,
+      "wallMs": 156.523457,
+      "cpuUserMs": 165.782,
+      "cpuSystemMs": 48.461,
+      "maxRssBytes": 135921664,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 6,
+      "wallMs": 151.80366700000002,
+      "cpuUserMs": 162.118,
+      "cpuSystemMs": 45.458,
+      "maxRssBytes": 131530752,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 6,
+      "wallMs": 145.452876,
+      "cpuUserMs": 139.048,
+      "cpuSystemMs": 42.954,
+      "maxRssBytes": 131448832,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 6,
+      "wallMs": 442.70483299999995,
+      "cpuUserMs": 750.562,
+      "cpuSystemMs": 92.046,
+      "maxRssBytes": 380354560,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 6,
+      "wallMs": 1114.30175,
+      "cpuUserMs": 1754.947,
+      "cpuSystemMs": 129.53,
+      "maxRssBytes": 849887232,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 6,
+      "wallMs": 962.4521240000001,
+      "cpuUserMs": 1523.287,
+      "cpuSystemMs": 116.892,
+      "maxRssBytes": 479526912,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 6,
+      "wallMs": 363.941374,
+      "cpuUserMs": 589.264,
+      "cpuSystemMs": 76.69,
+      "maxRssBytes": 268156928,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 6,
+      "wallMs": 712.309166,
+      "cpuUserMs": 1025.207,
+      "cpuSystemMs": 120.921,
+      "maxRssBytes": 623345664,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 7,
+      "wallMs": 967.0754580000001,
+      "cpuUserMs": 1519.285,
+      "cpuSystemMs": 118.711,
+      "maxRssBytes": 478494720,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 7,
+      "wallMs": 718.682,
+      "cpuUserMs": 971.242,
+      "cpuSystemMs": 118.757,
+      "maxRssBytes": 619315200,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 7,
+      "wallMs": 151.19799899999998,
+      "cpuUserMs": 161.755,
+      "cpuSystemMs": 46.684,
+      "maxRssBytes": 131055616,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 7,
+      "wallMs": 437.802124,
+      "cpuUserMs": 733.172,
+      "cpuSystemMs": 92.63,
+      "maxRssBytes": 374636544,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 7,
+      "wallMs": 142.26274999999998,
+      "cpuUserMs": 140.028,
+      "cpuSystemMs": 40.235,
+      "maxRssBytes": 132087808,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 7,
+      "wallMs": 1165.275208,
+      "cpuUserMs": 1715.477,
+      "cpuSystemMs": 137.314,
+      "maxRssBytes": 845627392,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 7,
+      "wallMs": 342.379791,
+      "cpuUserMs": 575.41,
+      "cpuSystemMs": 73.995,
+      "maxRssBytes": 262488064,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 8,
+      "wallMs": 435.70225,
+      "cpuUserMs": 736.329,
+      "cpuSystemMs": 93.625,
+      "maxRssBytes": 377208832,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 8,
+      "wallMs": 1074.696958,
+      "cpuUserMs": 1722.14,
+      "cpuSystemMs": 148.128,
+      "maxRssBytes": 808960000,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 8,
+      "wallMs": 159.67908400000002,
+      "cpuUserMs": 172.596,
+      "cpuSystemMs": 47.451,
+      "maxRssBytes": 135626752,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 8,
+      "wallMs": 997.757791,
+      "cpuUserMs": 1561.2,
+      "cpuSystemMs": 118.362,
+      "maxRssBytes": 479379456,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 8,
+      "wallMs": 355.022709,
+      "cpuUserMs": 596.931,
+      "cpuSystemMs": 72.325,
+      "maxRssBytes": 265338880,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 8,
+      "wallMs": 765.0074999999999,
+      "cpuUserMs": 1067.588,
+      "cpuSystemMs": 120.459,
+      "maxRssBytes": 666992640,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 8,
+      "wallMs": 151.852084,
+      "cpuUserMs": 144.56,
+      "cpuSystemMs": 45.327,
+      "maxRssBytes": 132399104,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 9,
+      "wallMs": 161.096917,
+      "cpuUserMs": 169.657,
+      "cpuSystemMs": 48.1,
+      "maxRssBytes": 135577600,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 9,
+      "wallMs": 988.8809999999999,
+      "cpuUserMs": 1540.237,
+      "cpuSystemMs": 123.793,
+      "maxRssBytes": 506150912,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 9,
+      "wallMs": 734.5490000000001,
+      "cpuUserMs": 993.67,
+      "cpuSystemMs": 125.801,
+      "maxRssBytes": 623263744,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 9,
+      "wallMs": 148.653667,
+      "cpuUserMs": 143.131,
+      "cpuSystemMs": 43.896,
+      "maxRssBytes": 132612096,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 9,
+      "wallMs": 1157.157,
+      "cpuUserMs": 1602.862,
+      "cpuSystemMs": 161.551,
+      "maxRssBytes": 883146752,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 9,
+      "wallMs": 437.069833,
+      "cpuUserMs": 740.154,
+      "cpuSystemMs": 90.191,
+      "maxRssBytes": 373833728,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 3
+      },
+      "index": 9,
+      "wallMs": 345.903417,
+      "cpuUserMs": 592.057,
+      "cpuSystemMs": 64.242,
+      "maxRssBytes": 265568256,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 0,
+      "wallMs": 477.425793,
+      "cpuUserMs": 806.111,
+      "cpuSystemMs": 167.938,
+      "maxRssBytes": 388235264,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 0,
+      "wallMs": 1138.382667,
+      "cpuUserMs": 1649.228,
+      "cpuSystemMs": 252.415,
+      "maxRssBytes": 870563840,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 0,
+      "wallMs": 178.225874,
+      "cpuUserMs": 182.179,
+      "cpuSystemMs": 95.12,
+      "maxRssBytes": 153190400,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 0,
+      "wallMs": 763.6279579999999,
+      "cpuUserMs": 1042.924,
+      "cpuSystemMs": 200.732,
+      "maxRssBytes": 649461760,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 0,
+      "wallMs": 180.032208,
+      "cpuUserMs": 170.259,
+      "cpuSystemMs": 106.659,
+      "maxRssBytes": 145440768,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 0,
+      "wallMs": 1011.593042,
+      "cpuUserMs": 1514.369,
+      "cpuSystemMs": 178.217,
+      "maxRssBytes": 539770880,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 0,
+      "wallMs": 411.538834,
+      "cpuUserMs": 644.773,
+      "cpuSystemMs": 130.081,
+      "maxRssBytes": 293076992,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 1,
+      "wallMs": 413.50716700000004,
+      "cpuUserMs": 658.773,
+      "cpuSystemMs": 136.68,
+      "maxRssBytes": 295976960,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 1,
+      "wallMs": 761.359459,
+      "cpuUserMs": 1045.472,
+      "cpuSystemMs": 205.901,
+      "maxRssBytes": 643203072,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 1,
+      "wallMs": 1197.83975,
+      "cpuUserMs": 1739.199,
+      "cpuSystemMs": 244.386,
+      "maxRssBytes": 844070912,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 1,
+      "wallMs": 989.975167,
+      "cpuUserMs": 1538.896,
+      "cpuSystemMs": 174.922,
+      "maxRssBytes": 511131648,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 1,
+      "wallMs": 174.902625,
+      "cpuUserMs": 169.029,
+      "cpuSystemMs": 99.23,
+      "maxRssBytes": 146194432,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 1,
+      "wallMs": 185.977916,
+      "cpuUserMs": 187.134,
+      "cpuSystemMs": 97.958,
+      "maxRssBytes": 158007296,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 1,
+      "wallMs": 476.4885,
+      "cpuUserMs": 795.549,
+      "cpuSystemMs": 168.263,
+      "maxRssBytes": 389120000,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 2,
+      "wallMs": 178.751917,
+      "cpuUserMs": 176.798,
+      "cpuSystemMs": 102.029,
+      "maxRssBytes": 142884864,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 2,
+      "wallMs": 174.93941700000002,
+      "cpuUserMs": 180.165,
+      "cpuSystemMs": 88.941,
+      "maxRssBytes": 152223744,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 2,
+      "wallMs": 407.62783299999995,
+      "cpuUserMs": 634.733,
+      "cpuSystemMs": 122.344,
+      "maxRssBytes": 293552128,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 2,
+      "wallMs": 469.771167,
+      "cpuUserMs": 781.09,
+      "cpuSystemMs": 163.903,
+      "maxRssBytes": 387956736,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 2,
+      "wallMs": 1136.3802489999998,
+      "cpuUserMs": 1764.506,
+      "cpuSystemMs": 245.558,
+      "maxRssBytes": 870301696,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 2,
+      "wallMs": 734.809833,
+      "cpuUserMs": 1050.616,
+      "cpuSystemMs": 183.493,
+      "maxRssBytes": 645578752,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 2,
+      "wallMs": 995.2038749999999,
+      "cpuUserMs": 1515.181,
+      "cpuSystemMs": 171.429,
+      "maxRssBytes": 548945920,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 3,
+      "wallMs": 405.90933299999995,
+      "cpuUserMs": 652.646,
+      "cpuSystemMs": 125.125,
+      "maxRssBytes": 294354944,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 3,
+      "wallMs": 1136.6078750000001,
+      "cpuUserMs": 1664.746,
+      "cpuSystemMs": 250.757,
+      "maxRssBytes": 880246784,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 3,
+      "wallMs": 749.83475,
+      "cpuUserMs": 1048.209,
+      "cpuSystemMs": 206.004,
+      "maxRssBytes": 641925120,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 3,
+      "wallMs": 176.264208,
+      "cpuUserMs": 170.764,
+      "cpuSystemMs": 99.449,
+      "maxRssBytes": 145489920,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 3,
+      "wallMs": 470.420625,
+      "cpuUserMs": 801.315,
+      "cpuSystemMs": 163.448,
+      "maxRssBytes": 387514368,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 3,
+      "wallMs": 1006.580459,
+      "cpuUserMs": 1457.278,
+      "cpuSystemMs": 171.415,
+      "maxRssBytes": 557432832,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 3,
+      "wallMs": 182.45149899999998,
+      "cpuUserMs": 182.973,
+      "cpuSystemMs": 95.255,
+      "maxRssBytes": 155009024,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 4,
+      "wallMs": 1193.8366250000001,
+      "cpuUserMs": 1735.325,
+      "cpuSystemMs": 240.999,
+      "maxRssBytes": 844578816,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 4,
+      "wallMs": 174.400292,
+      "cpuUserMs": 172.438,
+      "cpuSystemMs": 99.356,
+      "maxRssBytes": 146505728,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 4,
+      "wallMs": 995.0470829999999,
+      "cpuUserMs": 1579.108,
+      "cpuSystemMs": 172.772,
+      "maxRssBytes": 540557312,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 4,
+      "wallMs": 410.09750099999997,
+      "cpuUserMs": 646.41,
+      "cpuSystemMs": 130.334,
+      "maxRssBytes": 293896192,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 4,
+      "wallMs": 748.032167,
+      "cpuUserMs": 980.914,
+      "cpuSystemMs": 197.68,
+      "maxRssBytes": 630734848,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 4,
+      "wallMs": 467.81675,
+      "cpuUserMs": 795.126,
+      "cpuSystemMs": 157.802,
+      "maxRssBytes": 389136384,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 4,
+      "wallMs": 179.336166,
+      "cpuUserMs": 181.519,
+      "cpuSystemMs": 93.245,
+      "maxRssBytes": 152616960,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 5,
+      "wallMs": 743.513083,
+      "cpuUserMs": 1027.194,
+      "cpuSystemMs": 200.652,
+      "maxRssBytes": 629702656,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 5,
+      "wallMs": 186.638125,
+      "cpuUserMs": 186.542,
+      "cpuSystemMs": 95.716,
+      "maxRssBytes": 157106176,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 5,
+      "wallMs": 399.202166,
+      "cpuUserMs": 633.987,
+      "cpuSystemMs": 132.241,
+      "maxRssBytes": 296402944,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 5,
+      "wallMs": 1191.897,
+      "cpuUserMs": 1740.088,
+      "cpuSystemMs": 247.946,
+      "maxRssBytes": 857374720,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 5,
+      "wallMs": 462.582833,
+      "cpuUserMs": 759.196,
+      "cpuSystemMs": 162.989,
+      "maxRssBytes": 392364032,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 5,
+      "wallMs": 175.762541,
+      "cpuUserMs": 170.753,
+      "cpuSystemMs": 102.188,
+      "maxRssBytes": 146604032,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 5,
+      "wallMs": 986.91075,
+      "cpuUserMs": 1567.31,
+      "cpuSystemMs": 167.767,
+      "maxRssBytes": 510771200,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 6,
+      "wallMs": 180.81716699999998,
+      "cpuUserMs": 179.582,
+      "cpuSystemMs": 95.523,
+      "maxRssBytes": 153141248,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 6,
+      "wallMs": 468.27683399999995,
+      "cpuUserMs": 788.077,
+      "cpuSystemMs": 158.445,
+      "maxRssBytes": 388055040,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 6,
+      "wallMs": 995.8995,
+      "cpuUserMs": 1539.077,
+      "cpuSystemMs": 167.459,
+      "maxRssBytes": 513163264,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 6,
+      "wallMs": 393.10275,
+      "cpuUserMs": 630.507,
+      "cpuSystemMs": 121.306,
+      "maxRssBytes": 294830080,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 6,
+      "wallMs": 176.01475,
+      "cpuUserMs": 169.383,
+      "cpuSystemMs": 101.325,
+      "maxRssBytes": 144900096,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 6,
+      "wallMs": 742.231042,
+      "cpuUserMs": 1046.448,
+      "cpuSystemMs": 199.525,
+      "maxRssBytes": 642727936,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 6,
+      "wallMs": 1203.069083,
+      "cpuUserMs": 1739.013,
+      "cpuSystemMs": 248.435,
+      "maxRssBytes": 870776832,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 7,
+      "wallMs": 175.729166,
+      "cpuUserMs": 170.915,
+      "cpuSystemMs": 98.686,
+      "maxRssBytes": 145260544,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 7,
+      "wallMs": 409.413292,
+      "cpuUserMs": 627.64,
+      "cpuSystemMs": 134.644,
+      "maxRssBytes": 295010304,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 7,
+      "wallMs": 755.9527499999999,
+      "cpuUserMs": 1000.81,
+      "cpuSystemMs": 198.506,
+      "maxRssBytes": 631373824,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 7,
+      "wallMs": 185.395875,
+      "cpuUserMs": 186.139,
+      "cpuSystemMs": 95.635,
+      "maxRssBytes": 155533312,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 7,
+      "wallMs": 1031.4762509999998,
+      "cpuUserMs": 1549.728,
+      "cpuSystemMs": 171.071,
+      "maxRssBytes": 542523392,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 7,
+      "wallMs": 495.76729100000006,
+      "cpuUserMs": 815.95,
+      "cpuSystemMs": 180.107,
+      "maxRssBytes": 386646016,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 7,
+      "wallMs": 1189.172125,
+      "cpuUserMs": 1771.725,
+      "cpuSystemMs": 231.284,
+      "maxRssBytes": 902692864,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 8,
+      "wallMs": 1014.1281240000001,
+      "cpuUserMs": 1520.621,
+      "cpuSystemMs": 179.654,
+      "maxRssBytes": 539885568,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 8,
+      "wallMs": 763.016708,
+      "cpuUserMs": 1047.998,
+      "cpuSystemMs": 197.045,
+      "maxRssBytes": 638795776,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 8,
+      "wallMs": 397.62225,
+      "cpuUserMs": 645.625,
+      "cpuSystemMs": 118.33,
+      "maxRssBytes": 296239104,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 8,
+      "wallMs": 172.154666,
+      "cpuUserMs": 169.146,
+      "cpuSystemMs": 94.499,
+      "maxRssBytes": 143917056,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 8,
+      "wallMs": 457.47412599999996,
+      "cpuUserMs": 788.056,
+      "cpuSystemMs": 154.893,
+      "maxRssBytes": 387219456,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 8,
+      "wallMs": 1135.419417,
+      "cpuUserMs": 1675.538,
+      "cpuSystemMs": 248.705,
+      "maxRssBytes": 878133248,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 8,
+      "wallMs": 177.32908300000003,
+      "cpuUserMs": 178.943,
+      "cpuSystemMs": 95.518,
+      "maxRssBytes": 152190976,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 9,
+      "wallMs": 739.954833,
+      "cpuUserMs": 1023.487,
+      "cpuSystemMs": 198.788,
+      "maxRssBytes": 634306560,
+      "cssBytes": 2827608,
+      "cssGzipBytes": 234502,
+      "cssSha256": "bbf4fd4666f11767b1213cd76a2f753cc8effa7c6821b5190884d02772678d23",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30010,
+      "declarations": 30281
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 9,
+      "wallMs": 466.86633400000005,
+      "cpuUserMs": 806.959,
+      "cpuSystemMs": 162.814,
+      "maxRssBytes": 388431872,
+      "cssBytes": 1088883,
+      "cssGzipBytes": 92738,
+      "cssSha256": "d3046721f45d07df4320b1191db28b4549ee426e4a6898db17e62970a533d00e",
+      "nativeModules": ["rspack.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4834,
+      "declarations": 5556
+    },
+    {
+      "tier": "build",
+      "subject": "vite-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 9,
+      "wallMs": 180.617625,
+      "cpuUserMs": 182.216,
+      "cpuSystemMs": 95.079,
+      "maxRssBytes": 154763264,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["fsevents.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "rsbuild-baseline",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 9,
+      "wallMs": 176.129459,
+      "cpuUserMs": 170.193,
+      "cpuSystemMs": 103.516,
+      "maxRssBytes": 145997824,
+      "cssBytes": 0,
+      "cssGzipBytes": 20,
+      "cssSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "nativeModules": ["rspack.darwin-arm64.node"],
+      "rules": 0,
+      "declarations": 0
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-rs",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 9,
+      "wallMs": 415.492792,
+      "cpuUserMs": 631.179,
+      "cpuSystemMs": 129.264,
+      "maxRssBytes": 298336256,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node", "teacss-engine.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "teacss-ts",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 9,
+      "wallMs": 986.811917,
+      "cpuUserMs": 1485.334,
+      "cpuSystemMs": 173.73,
+      "maxRssBytes": 554237952,
+      "cssBytes": 1083694,
+      "cssGzipBytes": 90267,
+      "cssSha256": "f4ea28cee21dd814b47a9b414d3dff968bdcbc228ffa83f1ca063c4f0dea96d4",
+      "nativeModules": ["fsevents.node", "lightningcss.darwin-arm64.node", "rolldown-binding.darwin-arm64.node"],
+      "rules": 4832,
+      "declarations": 5395
+    },
+    {
+      "tier": "build",
+      "subject": "tailwind-v4-rsbuild",
+      "cell": {
+        "utilities": 20000,
+        "files": 300
+      },
+      "index": 9,
+      "wallMs": 1175.4860840000001,
+      "cpuUserMs": 1822.658,
+      "cpuSystemMs": 374.494,
+      "maxRssBytes": 822558720,
+      "cssBytes": 2830199,
+      "cssGzipBytes": 235684,
+      "cssSha256": "9d68285f66ca7af50b0493f4e1f1c0ff8b06a7330ef99fcb1e3bb8310bc6db39",
+      "nativeModules": ["lightningcss.darwin-arm64.node", "rspack.darwin-arm64.node", "tailwindcss-oxide.darwin-arm64.node"],
+      "rules": 30011,
+      "declarations": 30362
+    }
+  ],
+  "limiters": {}
+}
