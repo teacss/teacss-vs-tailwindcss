@@ -6,9 +6,9 @@ v4. `CLAUDE.md` points here.
 ## Read by task
 
 - Start with [README.md](README.md) for the layout and the commands.
-- The direction is the accepted [proposal](docs/proposals/v01-credible-benchmark.md);
-  the order of work is the [plan](docs/plans/v01-credible-benchmark.md).
-  The measurement rules are [spec v01.1](docs/specs/v01.1-benchmark-protocol.md);
+- The direction is the accepted [proposal](notes/proposals/v01-credible-benchmark.md);
+  the order of work is the [plan](notes/plans/v01-credible-benchmark.md).
+  The measurement rules are [spec v01.1](notes/specs/v01.1-benchmark-protocol.md);
   a number that does not follow them is not reported.
 
 ## Change rules
@@ -33,13 +33,13 @@ v4. `CLAUDE.md` points here.
 
 | Directory | Purpose |
 | --- | --- |
-| `docs/proposals/` | Direction and scope, with an index |
-| `docs/specs/` | The measurement protocol and other testable contracts |
-| `docs/plans/` | Implementation slices and their acceptance |
-| `docs/adrs/` | Architecture decision records, with an index |
-| `docs/knowledge/` | Evidence and background, with an index |
-| `docs/reports/` | Generated reports, one per published run |
-| `docs/articles/` | Plain-language write-ups of a published report, with an index |
+| `notes/proposals/` | Direction and scope, with an index |
+| `notes/specs/` | The measurement protocol and other testable contracts |
+| `notes/plans/` | Implementation slices and their acceptance |
+| `notes/adrs/` | Architecture decision records, with an index |
+| `notes/knowledge/` | Evidence and background, with an index |
+| `notes/reports/` | Generated reports, one per published run |
+| `notes/articles/` | Plain-language write-ups of a published report, with an index |
 
 Add, remove or rename a document and update its index in the same change.
 

@@ -250,7 +250,7 @@ export function renderReadmeSummary(model: ReportModel, stem: string, beside?: R
     ...besideTakeaway(model, beside),
     ...crossTakeaway(model, cross),
     "",
-    `[Full report](docs/reports/${stem}.md) · [audit](docs/reports/${stem}.audit.md) · [raw samples](results/${stem}.json) · [method](docs/specs/v01.1-benchmark-protocol.md)`,
+    `[Full report](notes/reports/${stem}.md) · [audit](notes/reports/${stem}.audit.md) · [raw samples](results/${stem}.json) · [method](notes/specs/v01.1-benchmark-protocol.md)`,
     "",
     README_END,
   );

@@ -62,7 +62,7 @@ test("the summary is two small tables, a few takeaways and the links, in plain w
   assert.match(text, /- Generating the CSS is only part of the build's CSS cost: 2 % for TeaCSS \(Rust engine\)\. The rest is the build plugin/);
   assert.match(text, /- TeaCSS \(Rust engine\) gets 10\.0× slower when the same classes are spread over 30 files instead of 3; the other tools do not care/);
   assert.match(text, /- @teacss\/engine 0\.8\.5-alpha\.4, tailwindcss 4\.3\.3; one Apple M2 Max, Node v24\.14\.1\./);
-  assert.match(text, /\[Full report\]\(docs\/reports\/2026-10-21T09-19-14-mac\.md\) · \[audit\]/);
+  assert.match(text, /\[Full report\]\(notes\/reports\/2026-10-21T09-19-14-mac\.md\) · \[audit\]/);
   assert.ok(!text.includes("Per 1,000"));
   assert.match(text, /\*\*Adding new classes to an engine\*\* that already holds those 10,000/);
   assert.match(text, /\*\*Saving a new file in the Vite dev server\*\* with 10,000 classes already in 30 files/);

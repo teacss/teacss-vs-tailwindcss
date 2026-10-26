@@ -79,7 +79,7 @@
 
 ## 公平性核对
 
-逐条对照 teacss-ts 的 `docs/plans/perf-iteration-loop.md` §2：
+逐条对照 teacss-ts 的 `notes/plans/perf-iteration-loop.md` §2：
 
 | 要求 | 本文 |
 | --- | --- |

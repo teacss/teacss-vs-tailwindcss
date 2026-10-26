@@ -60,4 +60,4 @@ Tailwind 在 Bun 下的 76 个不符全是逻辑简写被展开：`padding-inlin
 
 - [x] 第三份正式报告：TeaCSS 0.9.0（`@teacss/engine` 0.9.0）、五个组、spec v01.1 修订 4（[报告](../reports/2026-10-23T20-14-57-mac.md)、[审核](../reports/2026-10-23T20-14-57-mac.audit.md)，#33）。
 - [x] 剖析时发现构建样本含基准程序自己的收尾工作，对产出更大的 Tailwind 不利；修正为构建返回即停表（#34），03:56 的那一轮作废重跑。
-- [x] 两篇面向读者的文章（`docs/articles/`）与六张优化卡片（`docs/knowledge/optimization-cards-2026-10-24.md`），卡片已分别发给 teacss-ts 与 teacss-rs。
+- [x] 两篇面向读者的文章（`notes/articles/`）与六张优化卡片（`notes/knowledge/optimization-cards-2026-10-24.md`），卡片已分别发给 teacss-ts 与 teacss-rs。
