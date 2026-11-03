@@ -154,7 +154,9 @@ on the Rust engine.
 Verification compares the two TeaCSS engines byte for byte, the two command
 lines byte for byte with font URLs reduced to their digest, and the two Vite
 plugins class by class: `@teacss/vite-ts` passes its sheet through Lightning
-CSS and `@teacss/vite` does not, so their bytes differ by design. Every build
+CSS and `@teacss/vite` 0.10.4 does not. That is a teacss-rs defect, not a
+design difference; once a fixed `@teacss/vite` is measured, the plugin pair
+returns to the byte check. Every build
 is also checked with another stylesheet imported ahead of the tool's own,
 which `@teacss/vite` 0.10.3 failed under Vite 8.
 
