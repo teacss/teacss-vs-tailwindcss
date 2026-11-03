@@ -10,9 +10,9 @@ the two TeaCSS engines are separate ecosystems that share no package
 
 ## Status
 
-The subjects now pin TeaCSS 0.10 under spec revision 9: teacss-rs 0.10.4 and
+The subjects now pin TeaCSS 0.10 under spec revision 10: teacss-rs 0.10.5 and
 teacss-ts 0.10.3, two ecosystems that share no package, on Node 26
-([ADR-0005](notes/adrs/ADR-0005-two-teacss-ecosystems.md)). Revision 9 has no
+([ADR-0005](notes/adrs/ADR-0005-two-teacss-ecosystems.md)). TeaCSS 0.10 has no
 published run yet, so the block below still shows 0.9.3, and its numbers do
 not carry over to 0.10.
 
@@ -153,10 +153,9 @@ on the Rust engine.
 
 Verification compares the two TeaCSS engines byte for byte, the two command
 lines byte for byte with font URLs reduced to their digest, and the two Vite
-plugins class by class: `@teacss/vite-ts` passes its sheet through Lightning
-CSS and `@teacss/vite` 0.10.4 does not. That is a teacss-rs defect, not a
-design difference; once a fixed `@teacss/vite` is measured, the plugin pair
-returns to the byte check. Every build
+plugins byte for byte. `@teacss/vite` 0.10.4 let its sheet skip Vite's CSS
+pipeline, so revision 9 compared the plugins class by class; 0.10.5 fixes it,
+and revision 10 restores the byte check. Every build
 is also checked with another stylesheet imported ahead of the tool's own,
 which `@teacss/vite` 0.10.3 failed under Vite 8.
 

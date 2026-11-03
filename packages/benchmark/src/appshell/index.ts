@@ -55,7 +55,7 @@ const USAGE = `bench <command>
               --cross <ci.json>  add the same run from a second machine as a cross-check
 `;
 
-const SPEC_REVISION = 9;
+const SPEC_REVISION = 10;
 const SPEC_V02_REVISION = 7;
 const SPEC_V03_REVISION = 3;
 /** Spec v01.1 §Run protocol: refuse above this share of the logical cores. */

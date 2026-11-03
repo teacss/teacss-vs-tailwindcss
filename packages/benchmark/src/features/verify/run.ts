@@ -1,7 +1,7 @@
 import type { SubjectId } from "@bench/infrastructure";
 import type { SubjectTask } from "../../contract/index.ts";
 import { type Corpus, candidates, corpusProject, leadingStylesheetProject } from "../../corpus/index.ts";
-import { checkLeadingStylesheet, checkNativeModules, checkSameRules, checkStructure, type Mismatch, withFontDigests } from "./index.ts";
+import { checkLeadingStylesheet, checkNativeModules, checkStructure, type Mismatch, withFontDigests } from "./index.ts";
 
 export interface VerifySubject {
   readonly id: SubjectId;
@@ -45,17 +45,12 @@ function summarize(mismatches: readonly Mismatch[]): string {
 }
 
 /**
- * Spec v01.1 revision 9, §Equivalence: engines and the two CLIs write the same bytes, fonts aside. The bundler
- * plugins do not, because teacss-ts passes the sheet through Lightning CSS and teacss-rs splices it in afterwards,
- * so a plugin pair must select the same classes with the same properties.
+ * Spec v01.1 revision 10, §Equivalence: engines and bundler plugins write the same bytes, and the two CLIs the
+ * same bytes once font URLs are reduced to their digest.
  */
 function strongFinding(left: VerifyOutput, right: VerifyOutput, pair: readonly [string, string], tier: "engine" | "build"): string | undefined {
-  if (tier === "engine" || pair[0].endsWith("-cli")) {
-    const same = tier === "engine" ? left.cssSha256 === right.cssSha256 : withFontDigests(left.css ?? "").trimEnd() === withFontDigests(right.css ?? "").trimEnd();
-    return same ? undefined : `sha256 ${left.cssSha256.slice(0, 12)} vs ${right.cssSha256.slice(0, 12)}`;
-  }
-  const mismatches = checkSameRules(left.css ?? "", right.css ?? "");
-  return mismatches.length === 0 ? undefined : summarize(mismatches);
+  const same = tier === "build" && pair[0].endsWith("-cli") ? withFontDigests(left.css ?? "").trimEnd() === withFontDigests(right.css ?? "").trimEnd() : left.cssSha256 === right.cssSha256;
+  return same ? undefined : `sha256 ${left.cssSha256.slice(0, 12)} vs ${right.cssSha256.slice(0, 12)}`;
 }
 
 /** Runs spec v01.1 §Equivalence over every subject on one corpus. */

@@ -138,40 +138,6 @@ export function checkIdentical(leftSha256: string, rightSha256: string): StrongR
   return { identical: leftSha256 === rightSha256, leftSha256, rightSha256 };
 }
 
-const CLASS_IN_SELECTOR = /\.((?:\\.|[a-zA-Z0-9_-])+)/;
-
-/** Every class a sheet selects, with the properties its rules declare. */
-function classProperties(css: string): Map<string, Set<string>> {
-  const classes = new Map<string, Set<string>>();
-  for (const rule of parseRules(css)) {
-    for (const selector of rule.selector.split(",")) {
-      const name = selector.trim().match(CLASS_IN_SELECTOR)?.[1];
-      if (name === undefined) continue;
-      const properties = classes.get(name) ?? new Set<string>();
-      for (const property of rule.properties) properties.add(property);
-      classes.set(name, properties);
-    }
-  }
-  return classes;
-}
-
-/**
- * Spec v01.1 revision 9, §Equivalence: two builds of one project select the same classes with the same properties.
- * This is the build tier's check for a pair of bundler plugins, whose post-processing differs since 0.10.
- */
-export function checkSameRules(left: string, right: string): Mismatch[] {
-  const leftClasses = classProperties(left);
-  const rightClasses = classProperties(right);
-  const mismatches: Mismatch[] = [];
-  for (const candidate of new Set([...leftClasses.keys(), ...rightClasses.keys()])) {
-    const leftProperties = sorted([...(leftClasses.get(candidate) ?? [])]);
-    const rightProperties = sorted([...(rightClasses.get(candidate) ?? [])]);
-    if (!leftClasses.has(candidate) || !rightClasses.has(candidate)) mismatches.push({ candidate, reason: `only the ${leftClasses.has(candidate) ? "left" : "right"} side selects it` });
-    else if (leftProperties !== rightProperties) mismatches.push({ candidate, reason: `declares ${leftProperties} against ${rightProperties}` });
-  }
-  return mismatches;
-}
-
 /** A sheet with each bundled font's URL reduced to its digest: the two CLIs inline a font or write it to a file, the same font either way. */
 export function withFontDigests(css: string): string {
   return css.replaceAll(/url\("?[^"')]*?teacss[=-](?:v1-)?([0-9a-f]{64})[^"')]*"?\)/g, "url(font-$1)");
