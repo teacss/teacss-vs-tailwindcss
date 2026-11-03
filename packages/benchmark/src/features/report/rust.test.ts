@@ -110,3 +110,15 @@ test("from revision 9 the engines and the Vite pipelines are counted apart", () 
   assert.match(renderReadmeSummary(buildReport(record("other")), "s"), /\| Same CSS output \| \| 1 of 2 groups identical \|/);
   assert.match(renderMarkdown(buildReport(record("other"))), /\| Byte-identical output \| 1 of 2 measured groups \| \| differs \|/);
 });
+
+test("from revision 10 the Vite builds and dev servers are counted apart, and dev servers differ in fonts only", () => {
+  const dev = (subject: string, hash: string, index: number) => ({ tier: "dev", size: 10, subject: subjectId(subject), cell, index, wallMs: 50, polls: 1, cssBytes: 1, cssSha256: hash, nativeModules: [] }) as unknown as Sample;
+  const base = record();
+  const fonts = { ...base, specRevision: 10, samples: [...base.samples, ...[0, 1].flatMap((index) => [dev("teacss-ts", "linked", index), dev("teacss-rs", "inlined", index)])] };
+  assert.deepEqual(identicalOutputs(fonts, "build"), { identical: 1, compared: 1 });
+  assert.deepEqual(identicalOutputs(fonts, "dev"), { identical: 0, compared: 1 });
+  const markdown = renderMarkdown(buildReport(fonts));
+  assert.match(markdown, /\| Byte-identical output, Vite build \| 1 of 1 measured groups \| \| identical \|/);
+  assert.match(markdown, /\| Byte-identical output, Vite dev server \| 0 of 1 measured groups \| \| differs in the bundled fonts only: @teacss\/vite inlines them, @teacss\/vite-ts links them \|/);
+  assert.match(renderReadmeSummary(buildReport(fonts), "s"), /\| Same CSS output \| \| byte-identical from the engines and the Vite builds; the dev servers differ in the bundled fonts only, which @teacss\/vite inlines and @teacss\/vite-ts links \|/);
+});
