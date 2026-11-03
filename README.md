@@ -2,8 +2,11 @@
 
 A reproducible performance comparison of three atomic CSS engines on the same
 machine, the same paired corpus and the same build pipelines (Vite, PostCSS,
-Rsbuild and Bun): the TeaCSS TypeScript engine (`@teacss/core`), the TeaCSS
-Rust engine (`@teacss/engine`) and Tailwind CSS v4 (Oxide).
+Rsbuild and Bun): the TeaCSS TypeScript engine (`@teacss/core` with
+`@teacss/vite-ts`), the TeaCSS Rust engine (`@teacss/engine` with `@teacss/vite`
+and the other teacss-rs integrations) and Tailwind CSS v4 (Oxide). Since 0.10
+the two TeaCSS engines are separate ecosystems that share no package
+([ADR-0005](notes/adrs/ADR-0005-two-teacss-ecosystems.md)).
 
 ## Status
 
@@ -110,8 +113,8 @@ foundation depends on nothing in the workspace. `scripts/check-layout.ts` and
 
 ## Develop
 
-Bun installs the workspace; Node 24 runs the TypeScript sources directly, so
-there is no build step.
+Bun installs the workspace; Node 26 runs the TypeScript sources directly, so
+there is no build step. The teacss-rs packages need Node 26 or later.
 
 ```sh
 bun install
@@ -127,6 +130,7 @@ structure checks. Each script can run on its own: `bun run lint:check`,
 
 ```sh
 bun run bench:verify --utilities 5000 --files 30   # equivalence checks on one corpus
+bun run bench:cases                                  # the behaviours the 0.10 upgrade guide names
 bun run bench                                        # the full matrix, 30 samples per cell, into results/
 bun run bench:ts-tailwind                            # the same without teacss-rs
 bun run bench:report results/<file>.json --readme README.md   # report, JSON summary, and the README block
@@ -134,8 +138,19 @@ bun run bench:report results/<file>.json --readme README.md   # report, JSON sum
 
 `bun run bench` measures each tool twice: with the tuned production entry and
 with the entry its setup guide gives (`--group main,default-config`, the
-default). The PostCSS integrations are a separate round:
-`bun run bench --group postcss --tier build`.
+default). The other groups run on request, all of them at once with
+`--group main,default-config,postcss,rsbuild,bun,cli`: the PostCSS integrations
+(`postcss`), Rsbuild and Bun (`rsbuild`, `bun`), and the two TeaCSS command
+lines, `teacss-cli` and `teacss` (`cli`). teacss-ts publishes no PostCSS,
+Rsbuild or Bun integration since 0.10, so those groups have one TeaCSS subject,
+on the Rust engine.
+
+Verification compares the two TeaCSS engines byte for byte, the two command
+lines byte for byte with font URLs reduced to their digest, and the two Vite
+plugins class by class: `@teacss/vite-ts` passes its sheet through Lightning
+CSS and `@teacss/vite` does not, so their bytes differ by design. Every build
+is also checked with another stylesheet imported ahead of the tool's own,
+which `@teacss/vite` 0.10.3 failed under Vite 8.
 
 To check that the generated corpus is not cherry-picked, run the same matrix on
 classes taken from real Tailwind projects. List checked-out projects in a JSON
@@ -155,9 +170,10 @@ report refuses records that ran a different spec revision or corpus:
 bun run bench:report results/<local>.json --cross <ci-record>.json --readme README.md
 ```
 
-To measure unreleased TeaCSS builds, link a built teacss-ts checkout, or a
-built teacss-rs engine (`npm run build && npm run build:ts` in its
-`packages/engine`) under the published TeaCSS packages. One link at a time:
+To measure unreleased TeaCSS builds, link a built teacss-ts checkout
+(`@teacss/core`, `@teacss/vite-ts`, `@teacss/preset-standard`), or a built
+teacss-rs engine (`npm run build && npm run build:ts` in its `packages/engine`)
+under the published TeaCSS packages. One link at a time:
 
 ```sh
 bun run bench:link link --ts ../teacss-ts   # bench:link status shows where each package resolves
@@ -169,5 +185,5 @@ A report from a linked run says so on its first line and is not for
 publication. `bun run bench` refuses to start when the one-minute load exceeds 20 % of the
 logical cores; `--allow-busy` records the run anyway and the report says so.
 `node apps/bench/src/main.ts --help` lists every option. Bun is the package
-manager; Node 24 runs the harness and every measured process, because that is the runtime a Vite build uses by default
+manager; Node 26 runs the harness and every measured process, because that is the runtime a Vite build uses by default
 ([ADR-0003](notes/adrs/ADR-0003-published-packages.md)).

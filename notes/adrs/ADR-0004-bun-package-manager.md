@@ -1,5 +1,5 @@
 # ADR-0004: 用 Bun 管理依赖，Node 运行被测进程
-Status: accepted
+Status: accepted；Node 版本被 ADR-0005 改为 26
 
 ## Context
 所有者的项目（teacss-ts 等）用 Bun 做包管理与脚本入口，2026-10-21 要求本仓库同样不用 pnpm。ADR-0003 里「用 pnpm 安装」那一句因此作废。被测的是 Vite 构建，Vite 用户默认在 Node 上运行它；换成 Bun 运行时会改变要测的数字。
