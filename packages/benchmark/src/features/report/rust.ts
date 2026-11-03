@@ -83,12 +83,15 @@ export function valueRows(record: RunRecord): ValueRow[] {
  * Groups of samples (series and cell) where both engines produced the same bytes, out of those both measured;
  * `only` keeps the engine tier or the Vite pipeline tiers.
  */
-export function identicalOutputs(record: Pick<RunRecord, "samples">, only?: "engine" | "pipeline"): { identical: number; compared: number } {
+/** `@teacss/vite` inlines the bundled fonts as data URIs in development and `@teacss/vite-ts` links them; the sheets match once each font is reduced to its digest. */
+export const DEV_FONTS = "differs in the bundled fonts only: @teacss/vite inlines them, @teacss/vite-ts links them";
+
+export function identicalOutputs(record: Pick<RunRecord, "samples">, only?: "engine" | "pipeline" | "build" | "dev"): { identical: number; compared: number } {
   const hashes = new Map<string, { ts?: string; rs?: string }>();
   for (const sample of record.samples) {
     if (sample.subject !== TS && sample.subject !== RS) continue;
     if (sample.tier === "engine" && sample.scenario !== "cold" && sample.scenario !== "warm") continue;
-    if (only !== undefined && (sample.tier === "engine") !== (only === "engine")) continue;
+    if (only === "build" || only === "dev" ? sample.tier !== only : only !== undefined && (sample.tier === "engine") !== (only === "engine")) continue;
     const key = `${seriesOf(sample)}|${sample.cell.utilities}x${sample.cell.files}`;
     const entry = hashes.get(key) ?? {};
     entry[sample.subject === TS ? "ts" : "rs"] = sample.cssSha256;
@@ -121,10 +124,13 @@ export function valueTable(record: RunRecord, names: { ts: string; rs: string })
     `| | ${names.ts} | ${names.rs} | Rust compared with TypeScript |`,
     "| --- | --- | --- | --- |",
     ...rows.map((row) => `| ${row.label} | ${row.ts === undefined ? "" : row.format(row.ts)} | ${row.rs === undefined ? "" : row.format(row.rs)} | ${ratio(row)} |`),
-    // Spec v01.1 revision 9: the two Vite plugins post-process the sheet differently, so their bytes are counted apart.
-    ...(record.specRevision >= 9
-      ? [sameRow("Byte-identical output, engine", identicalOutputs(record, "engine"), "differs"), sameRow("Byte-identical output, Vite build and dev server", identicalOutputs(record, "pipeline"), "differs: only @teacss/vite-ts passes its sheet through Lightning CSS")]
-      : [sameRow("Byte-identical output", identicalOutputs(record), "differs")]),
+    // Spec v01.1 revision 10: the Vite builds compare byte for byte again, and only the dev servers serve the bundled fonts differently.
+    ...(record.specRevision >= 10
+      ? [sameRow("Byte-identical output, engine", identicalOutputs(record, "engine"), "differs"), sameRow("Byte-identical output, Vite build", identicalOutputs(record, "build"), "differs"), sameRow("Byte-identical output, Vite dev server", identicalOutputs(record, "dev"), DEV_FONTS)]
+      : // Spec v01.1 revision 9: the two Vite plugins post-process the sheet differently, so their bytes are counted apart.
+        record.specRevision >= 9
+        ? [sameRow("Byte-identical output, engine", identicalOutputs(record, "engine"), "differs"), sameRow("Byte-identical output, Vite build and dev server", identicalOutputs(record, "pipeline"), "differs: only @teacss/vite-ts passes its sheet through Lightning CSS")]
+        : [sameRow("Byte-identical output", identicalOutputs(record), "differs")]),
   ];
 }
 
@@ -161,11 +167,12 @@ export interface RustFindings {
   readonly value: readonly ValueRow[];
   readonly identical: { readonly identical: number; readonly compared: number };
   readonly engineIdentical: { readonly identical: number; readonly compared: number };
+  readonly buildIdentical: { readonly identical: number; readonly compared: number };
 }
 
 export function rustFindings(record: RunRecord): RustFindings {
-  if (!hasV02Data(record)) return { sections: [], value: [], identical: { identical: 0, compared: 0 }, engineIdentical: { identical: 0, compared: 0 } };
-  return { sections: rustSections(record), value: valueRows(record), identical: identicalOutputs(record), engineIdentical: identicalOutputs(record, "engine") };
+  if (!hasV02Data(record)) return { sections: [], value: [], identical: { identical: 0, compared: 0 }, engineIdentical: { identical: 0, compared: 0 }, buildIdentical: { identical: 0, compared: 0 } };
+  return { sections: rustSections(record), value: valueRows(record), identical: identicalOutputs(record), engineIdentical: identicalOutputs(record, "engine"), buildIdentical: identicalOutputs(record, "build") };
 }
 
 function rustSections(record: RunRecord): string[] {

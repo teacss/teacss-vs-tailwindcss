@@ -12,18 +12,20 @@ the two TeaCSS engines are separate ecosystems that share no package
 
 The subjects now pin TeaCSS 0.10 under spec revision 10: teacss-rs 0.10.5 and
 teacss-ts 0.10.5, two ecosystems that share no package, on Node 26
-([ADR-0005](notes/adrs/ADR-0005-two-teacss-ecosystems.md)). TeaCSS 0.10 has no
-published run yet, so the block below still shows 0.9.3, and its numbers do
-not carry over to 0.10.
+([ADR-0005](notes/adrs/ADR-0005-two-teacss-ecosystems.md)).
 
-Seven published runs; the latest (2026-10-25) measures TeaCSS 0.9.3 across
-Vite, PostCSS, Rsbuild and Bun under spec revision 8. Revisions 5 to 8 made
-each subject process match what a CLI user gets: the compile cache and the
+Eight published runs; the latest (2026-11-03) is the first of TeaCSS 0.10,
+across Vite, PostCSS, Rsbuild, Bun and the two CLIs
+([what changed in 0.10](notes/articles/teacss-0.10.5.md)). Its Node binary adds
+about 70 ms to every Node process, which favours no tool but makes absolute
+build times high; the [audit](notes/reports/2026-11-03T13-22-12-mac.audit.md)
+explains it. The seventh run measured TeaCSS 0.9.3 under spec revision 8.
+Revisions 5 to 8 made each subject process match what a CLI user gets: the compile cache and the
 `NODE_ENV` the `vite` and `rsbuild` CLIs set, only the packages the task uses,
 and a run that is discarded when the machine gets busy mid-run. Build, dev and
 cold-engine numbers are therefore not comparable with earlier runs. Revision 6
 also corrected a bias that made every earlier TypeScript-engine dev number too
-fast. The CSS is byte-for-byte the same as 0.9.0
+fast. The CSS of 0.9.3 is byte-for-byte the same as that of 0.9.0
 ([what changed in 0.9.2 and 0.9.3](notes/articles/teacss-0.9.3.md)). Two
 articles explain the 0.9.0 round in plain language:
 [the TypeScript engine against the Rust engine](notes/articles/teacss-0.9.0-ts-vs-rust.md)
@@ -37,63 +39,62 @@ is written for developers who want the answer without reading the full report.
 
 <!-- bench:summary:start -->
 
-### Results from 2026-10-25
+### Results from 2026-11-03
 
 **Generating the CSS for 20,000 classes** (median of 30 runs)
 
 | | Time |
 | --- | --- |
-| TeaCSS (Rust engine) | 52 ms |
-| Tailwind CSS v4 | 232 ms (4.5× slower) |
-| TeaCSS (TypeScript engine) | 495 ms (9.6× slower) |
+| TeaCSS (Rust engine) | 42 ms |
+| Tailwind CSS v4 | 226 ms (5.4× slower) |
+| TeaCSS (TypeScript engine) | 466 ms (11.1× slower) |
 
 **Adding new classes to an engine** that already holds those 20,000 (median of 30 runs)
 
 | | +10 classes | +100 classes |
 | --- | --- | --- |
-| TeaCSS (Rust engine) | 18 ms | 19 ms |
-| TeaCSS (TypeScript engine) | 112 ms (6.1× slower) | 117 ms (6.3× slower) |
-| Tailwind CSS v4 | 140 ms (7.7× slower) | 145 ms (7.8× slower) |
+| TeaCSS (Rust engine) | 6.2 ms | 7.4 ms |
+| Tailwind CSS v4 | 116 ms (18.5× slower) | 123 ms (16.7× slower) |
+| TeaCSS (TypeScript engine) | 116 ms (18.6× slower) | 124 ms (16.7× slower) |
 
 **Saving a new file in the Vite dev server** with 20,000 classes already in 300 files, until the page's stylesheet has the new classes (median of 30 runs)
 
 | | +10 classes | +100 classes |
 | --- | --- | --- |
-| TeaCSS (Rust engine) | 77 ms | 73 ms |
-| TeaCSS (TypeScript engine) | 311 ms (4.1× slower) | 321 ms (4.4× slower) |
-| Tailwind CSS v4 | 324 ms (4.2× slower) | 311 ms (4.2× slower) |
+| TeaCSS (Rust engine) | 74 ms | 81 ms |
+| TeaCSS (TypeScript engine) | 271 ms (3.7× slower) | 300 ms (3.7× slower) |
+| Tailwind CSS v4 | 310 ms (4.2× slower) | 322 ms (4.0× slower) |
 
-**Building a Vite project with those classes in 300 files** (median of 30 runs; the project builds in 185 ms with no CSS tool)
+**Building a Vite project with those classes in 300 files** (median of 30 runs; the project builds in 250 ms with no CSS tool)
 
 | | Build | of which CSS |
 | --- | --- | --- |
-| TeaCSS (Rust engine) | 405 ms | 220 ms |
-| Tailwind CSS v4 | 759 ms (1.9× slower) | 574 ms |
-| TeaCSS (TypeScript engine) | 1.02 s (2.5× slower) | 831 ms |
+| TeaCSS (Rust engine) | 388 ms | 139 ms |
+| Tailwind CSS v4 | 779 ms (2.0× slower) | 529 ms |
+| TeaCSS (TypeScript engine) | 1.04 s (2.7× slower) | 793 ms |
 
 **What the Rust engine changes for TeaCSS**
 
 | | TypeScript engine | Rust engine |
 | --- | --- | --- |
-| Generate the CSS (warm process) | 495 ms | 52 ms (9.6× faster) |
-| Add 10 classes to a running engine | 112 ms | 18 ms (6.1× faster) |
-| Dev server: save a file with 10 new classes | 311 ms | 77 ms (4.1× faster) |
-| Vite production build | 1.02 s | 405 ms (2.5× faster) |
-| Resident memory after generating | 748.1 MB | 381.2 MB (2.0× less) |
-| Same CSS output | | byte-identical in every measured case |
+| Generate the CSS (warm process) | 466 ms | 42 ms (11.1× faster) |
+| Add 10 classes to a running engine | 116 ms | 6.2 ms (18.6× faster) |
+| Dev server: save a file with 10 new classes | 271 ms | 74 ms (3.7× faster) |
+| Vite production build | 1.04 s | 388 ms (2.7× faster) |
+| Resident memory after generating | 699.0 MB | 294.3 MB (2.4× less) |
+| Same CSS output | | byte-identical from the engines and the Vite builds; the dev servers differ in the bundled fonts only, which @teacss/vite inlines and @teacss/vite-ts links |
 
 **In short**
 
 - TeaCSS (Rust engine) is fastest both at generating the CSS and at finishing the build.
-- Generating the CSS is only part of the build's CSS cost: 24 % for TeaCSS (Rust engine). The rest is the build plugin, so a faster engine does not by itself give a faster build.
-- For the same classes, Tailwind CSS v4 emits 2.6× the CSS of TeaCSS: 30,010 rules against 4,832. Part of its build time goes to producing that extra output.
-- The price of the Rust engine is a native file of 8.4 MB per platform (8 platform packages), loaded in 1.2 ms. It served 6 of the 6 example configurations it was given.
+- For the same classes, Tailwind CSS v4 emits 2.6× the CSS of TeaCSS: 30,010 rules against 4,834. Part of its build time goes to producing that extra output.
+- The price of the Rust engine is a native file of 9.2 MB per platform (8 platform packages), loaded in 2.4 ms. It served 2 of the 2 example configurations it was given.
 - Every tool was given the same classes, and before anything was timed each tool's output was checked against them; every timed call that added classes was checked for those classes. The tools emit different colour and size values by design, so this is the time to a correct stylesheet, not to identical bytes.
-- vite 8.3.4, @teacss/core 0.9.3, @teacss/engine 0.9.3, tailwindcss 4.3.3; one Apple M2 Max, Node v24.14.1. Milliseconds will differ on your machine; the ratios carry over.
-- With each tool's out-of-the-box entry instead of the tuned one, the build takes 0.98× as long for TeaCSS (Rust engine), 0.99× as long for TeaCSS (TypeScript engine) and 1.00× as long for Tailwind CSS v4, so the comparison does not hinge on one tool's configuration.
-- On other build tools: with Rsbuild, TeaCSS (Rust engine) adds 304 ms to the build and Tailwind CSS v4 adds 992 ms, so TeaCSS (Rust engine) adds less; with Bun (Bun runtime), TeaCSS (Rust engine) adds 153 ms to the build and Tailwind CSS v4 adds 340 ms, so TeaCSS (Rust engine) adds less. The Build tools section of the full report sets them beside Vite.
+- vite 8.3.4, @teacss/core 0.10.5, @teacss/engine 0.10.5, tailwindcss 4.3.3; one Apple M2 Max, Node v26.12.0. Milliseconds will differ on your machine; the ratios carry over.
+- With each tool's out-of-the-box entry instead of the tuned one, the build takes 0.97× as long for TeaCSS (Rust engine), 1.00× as long for TeaCSS (TypeScript engine) and 1.01× as long for Tailwind CSS v4, so the comparison does not hinge on one tool's configuration.
+- On other build tools: with Rsbuild, TeaCSS (Rust engine) adds 310 ms to the build and Tailwind CSS v4 adds 960 ms, so TeaCSS (Rust engine) adds less; with Bun (Bun runtime), TeaCSS (Rust engine) adds 96 ms to the build and Tailwind CSS v4 adds 320 ms, so TeaCSS (Rust engine) adds less. The Build tools section of the full report sets them beside Vite.
 
-[Full report](notes/reports/2026-10-25T12-05-32-mac.md) · [audit](notes/reports/2026-10-25T12-05-32-mac.audit.md) · [raw samples](results/2026-10-25T12-05-32-mac.json) · [method](notes/specs/v01.1-benchmark-protocol.md)
+[Full report](notes/reports/2026-11-03T13-22-12-mac.md) · [audit](notes/reports/2026-11-03T13-22-12-mac.audit.md) · [raw samples](results/2026-11-03T13-22-12-mac.json) · [method](notes/specs/v01.1-benchmark-protocol.md)
 
 <!-- bench:summary:end -->
 

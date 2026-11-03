@@ -99,8 +99,14 @@ function rustTable(model: ReportModel): string[] {
   }
   const { identical, compared } = model.rust.identical;
   const engine = model.rust.engineIdentical;
-  const enginesOnly = model.record.specRevision >= 9 && engine.compared > 0 && engine.identical === engine.compared;
-  if (compared > 0) lines.push(`| Same CSS output | | ${identical === compared ? "byte-identical in every measured case" : enginesOnly ? "byte-identical from the engines; the Vite builds differ, since only @teacss/vite-ts passes its sheet through Lightning CSS" : `${identical} of ${compared} groups identical`} |`);
+  const build = model.rust.buildIdentical;
+  const all = (same: { identical: number; compared: number }) => same.compared > 0 && same.identical === same.compared;
+  const enginesOnly = model.record.specRevision >= 9 && all(engine);
+  const differs =
+    model.record.specRevision >= 10 && all(build)
+      ? "byte-identical from the engines and the Vite builds; the dev servers differ in the bundled fonts only, which @teacss/vite inlines and @teacss/vite-ts links"
+      : "byte-identical from the engines; the Vite builds differ, since only @teacss/vite-ts passes its sheet through Lightning CSS";
+  if (compared > 0) lines.push(`| Same CSS output | | ${identical === compared ? "byte-identical in every measured case" : enginesOnly ? differs : `${identical} of ${compared} groups identical`} |`);
   lines.push("");
   return lines;
 }
