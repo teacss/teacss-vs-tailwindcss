@@ -1,26 +1,19 @@
-import { createRequire } from "node:module";
-import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describePackages, nativeArtifact, resolvePackage, type SubjectClient, subjectId, type Workspace } from "@bench/infrastructure";
 import { createRsbuild } from "@rsbuild/core";
 import { pluginTeacss } from "@teacss/rsbuild";
+import { CSS_ENTRY } from "./index.ts";
 
-const require = createRequire(import.meta.url);
 const HERE = fileURLToPath(new URL(".", import.meta.url));
-const PACKAGES = ["@teacss/rsbuild", "@teacss/core", "@teacss/preset-standard", "@rsbuild/core"];
-const CSS_ENTRY = '@presets "standard";\n@source "./src/**/*.js";\n@teacss;\n';
+const PACKAGES = ["@teacss/rsbuild", "@teacss/engine", "@rsbuild/core"];
 
-/** The engine beside the core that `@teacss/rsbuild` loads. */
 function resolved() {
-  const packages = PACKAGES.map((name) => resolvePackage(name, HERE));
-  const core = packages.find((entry) => entry.name === "@teacss/core");
-  if (core === undefined) throw new Error("@teacss/core is not resolved");
-  return [...packages, resolvePackage("@teacss/engine", core.dir)];
+  return PACKAGES.map((name) => resolvePackage(name, HERE));
 }
 
 /** Spec v03.1 §Tiers: one production build of `src/index.js`, returning every emitted stylesheet. */
 async function rsbuildBuild(workspace: Workspace): Promise<string> {
-  const rsbuild = await createRsbuild({ cwd: workspace.dir, rsbuildConfig: { mode: "production", logLevel: "error", plugins: [pluginTeacss({ cwd: workspace.dir })], source: { entry: { index: "./src/index.js" } }, output: { filenameHash: false } } });
+  const rsbuild = await createRsbuild({ cwd: workspace.dir, rsbuildConfig: { mode: "production", logLevel: "error", plugins: [pluginTeacss({ root: workspace.dir })], source: { entry: { index: "./src/index.js" } }, output: { filenameHash: false } } });
   await rsbuild.build();
   return workspace
     .list("dist/static/css")
@@ -29,17 +22,14 @@ async function rsbuildBuild(workspace: Workspace): Promise<string> {
     .join("");
 }
 
-/**
- * Spec v03.1 §Subjects: `@teacss/rsbuild` as its README sets it up. The plugin takes no engine option, so
- * the registration's `TEACSS_ENGINE` chooses it, with `TEACSS_ENGINE_STRICT=1`.
- */
-export function teacssRsbuildSubject(engine: "ts" | "rust"): SubjectClient {
+/** Spec v03.1 §Subjects: `@teacss/rsbuild` as its README sets it up; since 0.10 it runs the Rust engine only. */
+export function teacssRsbuildSubject(): SubjectClient {
   return {
-    id: subjectId(`${engine === "ts" ? "teacss-ts" : "teacss-rs"}-rsbuild`),
+    id: subjectId("teacss-rs-rsbuild"),
     describe: async () => {
       const packages = resolved();
       const engineDir = packages.find((entry) => entry.name === "@teacss/engine");
-      const native = engine === "rust" && engineDir !== undefined ? nativeArtifact(engineDir) : undefined;
+      const native = engineDir === undefined ? undefined : nativeArtifact(engineDir);
       return { ...describePackages(packages), ...(native === undefined ? {} : { native }) };
     },
     engine: async () => {
@@ -50,8 +40,7 @@ export function teacssRsbuildSubject(engine: "ts" | "rust"): SubjectClient {
     },
     prepare: async (workspace, project) => {
       for (const [path, content] of project.files) workspace.write(path, content);
-      workspace.write("index.css", CSS_ENTRY);
-      workspace.link("node_modules/@teacss/preset-standard", dirname(require.resolve("@teacss/preset-standard/package.json")));
+      if (!project.files.has("index.css")) workspace.write("index.css", CSS_ENTRY);
       workspace.write("src/index.js", `${project.modules.map((module) => `import "./${module.replace(/^src\//, "")}";`).join("\n")}\nimport "../index.css";\n`);
     },
     build: async (workspace) => ({ css: await rsbuildBuild(workspace) }),

@@ -3,6 +3,10 @@
   "extends": ["@devjskit/biome-config"],
   "overrides": [
     {
+      "includes": ["packages/subject-teacss/src/engine-entry.css"],
+      "linter": { "rules": { "suspicious": { "noUnknownAtRules": "off" } } }
+    },
+    {
       "includes": ["packages/benchmark/src/features/**"],
       "linter": {
         "rules": {

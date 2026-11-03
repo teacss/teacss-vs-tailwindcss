@@ -69,6 +69,17 @@ export function corpusProject(corpus: Corpus, syntax: Syntax, header = ""): Corp
   return { modules, files };
 }
 
+export const LEADING_CLASS = "bench-leading";
+
+/**
+ * The same project with another stylesheet ahead of the tool's own: the first module imports it, so every
+ * subject's entry loads it before its stylesheet, whatever that entry is (spec v01.1 revision 9, §Equivalence).
+ */
+export function leadingStylesheetProject(corpus: Corpus, syntax: Syntax): CorpusProject {
+  const { modules, files } = corpusProject(corpus, syntax);
+  return { modules: ["src/leading.js", ...modules], files: new Map([...files, ["src/leading.js", 'import "./leading.css";\n'], ["src/leading.css", `.${LEADING_CLASS}{outline-style:dashed}\n`]]) };
+}
+
 export interface CorpusProfile {
   readonly families: Readonly<Record<string, number>>;
   readonly conditionCounts: Readonly<Record<string, number>>;

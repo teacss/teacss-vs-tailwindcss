@@ -6,6 +6,7 @@ import { version as nodeVersion } from "node:process";
 import { type Invocation, parseInvocation, type SubjectId, type SubjectVersions, subjectId } from "@bench/infrastructure";
 import { buildCommunityPool, type CommunityPool, type CommunityRepository, communityCorpus } from "../corpus/community.ts";
 import { type Corpus, DEFAULT_SEED, generateCorpus, PAIR_TABLE_VERSION, profileCorpus } from "../corpus/index.ts";
+import { BEHAVIOR_CASES, runCases } from "../features/cases/index.ts";
 import { bunVersion, captureEnvironment, loadShare } from "../features/environment/index.ts";
 import { measure, type Tier } from "../features/measure/run.ts";
 import { installFresh, measurePrice, type PriceRecord, teacssEntries } from "../features/price/index.ts";
@@ -37,10 +38,12 @@ const USAGE = `bench <command>
               --community <list.json>  build it from real Tailwind projects instead
   verify      run the equivalence checks of spec v01.1 on one corpus (bench run does this first)
               --utilities <n> (5000)  --files <n> (30)  --seed <n>  --subjects <a,b>  --community <list.json>
+  cases       check the behaviours the 0.10 upgrade guide names on the published packages (spec v01.1 §Behaviour cases)
+              --subjects <a,b>
   run         measure the scale matrix and write results/<time>-<host>.json
               --utilities <a,b,c> (1000,5000,20000)  --files <a,b,c> (3,30,300)
               --samples <n> (30)  --tier engine|dev|build|all (all)  --subjects <a,b>
-              --group main,default-config,postcss,rsbuild,bun (main,default-config)
+              --group main,default-config,postcss,rsbuild,bun,cli (main,default-config)
               --seed <n>  --out <dir> (results)  --allow-busy  --no-profile  --no-price
               --install-runs <n> (3)  --configs <dir>  --community <list.json>
               --allow-node-mismatch  --allow-bun-mismatch
@@ -52,9 +55,9 @@ const USAGE = `bench <command>
               --cross <ci.json>  add the same run from a second machine as a cross-check
 `;
 
-const SPEC_REVISION = 8;
-const SPEC_V02_REVISION = 6;
-const SPEC_V03_REVISION = 2;
+const SPEC_REVISION = 9;
+const SPEC_V02_REVISION = 7;
+const SPEC_V03_REVISION = 3;
 /** Spec v01.1 §Run protocol: refuse above this share of the logical cores. */
 const LOAD_SHARE_LIMIT = 0.2;
 /** Spec v01.1 revision 8: the share no cell may exceed during a run; every published run so far stayed at or below 42 %. */
@@ -101,7 +104,7 @@ function chosenSubjects(invocation: Invocation, registry: SubjectRegistry): [Sub
     const groupOption = invocation.options.get("group");
     const groups = typeof groupOption === "string" ? groupOption.split(",") : DEFAULT_GROUPS;
     const chosen = [...registry].filter(([, registration]) => groups.includes(registration.group));
-    if (chosen.length === 0) throw new Error(`--group: no subject in ${groups.join(", ")}; groups are main, default-config, postcss, rsbuild, bun`);
+    if (chosen.length === 0) throw new Error(`--group: no subject in ${groups.join(", ")}; groups are main, default-config, postcss, rsbuild, bun, cli`);
     return chosen;
   }
   const names = wanted.split(",");
@@ -160,6 +163,18 @@ export async function createApp(deps: AppDeps): Promise<number> {
       const { findings } = await verifyOn(corpus, chosenSubjects(invocation, registry), true);
       deps.stdout(findings === 0 ? "verify: ok\n" : `verify: ${findings} finding(s)\n`);
       return findings === 0 ? 0 : 1;
+    },
+    cases: async (invocation) => {
+      const wanted = invocation.options.has("subjects") ? chosenSubjects(invocation, registry).map(([id]) => id) : [...registry.keys()];
+      const { passed, findings } = await runCases(BEHAVIOR_CASES, new Set(wanted), async (subject, task) => {
+        const { response } = await invokeSubject(registry, subject, task, processDeps);
+        const result = response.result;
+        if (result.kind !== "engine" && result.kind !== "build") throw new Error(`${subject}: expected an engine or build result`);
+        return result.css;
+      });
+      for (const finding of findings) deps.stdout(`  FAIL ${finding.subject}: ${finding.id}: ${finding.detail}\n`);
+      deps.stdout(`cases: ${passed} passed, ${findings.length} failed\n`);
+      return findings.length === 0 ? 0 : 1;
     },
   };
   commands["run"] = async (invocation) => {

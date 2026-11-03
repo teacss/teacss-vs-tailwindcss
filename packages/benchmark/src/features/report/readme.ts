@@ -109,7 +109,8 @@ function priceTakeaway(model: ReportModel): string | undefined {
   if (rust === undefined || native === undefined) return undefined;
   const load = rust.nativeLoadMs.length === 0 ? undefined : [...rust.nativeLoadMs].sort((left, right) => left - right)[Math.floor(rust.nativeLoadMs.length / 2)];
   const served = rust.coverage.filter((result) => result.served).length;
-  const coverage = rust.coverage.length === 0 ? "" : ` It served ${served} of the ${rust.coverage.length} example configurations it was given${served === rust.coverage.length ? "" : "; the rest fall back to the TypeScript engine"}.`;
+  const rest = model.record.specRevision >= 9 ? "the rest run only on the TypeScript ecosystem, since 0.10 has no fallback" : "the rest fall back to the TypeScript engine";
+  const coverage = rust.coverage.length === 0 ? "" : ` It served ${served} of the ${rust.coverage.length} example configurations it was given${served === rust.coverage.length ? "" : `; ${rest}`}.`;
   return `The price of the Rust engine is a native file of ${(native.bytes / 1048576).toFixed(1)} MB per platform (${native.platformPackages} platform packages), loaded in ${load === undefined ? "an unmeasured time" : seconds(load)}.${coverage}`;
 }
 

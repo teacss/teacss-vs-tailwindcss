@@ -93,6 +93,7 @@ test("the full report and README carry the Rust sections only for v02 records", 
   assert.match(markdown, /\| JavaScript heap after generating \| 90\.0 MB \| 30\.0 MB \| not comparable: the Rust engine's memory is outside the heap \|/);
   assert.match(readme, /\| Same CSS output \| \| byte-identical in every measured case \|/);
   assert.match(readme, /The price of the Rust engine is a native file of 8\.2 MB per platform \(8 platform packages\), loaded in 1\.1 ms\. It served 1 of the 2 example configurations it was given; the rest fall back to the TypeScript engine\./);
+  assert.match(renderReadmeSummary(buildReport({ ...record(), specRevision: 9 }), "s"), /It served 1 of the 2 example configurations it was given; the rest run only on the TypeScript ecosystem, since 0\.10 has no fallback\./);
   const old = { ...record(), samples: record().samples.map((sample) => (sample.tier === "engine" ? ({ ...sample, cpuMs: undefined, rssBytes: undefined, heapBytes: undefined } as unknown as Sample) : sample)) };
   assert.equal(hasV02Data(old), false);
   assert.ok(!renderMarkdown(buildReport(old)).includes("value of Rust"));

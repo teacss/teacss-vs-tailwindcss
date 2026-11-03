@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { subjectId } from "@bench/infrastructure";
-import { generateCorpus } from "../../corpus/index.ts";
+import { generateCorpus, LEADING_CLASS, leadingStylesheetProject } from "../../corpus/index.ts";
 import { countOutput } from "../../css/index.ts";
-import { checkNativeModules, checkStructure, escapeClass, parseRules } from "./index.ts";
+import { checkLeadingStylesheet, checkNativeModules, checkSameRules, checkStructure, escapeClass, parseRules, withFontDigests } from "./index.ts";
 import { verifyCorpus } from "./run.ts";
 
 const cases = [
@@ -85,13 +85,102 @@ test("containsClass needs the class to end at a selector boundary", async () => 
   assert.equal(containsClass(".p-1", "p-1"), true);
 });
 
-test("each teacss-ts subject is checked byte for byte against its teacss-rs twin in the same group", async () => {
-  const subject = (id: string) => ({ id: subjectId(id), syntax: "teacss" as const, tiers: ["build"] as const, natives: { required: [], forbidden: [] } });
-  const subjects = ["teacss-ts", "teacss-rs", "teacss-ts-bun", "teacss-rs-bun", "teacss-ts-rsbuild"].map(subject);
-  const hashes: Record<string, string> = { "teacss-ts": "same", "teacss-rs": "same", "teacss-ts-bun": "aaaa", "teacss-rs-bun": "bbbb", "teacss-ts-rsbuild": "cccc" };
-  const report = await verifyCorpus(generateCorpus({ seed: 1, utilities: 5, files: 1 }), subjects, async (id) => ({ css: "", cssSha256: hashes[id] ?? "", nativeModules: [] }));
+const leading = `.${LEADING_CLASS}{outline-style:dashed}`;
+
+test("the leading project puts the stylesheet in the first module, so every subject's entry loads it first", () => {
+  const project = leadingStylesheetProject(generateCorpus({ seed: 1, utilities: 5, files: 2 }), "teacss");
+  assert.equal(project.modules[0], "src/leading.js");
+  assert.equal(project.files.get("src/leading.js"), 'import "./leading.css";\n');
+  assert.ok(project.files.get("src/leading.css")?.includes(LEADING_CLASS));
+  assert.equal(project.modules.length, 3);
+});
+
+test("a leading stylesheet that kept every utility behind it passes", () => {
+  assert.deepEqual(checkLeadingStylesheet(cases, "teacss", `${leading}${teacssCss}`), []);
+});
+
+test("utilities lost behind a leading stylesheet are named, as @teacss/vite 0.10.3 lost all of them", () => {
+  assert.deepEqual(
+    checkLeadingStylesheet(cases, "teacss", leading).map((mismatch) => mismatch.candidate),
+    cases.map((entry) => entry.teacss),
+  );
+});
+
+test("a leading stylesheet that vanished or moved behind the utilities is named", () => {
+  assert.deepEqual(checkLeadingStylesheet(cases, "teacss", teacssCss), [{ candidate: LEADING_CLASS, reason: "the stylesheet ahead of the tool's own is gone" }]);
+  assert.deepEqual(checkLeadingStylesheet(cases, "teacss", `${teacssCss}${leading}`), [{ candidate: "p:4", reason: `comes before ${LEADING_CLASS}` }]);
+});
+
+test("two builds differing only in how they print rules select the same classes", () => {
+  assert.deepEqual(checkSameRules(".a{padding:0.5px;margin:0}@media (min-width:1px){.b:hover{color:red}}", ".a{margin:0;padding:.5px}@media (width>=1px){.b:hover{color:red}}"), []);
+});
+
+test("a class on one side only and a property on one side only are named", () => {
+  assert.deepEqual(checkSameRules(".a{margin:0}.b{color:red}", ".a{margin:0;padding:0}.c{color:red}"), [
+    { candidate: "a", reason: "declares margin against margin,padding" },
+    { candidate: "b", reason: "only the left side selects it" },
+    { candidate: "c", reason: "only the right side selects it" },
+  ]);
+});
+
+test("a bundled font compares by digest, whether inlined or written to a file", () => {
+  const digest = "7e3ca49872a47f2f150ca90cc024fc9b0ec04ade959a0000000000000000abcd";
+  const inlined = `@font-face{src:url("data:font/woff2;teacss=v1-${digest};base64,AAAA")}`;
+  const extracted = `@font-face{src:url("./teacss-fonts/teacss-${digest}.woff2")}`;
+  assert.equal(withFontDigests(inlined), withFontDigests(extracted));
+  assert.notEqual(withFontDigests(inlined), withFontDigests(inlined.replace(digest, digest.replace("abcd", "abce"))));
+  assert.equal(withFontDigests('.a{background:url("/img/a.png")}'), '.a{background:url("/img/a.png")}');
+});
+
+function fakeSubject(id: string, tiers: readonly ("engine" | "build")[]) {
+  return { id: subjectId(id), syntax: "teacss" as const, tiers, natives: { required: [], forbidden: [] } };
+}
+
+const corpus = generateCorpus({ seed: 1, utilities: 5, files: 1 });
+/** Selects every case with its properties but draws no condition, so the tests below read only the findings they are about. */
+const sheet = (extra = "") => corpus.cases.map((entry) => `.${escapeClass(entry.teacss)}{${entry.properties.map((property) => `${property}:0`).join(";")}}`).join("") + extra;
+
+test("engines compare by bytes, and a pair is formed only where both sides exist", async () => {
+  const subjects = [fakeSubject("teacss-ts", ["engine"]), fakeSubject("teacss-rs", ["engine"]), fakeSubject("teacss-rs-bun", ["engine"])];
+  const hashes: Record<string, string> = { "teacss-ts": "aaaa", "teacss-rs": "bbbb", "teacss-rs-bun": "cccc" };
+  const report = await verifyCorpus(corpus, subjects, async (id) => ({ css: "", cssSha256: hashes[id] ?? "", nativeModules: [] }));
   assert.deepEqual(
     report.findings.filter((finding) => finding.check === "strong").map((finding) => `${finding.subject} ${finding.tier}`),
-    ["teacss-ts-bun vs teacss-rs-bun build"],
+    ["teacss-ts vs teacss-rs engine"],
+  );
+});
+
+test("a plugin pair may differ in bytes but not in classes; a CLI pair may differ in font URLs only", async () => {
+  const digest = "a".repeat(64);
+  const outputs: Record<string, string> = {
+    "teacss-ts": sheet(),
+    "teacss-rs": sheet().replaceAll(":0", ": 0"),
+    "teacss-ts-default": sheet(),
+    "teacss-rs-default": sheet(".extra{color:red}"),
+    "teacss-ts-cli": sheet(`@font-face{src:url("./teacss-fonts/teacss-${digest}.woff2")}`),
+    "teacss-rs-cli": sheet(`@font-face{src:url("data:font/woff2;teacss=v1-${digest};base64,AAAA")}`),
+  };
+  const report = await verifyCorpus(
+    corpus,
+    Object.keys(outputs).map((id) => fakeSubject(id, ["build"])),
+    async (id, task) => ({ css: `${task.kind === "build" && task.modules.includes("src/leading.js") ? leading : ""}${outputs[id] ?? ""}`, cssSha256: id, nativeModules: [] }),
+  );
+  assert.deepEqual(
+    report.findings.filter((finding) => finding.check === "strong").map((finding) => `${finding.subject} ${finding.check}`),
+    ["teacss-ts-default vs teacss-rs-default strong"],
+  );
+});
+
+test("every build subject is built again with a stylesheet ahead of its own, and a lost utility fails it", async () => {
+  const built: string[] = [];
+  const report = await verifyCorpus(corpus, [fakeSubject("teacss-rs", ["build"])], async (_id, task) => {
+    if (task.kind !== "build") throw new Error("expected a build");
+    built.push(task.modules[0] ?? "");
+    return { css: task.modules.includes("src/leading.js") ? leading : sheet(), cssSha256: "x", nativeModules: [] };
+  });
+  assert.deepEqual(built, ["src/gen-000.js", "src/leading.js"]);
+  assert.deepEqual(
+    report.findings.filter((finding) => finding.check === "leading").map((finding) => `${finding.subject} ${finding.tier} ${finding.check}`),
+    ["teacss-rs build leading"],
   );
 });
