@@ -10,6 +10,12 @@ the two TeaCSS engines are separate ecosystems that share no package
 
 ## Status
 
+The subjects now pin TeaCSS 0.10 under spec revision 9: teacss-rs 0.10.4 and
+teacss-ts 0.10.3, two ecosystems that share no package, on Node 26
+([ADR-0005](notes/adrs/ADR-0005-two-teacss-ecosystems.md)). Revision 9 has no
+published run yet, so the block below still shows 0.9.3, and its numbers do
+not carry over to 0.10.
+
 Seven published runs; the latest (2026-10-25) measures TeaCSS 0.9.3 across
 Vite, PostCSS, Rsbuild and Bun under spec revision 8. Revisions 5 to 8 made
 each subject process match what a CLI user gets: the compile cache and the
