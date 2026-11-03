@@ -229,7 +229,7 @@ function verificationLines(record: Omit<RunRecord, "samples">, hasDev: boolean):
   const verification = record.verification;
   if (verification === undefined) return [];
   return [
-    `**Method and verification.** Commit \`${record.environment.commit}\`. Before timing anything, every subject was checked on each of the ${verification.cells} corpus and file layout(s) of this run (${verification.checks} subject run(s), ${verification.cases} paired case(s) in all) with no difference in properties or conditions; a run with any finding writes no record.${verification.longhandCases === undefined ? "" : ` ${verification.longhandCases} subject case(s) declared a logical shorthand as its two \`-start\` and \`-end\` longhands, which counts as the shorthand (spec v03.1 §Equivalence).`}${hasDev ? " Dev-tier times include up to 5 ms of polling delay, the same for every tool." : ""}`,
+    `**Method and verification.** Commit \`${record.environment.commit}\`. Before timing anything, every subject was checked on each of the ${verification.cells} corpus and file layout(s) of this run (${verification.checks} subject run(s), ${verification.cases} paired case(s) in all) with no difference in properties or conditions; a run with any finding writes no record.${record.specRevision >= 9 ? " Every bundler build was also run with another stylesheet imported ahead of the tool's own and lost no case (spec v01.1 revision 9)." : ""}${verification.longhandCases === undefined ? "" : ` ${verification.longhandCases} subject case(s) declared a logical shorthand as its two \`-start\` and \`-end\` longhands, which counts as the shorthand (spec v03.1 §Equivalence).`}${hasDev ? " Dev-tier times include up to 5 ms of polling delay, the same for every tool." : ""}`,
     "",
   ];
 }

@@ -71,6 +71,8 @@ test("value rows compare the engines on speed, CPU, memory, GC and spread", () =
 test("identical outputs count warm and build groups, not incremental ones", () => {
   assert.deepEqual(identicalOutputs(record()), { identical: 2, compared: 2 });
   assert.deepEqual(identicalOutputs(record("other")), { identical: 1, compared: 2 });
+  assert.deepEqual(identicalOutputs(record("other"), "engine"), { identical: 1, compared: 1 });
+  assert.deepEqual(identicalOutputs(record("other"), "pipeline"), { identical: 0, compared: 1 });
 });
 
 test("the price table lists native size, packages, load, install and coverage", () => {
@@ -97,4 +99,14 @@ test("the full report and README carry the Rust sections only for v02 records", 
   const old = { ...record(), samples: record().samples.map((sample) => (sample.tier === "engine" ? ({ ...sample, cpuMs: undefined, rssBytes: undefined, heapBytes: undefined } as unknown as Sample) : sample)) };
   assert.equal(hasV02Data(old), false);
   assert.ok(!renderMarkdown(buildReport(old)).includes("value of Rust"));
+});
+
+test("from revision 9 the engines and the Vite pipelines are counted apart", () => {
+  const split = { ...record("other"), specRevision: 9 };
+  const markdown = renderMarkdown(buildReport(split));
+  assert.match(markdown, /\| Byte-identical output, engine \| 1 of 1 measured groups \| \| identical \|/);
+  assert.match(markdown, /\| Byte-identical output, Vite build and dev server \| 0 of 1 measured groups \| \| differs: only @teacss\/vite-ts passes its sheet through Lightning CSS \|/);
+  assert.match(renderReadmeSummary(buildReport(split), "s"), /\| Same CSS output \| \| byte-identical from the engines; the Vite builds differ, since only @teacss\/vite-ts passes its sheet through Lightning CSS \|/);
+  assert.match(renderReadmeSummary(buildReport(record("other")), "s"), /\| Same CSS output \| \| 1 of 2 groups identical \|/);
+  assert.match(renderMarkdown(buildReport(record("other"))), /\| Byte-identical output \| 1 of 2 measured groups \| \| differs \|/);
 });

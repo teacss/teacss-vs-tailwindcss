@@ -77,4 +77,6 @@ test("a v02 record opens with the method commit and verification, and names conf
   const rustPostcss = { ...v02, specRevision: 9, subjects: { "teacss-rs-postcss": { packages: {}, local: {} }, "tailwind-v4-postcss": { packages: {}, local: {} } } };
   assert.ok(!renderMarkdown(buildReport(rustPostcss)).includes("Subset run"), "from revision 9 the PostCSS round has no teacss-ts subject to miss");
   assert.match(renderMarkdown(buildReport({ ...v02, specRevision: 9 })), /the Rust packages have no fallback since 0\.10, and a Rust subject that did not load the native engine would have failed the run\./);
+  assert.match(renderMarkdown(buildReport({ ...v02, specRevision: 9 })), /no record\. Every bundler build was also run with another stylesheet imported ahead of the tool's own and lost no case \(spec v01\.1 revision 9\)\./);
+  assert.ok(!renderMarkdown(buildReport(v02)).includes("imported ahead"), "older records render as before");
 });

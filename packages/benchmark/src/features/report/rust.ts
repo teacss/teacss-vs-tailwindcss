@@ -79,12 +79,16 @@ export function valueRows(record: RunRecord): ValueRow[] {
   return rows.filter((row) => row.ts !== undefined || row.rs !== undefined);
 }
 
-/** Groups of samples (series and cell) where both engines produced the same bytes, out of those both measured. */
-export function identicalOutputs(record: RunRecord): { identical: number; compared: number } {
+/**
+ * Groups of samples (series and cell) where both engines produced the same bytes, out of those both measured;
+ * `only` keeps the engine tier or the Vite pipeline tiers.
+ */
+export function identicalOutputs(record: Pick<RunRecord, "samples">, only?: "engine" | "pipeline"): { identical: number; compared: number } {
   const hashes = new Map<string, { ts?: string; rs?: string }>();
   for (const sample of record.samples) {
     if (sample.subject !== TS && sample.subject !== RS) continue;
     if (sample.tier === "engine" && sample.scenario !== "cold" && sample.scenario !== "warm") continue;
+    if (only !== undefined && (sample.tier === "engine") !== (only === "engine")) continue;
     const key = `${seriesOf(sample)}|${sample.cell.utilities}x${sample.cell.files}`;
     const entry = hashes.get(key) ?? {};
     entry[sample.subject === TS ? "ts" : "rs"] = sample.cssSha256;
@@ -112,12 +116,15 @@ function ratio(row: ValueRow): string {
 export function valueTable(record: RunRecord, names: { ts: string; rs: string }): string[] {
   const rows = valueRows(record);
   if (rows.length === 0) return [];
-  const same = identicalOutputs(record);
+  const sameRow = (label: string, same: { identical: number; compared: number }, differs: string) => `| ${label} | ${same.identical} of ${same.compared} measured groups | | ${same.identical === same.compared ? "identical" : differs} |`;
   return [
     `| | ${names.ts} | ${names.rs} | Rust compared with TypeScript |`,
     "| --- | --- | --- | --- |",
     ...rows.map((row) => `| ${row.label} | ${row.ts === undefined ? "" : row.format(row.ts)} | ${row.rs === undefined ? "" : row.format(row.rs)} | ${ratio(row)} |`),
-    `| Byte-identical output | ${same.identical} of ${same.compared} measured groups | | ${same.identical === same.compared ? "identical" : "differs"} |`,
+    // Spec v01.1 revision 9: the two Vite plugins post-process the sheet differently, so their bytes are counted apart.
+    ...(record.specRevision >= 9
+      ? [sameRow("Byte-identical output, engine", identicalOutputs(record, "engine"), "differs"), sameRow("Byte-identical output, Vite build and dev server", identicalOutputs(record, "pipeline"), "differs: only @teacss/vite-ts passes its sheet through Lightning CSS")]
+      : [sameRow("Byte-identical output", identicalOutputs(record), "differs")]),
   ];
 }
 
@@ -153,11 +160,12 @@ export interface RustFindings {
   readonly sections: readonly string[];
   readonly value: readonly ValueRow[];
   readonly identical: { readonly identical: number; readonly compared: number };
+  readonly engineIdentical: { readonly identical: number; readonly compared: number };
 }
 
 export function rustFindings(record: RunRecord): RustFindings {
-  if (!hasV02Data(record)) return { sections: [], value: [], identical: { identical: 0, compared: 0 } };
-  return { sections: rustSections(record), value: valueRows(record), identical: identicalOutputs(record) };
+  if (!hasV02Data(record)) return { sections: [], value: [], identical: { identical: 0, compared: 0 }, engineIdentical: { identical: 0, compared: 0 } };
+  return { sections: rustSections(record), value: valueRows(record), identical: identicalOutputs(record), engineIdentical: identicalOutputs(record, "engine") };
 }
 
 function rustSections(record: RunRecord): string[] {

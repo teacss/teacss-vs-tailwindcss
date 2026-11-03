@@ -98,7 +98,9 @@ function rustTable(model: ReportModel): string[] {
     lines.push(`| ${row.label} | ${row.format(row.ts ?? 0)} | ${row.format(row.rs ?? 0)}${note} |`);
   }
   const { identical, compared } = model.rust.identical;
-  if (compared > 0) lines.push(`| Same CSS output | | ${identical === compared ? "byte-identical in every measured case" : `${identical} of ${compared} groups identical`} |`);
+  const engine = model.rust.engineIdentical;
+  const enginesOnly = model.record.specRevision >= 9 && engine.compared > 0 && engine.identical === engine.compared;
+  if (compared > 0) lines.push(`| Same CSS output | | ${identical === compared ? "byte-identical in every measured case" : enginesOnly ? "byte-identical from the engines; the Vite builds differ, since only @teacss/vite-ts passes its sheet through Lightning CSS" : `${identical} of ${compared} groups identical`} |`);
   lines.push("");
   return lines;
 }

@@ -240,12 +240,14 @@ export async function createApp(deps: AppDeps): Promise<number> {
       busyLimit: allowBusy ? undefined : RUN_LOAD_SHARE_LIMIT,
     });
     const largest = plan.cells.reduce((best, cell) => (cell.utilities * cell.files >= best.utilities * best.files ? cell : best));
+    // A command-line subject does its work in a child process, which a profile of the subject process does not see.
+    const profiled = plan.subjects.filter((subject) => registry.get(subject.id)?.group !== "cli");
     const limiters = invocation.options.has("no-profile")
       ? {}
       : await profileSubjects(
           largest,
           corpusFor,
-          plan.subjects,
+          profiled,
           plan.tiers.filter((tier): tier is "engine" | "build" => tier !== "dev"),
           async (subject, task, nodeArgs) => {
             deps.stdout(`  profiling ${subject} ${task.kind} on ${largest.utilities}x${largest.files} (not counted)\n`);
