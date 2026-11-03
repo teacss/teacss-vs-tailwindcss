@@ -6,10 +6,10 @@ import { parseArgs } from "node:util";
 const SUBJECT_MODULES = "packages/subject-teacss/node_modules/@teacss";
 const STATE_FILE = "packages/subject-teacss/node_modules/.bench-local.json";
 
-/** The teacss-ts packages a teacss subject imports, by their directory in that checkout. @teacss/engine resolves from core. */
+/** The teacss-ts packages a teacss subject imports, by their directory in that checkout. */
 const SOURCES: Readonly<Record<string, string>> = {
   core: "packages-engine/core",
-  vite: "packages-integrations/vite",
+  "vite-ts": "packages-integrations/vite",
   "preset-standard": "packages-presets/preset-standard",
 };
 
@@ -29,15 +29,6 @@ function readState(): State | undefined {
   return existsSync(STATE_FILE) ? (JSON.parse(readFileSync(STATE_FILE, "utf8")) as State) : undefined;
 }
 
-function engineFromCore(): string {
-  const core = realpathSync(join(SUBJECT_MODULES, "core"));
-  for (let dir = core; dir !== dirname(dir); dir = dirname(dir)) {
-    const candidate = join(dir, "node_modules/@teacss/engine");
-    if (existsSync(join(candidate, "package.json"))) return realpathSync(candidate);
-  }
-  return "unresolved: @teacss/core cannot reach @teacss/engine; the teacss-rs subject will fail";
-}
-
 /**
  * Every `@teacss/engine` link the subjects can reach: the subject's own and those inside the store entries of the
  * packages that depend on it. Only links to a store copy of the engine version the subject pins are taken, so
@@ -46,7 +37,7 @@ function engineFromCore(): string {
 function engineLinks(): string[] {
   const own = join(SUBJECT_MODULES, "engine");
   const pinned = (JSON.parse(readFileSync("packages/subject-teacss/package.json", "utf8")) as { dependencies: Record<string, string> }).dependencies["@teacss/engine"];
-  const copy = (target: string) => basename(dirname(dirname(dirname(target)))).startsWith(`@teacss+engine@${pinned}+`);
+  const copy = (target: string) => /^@teacss\+engine@([^+]+)/.exec(basename(dirname(dirname(dirname(target)))))?.[1] === pinned;
   const links = [own];
   for (const entry of readdirSync(STORE)) {
     const at = join(STORE, entry, "node_modules/@teacss/engine");
@@ -59,7 +50,7 @@ function status(): void {
   const state = readState();
   stdout.write(state === undefined ? "teacss subjects use the packages from bun.lock\n" : `teacss subjects are linked to ${[state.teacssTs, state.teacssRs].filter(Boolean).join(" and ")}\n`);
   for (const name of Object.keys(SOURCES)) stdout.write(`  @teacss/${name} -> ${realpathSync(join(SUBJECT_MODULES, name))}\n`);
-  stdout.write(`  @teacss/engine (from core) -> ${engineFromCore()}\n`);
+  stdout.write(`  @teacss/engine -> ${realpathSync(join(SUBJECT_MODULES, "engine"))}\n`);
 }
 
 function linkEngine(teacssRs: string): void {
@@ -116,7 +107,7 @@ const { positionals, values } = parseArgs({ args: argv.slice(2), allowPositional
 try {
   const [command = "status"] = positionals;
   if (command === "status") status();
-  // With --ts, core resolves the engine from that checkout's own install, so a teacss-rs engine is linked on its own.
+  // The two ecosystems share no package, so a teacss-rs engine is linked on its own.
   else if (command === "link" && values.ts !== undefined && values.rs !== undefined) throw new Error("link one checkout at a time: --ts for teacss-ts packages, --rs for the teacss-rs engine");
   else if (command === "link" && values.rs !== undefined) linkEngine(values.rs);
   else if (command === "link") link(values.ts ?? "../teacss-ts");

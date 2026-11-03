@@ -6,16 +6,17 @@
   "license": "MIT",
   "author": "Billgo <hi@billgo.me>",
   "type": "module",
-  "packageManager": "bun@1.4.3",
+  "packageManager": "bun@1.4.4",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "engines": {
-    "node": ">=24.0.0"
+    "node": ">=26.0.0"
   },
   "scripts": {
     "bench": "node apps/bench/src/main.ts run",
+    "bench:cases": "node apps/bench/src/main.ts cases",
     "bench:corpus": "node apps/bench/src/main.ts corpus",
     "bench:link": "node scripts/link-local.ts",
     "bench:report": "node apps/bench/src/main.ts report",

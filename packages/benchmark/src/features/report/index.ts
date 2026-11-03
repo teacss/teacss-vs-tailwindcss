@@ -26,14 +26,15 @@ export interface SubjectRow {
 }
 
 /** Subjects of one configuration or build tool are ranked against each other only (spec v02.1 §Configurations, v03.1 §Subjects). */
-export type TableGroup = "main" | "default-config" | "postcss" | "rsbuild" | "bun";
-const GROUP_ORDER: readonly TableGroup[] = ["main", "default-config", "postcss", "rsbuild", "bun"];
+export type TableGroup = "main" | "default-config" | "postcss" | "rsbuild" | "bun" | "cli";
+const GROUP_ORDER: readonly TableGroup[] = ["main", "default-config", "postcss", "rsbuild", "bun", "cli"];
 
 export function groupOf(subject: string): TableGroup {
   if (subject.endsWith("-default")) return "default-config";
   if (subject.endsWith("-postcss")) return "postcss";
   if (subject.endsWith("-rsbuild") || subject === "rsbuild-baseline") return "rsbuild";
   if (subject.endsWith("-bun") || subject === "bun-baseline") return "bun";
+  if (subject.endsWith("-cli")) return "cli";
   return "main";
 }
 
@@ -179,12 +180,14 @@ function localLines(record: Omit<RunRecord, "samples">): string[] {
 
 /** Spec v02.1 §Configurations: a default run measures the tuned and the out-of-the-box setup of every tool. */
 const V02_SUBJECTS: readonly string[] = [...SPEC_SUBJECTS, "teacss-ts-default", "teacss-rs-default", "tailwind-v4-default"];
-const POSTCSS_SUBJECTS: readonly string[] = ["teacss-ts-postcss", "teacss-rs-postcss", "tailwind-v4-postcss"];
+/** teacss-ts stopped publishing a PostCSS integration at 0.10, which spec v01.1 revision 9 measures. */
+const postcssSubjects = (record: Omit<RunRecord, "samples">): readonly string[] => (record.specRevision >= 9 ? ["teacss-rs-postcss", "tailwind-v4-postcss"] : ["teacss-ts-postcss", "teacss-rs-postcss", "tailwind-v4-postcss"]);
 
 function notMeasuredLines(record: Omit<RunRecord, "samples">): string[] {
   const measured = Object.keys(record.subjects);
   // A PostCSS round is its own run (spec v02.1); only its own three subjects are expected there.
-  const expected = record.v02Revision === undefined ? SPEC_SUBJECTS : measured.every((subject) => POSTCSS_SUBJECTS.includes(subject)) ? POSTCSS_SUBJECTS : V02_SUBJECTS;
+  const postcss = postcssSubjects(record);
+  const expected = record.v02Revision === undefined ? SPEC_SUBJECTS : measured.every((subject) => postcss.includes(subject)) ? postcss : V02_SUBJECTS;
   const missing = expected.filter((subject) => !(subject in record.subjects));
   if (missing.length === 0) return [];
   return [`**Subset run.** Measured: ${Object.keys(record.subjects).join(", ")}. Not measured: ${missing.join(", ")}. No number in this report speaks for a subject that was not measured.`, ""];
@@ -226,7 +229,7 @@ function verificationLines(record: Omit<RunRecord, "samples">, hasDev: boolean):
   const verification = record.verification;
   if (verification === undefined) return [];
   return [
-    `**Method and verification.** Commit \`${record.environment.commit}\`. Before timing anything, every subject was checked on each of the ${verification.cells} corpus and file layout(s) of this run (${verification.checks} subject run(s), ${verification.cases} paired case(s) in all) with no difference in properties or conditions; a run with any finding writes no record.${verification.longhandCases === undefined ? "" : ` ${verification.longhandCases} subject case(s) declared a logical shorthand as its two \`-start\` and \`-end\` longhands, which counts as the shorthand (spec v03.1 §Equivalence).`}${hasDev ? " Dev-tier times include up to 5 ms of polling delay, the same for every tool." : ""}`,
+    `**Method and verification.** Commit \`${record.environment.commit}\`. Before timing anything, every subject was checked on each of the ${verification.cells} corpus and file layout(s) of this run (${verification.checks} subject run(s), ${verification.cases} paired case(s) in all) with no difference in properties or conditions; a run with any finding writes no record.${record.specRevision >= 9 ? " Every bundler build was also run with another stylesheet imported ahead of the tool's own and lost no case (spec v01.1 revision 9)." : ""}${verification.longhandCases === undefined ? "" : ` ${verification.longhandCases} subject case(s) declared a logical shorthand as its two \`-start\` and \`-end\` longhands, which counts as the shorthand (spec v03.1 §Equivalence).`}${hasDev ? " Dev-tier times include up to 5 ms of polling delay, the same for every tool." : ""}`,
     "",
   ];
 }
@@ -298,7 +301,7 @@ export function renderMarkdown(model: ReportModel, beside?: ReportModel, cross?:
     "1. **Why not double?** The Limiter section names the frames where each subject spends its time; a change that does not touch them cannot move the number much.",
     record.v02Revision === undefined
       ? `2. **Was it tuned?** ${packagesRan(record)} with its documented production configuration (spec v01.1 §Subjects); the Rust engine ran with \`TEACSS_ENGINE_STRICT=1\`, so a fallback would have failed the run.`
-      : `2. **Was it tuned?** ${packagesRan(record)}. The \`main\` subjects use each tool's tuned production entry, the \`-default\` subjects the entry its setup guide gives, and the \`-postcss\` subjects its PostCSS integration (spec v02.1 §Configurations)${Object.keys(record.subjects).some((subject) => subject.endsWith("-rsbuild") || subject.endsWith("-bun")) ? "; the `-rsbuild` and `-bun` subjects use each tool's documented plugin for that build tool, and the `-bun` subjects run in the Bun runtime (spec v03.1 §Subjects)" : ""}; every TeaCSS Rust subject ran with \`TEACSS_ENGINE_STRICT=1\`, so a fallback would have failed the run.`,
+      : `2. **Was it tuned?** ${packagesRan(record)}. The \`main\` subjects use each tool's tuned production entry, the \`-default\` subjects the entry its setup guide gives, and the \`-postcss\` subjects its PostCSS integration (spec v02.1 §Configurations)${Object.keys(record.subjects).some((subject) => subject.endsWith("-rsbuild") || subject.endsWith("-bun")) ? "; the `-rsbuild` and `-bun` subjects use each tool's documented plugin for that build tool, and the `-bun` subjects run in the Bun runtime (spec v03.1 §Subjects)" : ""}${record.specRevision >= 9 ? "; the Rust packages have no fallback since 0.10, and a Rust subject that did not load the native engine would have failed the run." : "; every TeaCSS Rust subject ran with `TEACSS_ENGINE_STRICT=1`, so a fallback would have failed the run."}`,
     "3. **Did it break limits?** The CSS sizes in the tables bound the work; a median below the time to write that many bytes would be suspect.",
     "4. **Did it error?** A run with any subject error, timeout or fallback writes no record; this record exists, so every sample succeeded.",
     "5. **Does it reproduce?** Each cell holds the stated number of samples per subject, interleaved per round; the tables give the IQR and the p95, and a pair closer than the larger IQR or with p >= 0.01 is reported as no measurable difference.",

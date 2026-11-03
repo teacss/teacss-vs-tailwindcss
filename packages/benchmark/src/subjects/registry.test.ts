@@ -16,17 +16,16 @@ test("every production subject resolves to a module file and declares its tiers,
       "teacss-ts-default",
       "teacss-rs-default",
       "tailwind-v4-default",
-      "teacss-ts-postcss",
       "teacss-rs-postcss",
       "tailwind-v4-postcss",
       "rsbuild-baseline",
-      "teacss-ts-rsbuild",
       "teacss-rs-rsbuild",
       "tailwind-v4-rsbuild",
       "bun-baseline",
-      "teacss-ts-bun",
       "teacss-rs-bun",
       "tailwind-v4-bun",
+      "teacss-ts-cli",
+      "teacss-rs-cli",
     ],
   );
   for (const [id, registration] of registry) {
@@ -35,8 +34,8 @@ test("every production subject resolves to a module file and declares its tiers,
   }
   assert.deepEqual(registry.get("teacss-rs" as never)?.natives.required, ["teacss-engine"]);
   assert.deepEqual(registry.get("tailwind-v4-default" as never)?.tiers, ["dev", "build"]);
-  assert.equal(registry.get("teacss-rs-postcss" as never)?.env["TEACSS_ENGINE"], "rust");
-  assert.equal(registry.get("teacss-ts-postcss" as never)?.env["TEACSS_ENGINE"], "ts");
+  assert.deepEqual(registry.get("teacss-rs-postcss" as never)?.env, {});
+  assert.deepEqual(registry.get("teacss-ts" as never)?.natives.forbidden, ["teacss-engine", "tailwindcss-oxide"]);
   assert.deepEqual(registry.get("teacss-rs-rsbuild" as never)?.natives.required, ["teacss-engine", "rspack"]);
   assert.equal(registry.get("teacss-rs-rsbuild" as never)?.group, "rsbuild");
   assert.equal(registry.get("teacss-rs-bun" as never)?.runtime, "bun");
