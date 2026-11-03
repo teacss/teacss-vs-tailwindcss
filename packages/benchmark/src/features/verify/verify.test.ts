@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { subjectId } from "@bench/infrastructure";
 import { generateCorpus, LEADING_CLASS, leadingStylesheetProject } from "../../corpus/index.ts";
 import { countOutput } from "../../css/index.ts";
-import { checkLeadingStylesheet, checkNativeModules, checkSameRules, checkStructure, escapeClass, parseRules, withFontDigests } from "./index.ts";
+import { checkLeadingStylesheet, checkNativeModules, checkStructure, escapeClass, parseRules, withFontDigests } from "./index.ts";
 import { verifyCorpus } from "./run.ts";
 
 const cases = [
@@ -111,18 +111,6 @@ test("a leading stylesheet that vanished or moved behind the utilities is named"
   assert.deepEqual(checkLeadingStylesheet(cases, "teacss", `${teacssCss}${leading}`), [{ candidate: "p:4", reason: `comes before ${LEADING_CLASS}` }]);
 });
 
-test("two builds differing only in how they print rules select the same classes", () => {
-  assert.deepEqual(checkSameRules(".a{padding:0.5px;margin:0}@media (min-width:1px){.b:hover{color:red}}", ".a{margin:0;padding:.5px}@media (width>=1px){.b:hover{color:red}}"), []);
-});
-
-test("a class on one side only and a property on one side only are named", () => {
-  assert.deepEqual(checkSameRules(".a{margin:0}.b{color:red}", ".a{margin:0;padding:0}.c{color:red}"), [
-    { candidate: "a", reason: "declares margin against margin,padding" },
-    { candidate: "b", reason: "only the left side selects it" },
-    { candidate: "c", reason: "only the right side selects it" },
-  ]);
-});
-
 test("a bundled font compares by digest, whether inlined or written to a file", () => {
   const digest = "7e3ca49872a47f2f150ca90cc024fc9b0ec04ade959a0000000000000000abcd";
   const inlined = `@font-face{src:url("data:font/woff2;teacss=v1-${digest};base64,AAAA")}`;
@@ -150,20 +138,23 @@ test("engines compare by bytes, and a pair is formed only where both sides exist
   );
 });
 
-test("a plugin pair may differ in bytes but not in classes; a CLI pair may differ in font URLs only", async () => {
+test("a plugin pair must write the same bytes; a CLI pair may differ in font URLs only", async () => {
   const digest = "a".repeat(64);
   const outputs: Record<string, string> = {
     "teacss-ts": sheet(),
-    "teacss-rs": sheet().replaceAll(":0", ": 0"),
+    "teacss-rs": sheet(),
     "teacss-ts-default": sheet(),
-    "teacss-rs-default": sheet(".extra{color:red}"),
+    "teacss-rs-default": sheet().replaceAll(":0", ": 0"),
     "teacss-ts-cli": sheet(`@font-face{src:url("./teacss-fonts/teacss-${digest}.woff2")}`),
     "teacss-rs-cli": sheet(`@font-face{src:url("data:font/woff2;teacss=v1-${digest};base64,AAAA")}`),
   };
   const report = await verifyCorpus(
     corpus,
     Object.keys(outputs).map((id) => fakeSubject(id, ["build"])),
-    async (id, task) => ({ css: `${task.kind === "build" && task.modules.includes("src/leading.js") ? leading : ""}${outputs[id] ?? ""}`, cssSha256: id, nativeModules: [] }),
+    async (id, task) => {
+      const css = `${task.kind === "build" && task.modules.includes("src/leading.js") ? leading : ""}${outputs[id] ?? ""}`;
+      return { css, cssSha256: css, nativeModules: [] };
+    },
   );
   assert.deepEqual(
     report.findings.filter((finding) => finding.check === "strong").map((finding) => `${finding.subject} ${finding.check}`),
