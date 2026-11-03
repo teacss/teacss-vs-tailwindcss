@@ -11,7 +11,7 @@ the two TeaCSS engines are separate ecosystems that share no package
 ## Status
 
 The subjects now pin TeaCSS 0.10 under spec revision 10: teacss-rs 0.10.5 and
-teacss-ts 0.10.4, two ecosystems that share no package, on Node 26
+teacss-ts 0.10.5, two ecosystems that share no package, on Node 26
 ([ADR-0005](notes/adrs/ADR-0005-two-teacss-ecosystems.md)). TeaCSS 0.10 has no
 published run yet, so the block below still shows 0.9.3, and its numbers do
 not carry over to 0.10.
