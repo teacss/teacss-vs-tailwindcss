@@ -28,7 +28,7 @@ function project(modules: Readonly<Record<string, string>>, others: Readonly<Rec
   return { modules: Object.keys(modules), files: { "index.html": HTML, ...modules, ...others } };
 }
 
-/** The behaviours of the 0.10 line that a change of output would show, per the upgrade guide. Each lists a form that works next to the one that must not. */
+/** The behaviours of the 0.10 line that a change of output would show, per the upgrade guide. Each holds a form that must work, so an absence alone never passes. */
 export const BEHAVIOR_CASES: readonly BehaviorCase[] = [
   { id: "position-visibility takes only the spec spelling", since: "0.10.2", subjects: ENGINES, input: { tokens: ["position-vis:anchors-valid", "position-vis:anchor-valid"] }, contains: ["position-visibility:anchors-valid"], omits: ["position-vis:anchor-valid"] },
   { id: "hyphenate-limit-chars starts at 1", since: "0.10.2", subjects: ENGINES, input: { tokens: ["hyphenate-limit-chars:1", "hyphenate-limit-chars:0"] }, selects: ["hyphenate-limit-chars:1"], omits: ["hyphenate-limit-chars:0"] },
@@ -38,7 +38,15 @@ export const BEHAVIOR_CASES: readonly BehaviorCase[] = [
   { id: "rotate:[0] carries a unit", since: "0.10.2", subjects: ENGINES, input: { tokens: ["rotate:[0]"] }, contains: ["rotate:0deg"] },
   { id: "backdrop-filter keywords carry the -webkit- prefix", since: "0.10.2", subjects: ENGINES, input: { tokens: ["backdrop-filter:none"] }, contains: ["-webkit-backdrop-filter:none"] },
   { id: "@rtl guards the subject itself", since: "0.10.2", subjects: ENGINES, input: { tokens: ["p:4@rtl"] }, contains: [':is([dir="rtl"],[dir="rtl"] *)'] },
+  { id: "an @ at depth 0 of a $var value or fallback does not match", since: "0.10.3", subjects: ENGINES, input: { tokens: ["w:$x|1px", "w:$x@hover", "w:$x|'a@b'", "$x:1@hovr"] }, selects: ["w:$x|1px", "w:$x@hover"], omits: ["w:$x|'a@b'", "$x:1@hovr"] },
   { id: "two pseudo-elements only fail to match", since: "0.10.3", subjects: ENGINES, input: { tokens: ["p:4@::before@::after", "m:2"] }, selects: ["m:2"], omits: ["p:4@::before@::after"] },
+  {
+    id: "another stylesheet ahead of the generated one keeps every utility",
+    since: "0.10.4",
+    subjects: ["teacss-ts", "teacss-rs", "teacss-rs-postcss", "teacss-rs-rsbuild", "teacss-rs-bun"],
+    input: project({ "src/case.js": 'import "./first.css";\ndocument.getElementById("app").innerHTML = `<div class="first p:4 m:2"></div>`;\n' }, { "src/first.css": ".first{outline-style:dashed}\n" }),
+    selects: ["first", "p:4", "m:2"],
+  },
   {
     id: "a quoted space in an array element's brackets keeps the token",
     since: "0.10.2",
@@ -84,7 +92,7 @@ export interface CaseFinding {
 }
 
 export interface CaseReport {
-  /** One entry per case and subject that ran. */
+  /** Case and subject pairs that held. */
   readonly passed: number;
   readonly findings: readonly CaseFinding[];
 }
