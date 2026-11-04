@@ -80,12 +80,21 @@ export function valueRows(record: RunRecord): ValueRow[] {
 }
 
 /**
+ * What separates the two dev sheets, by the `@teacss/vite` the record ran. Up to 0.10.5 it inlined the bundled fonts
+ * as data URIs, which `@teacss/vite-ts` links. From 0.10.6 both link them, and only `@teacss/vite-ts` spells the
+ * font rules' `url()` as `URL(`.
+ */
+export function devDifference(record: Pick<RunRecord, "subjects">): { readonly table: string; readonly readme: string } {
+  const [minor = 0, patch = 0] = (record.subjects[RS]?.packages["@teacss/vite"] ?? "").split(".").slice(1).map(Number);
+  return minor > 10 || (minor === 10 && patch >= 6)
+    ? { table: "differs in the case of url() only: @teacss/vite-ts writes it as URL( in the font rules", readme: "the dev servers differ only in the case of url() in the font rules, which @teacss/vite-ts writes as URL(" }
+    : { table: "differs in the bundled fonts only: @teacss/vite inlines them, @teacss/vite-ts links them", readme: "the dev servers differ in the bundled fonts only, which @teacss/vite inlines and @teacss/vite-ts links" };
+}
+
+/**
  * Groups of samples (series and cell) where both engines produced the same bytes, out of those both measured;
  * `only` keeps the engine tier or the Vite pipeline tiers.
  */
-/** `@teacss/vite` inlines the bundled fonts as data URIs in development and `@teacss/vite-ts` links them; the sheets match once each font is reduced to its digest. */
-export const DEV_FONTS = "differs in the bundled fonts only: @teacss/vite inlines them, @teacss/vite-ts links them";
-
 export function identicalOutputs(record: Pick<RunRecord, "samples">, only?: "engine" | "pipeline" | "build" | "dev"): { identical: number; compared: number } {
   const hashes = new Map<string, { ts?: string; rs?: string }>();
   for (const sample of record.samples) {
@@ -124,9 +133,9 @@ export function valueTable(record: RunRecord, names: { ts: string; rs: string })
     `| | ${names.ts} | ${names.rs} | Rust compared with TypeScript |`,
     "| --- | --- | --- | --- |",
     ...rows.map((row) => `| ${row.label} | ${row.ts === undefined ? "" : row.format(row.ts)} | ${row.rs === undefined ? "" : row.format(row.rs)} | ${ratio(row)} |`),
-    // Spec v01.1 revision 10: the Vite builds compare byte for byte again, and only the dev servers serve the bundled fonts differently.
+    // Spec v01.1 revision 10: the Vite builds compare byte for byte again, and only the dev servers differ, in the font rules.
     ...(record.specRevision >= 10
-      ? [sameRow("Byte-identical output, engine", identicalOutputs(record, "engine"), "differs"), sameRow("Byte-identical output, Vite build", identicalOutputs(record, "build"), "differs"), sameRow("Byte-identical output, Vite dev server", identicalOutputs(record, "dev"), DEV_FONTS)]
+      ? [sameRow("Byte-identical output, engine", identicalOutputs(record, "engine"), "differs"), sameRow("Byte-identical output, Vite build", identicalOutputs(record, "build"), "differs"), sameRow("Byte-identical output, Vite dev server", identicalOutputs(record, "dev"), devDifference(record).table)]
       : // Spec v01.1 revision 9: the two Vite plugins post-process the sheet differently, so their bytes are counted apart.
         record.specRevision >= 9
         ? [sameRow("Byte-identical output, engine", identicalOutputs(record, "engine"), "differs"), sameRow("Byte-identical output, Vite build and dev server", identicalOutputs(record, "pipeline"), "differs: only @teacss/vite-ts passes its sheet through Lightning CSS")]
