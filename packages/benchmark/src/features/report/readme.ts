@@ -1,7 +1,7 @@
 import { crossComparisons } from "./cross.ts";
 import type { CellTable, ReportModel, Series, SubjectRow } from "./index.ts";
 import { BASELINE, type TableGroup } from "./index.ts";
-import { valueVerdict } from "./rust.ts";
+import { devDifference, valueVerdict } from "./rust.ts";
 import { BUILD_TOOLS, buildToolRows, CSS_TOOLS } from "./tools.ts";
 
 export const README_START = "<!-- bench:summary:start -->";
@@ -102,10 +102,7 @@ function rustTable(model: ReportModel): string[] {
   const build = model.rust.buildIdentical;
   const all = (same: { identical: number; compared: number }) => same.compared > 0 && same.identical === same.compared;
   const enginesOnly = model.record.specRevision >= 9 && all(engine);
-  const differs =
-    model.record.specRevision >= 10 && all(build)
-      ? "byte-identical from the engines and the Vite builds; the dev servers differ in the bundled fonts only, which @teacss/vite inlines and @teacss/vite-ts links"
-      : "byte-identical from the engines; the Vite builds differ, since only @teacss/vite-ts passes its sheet through Lightning CSS";
+  const differs = model.record.specRevision >= 10 && all(build) ? `byte-identical from the engines and the Vite builds; ${devDifference(model.record).readme}` : "byte-identical from the engines; the Vite builds differ, since only @teacss/vite-ts passes its sheet through Lightning CSS";
   if (compared > 0) lines.push(`| Same CSS output | | ${identical === compared ? "byte-identical in every measured case" : enginesOnly ? differs : `${identical} of ${compared} groups identical`} |`);
   lines.push("");
   return lines;
