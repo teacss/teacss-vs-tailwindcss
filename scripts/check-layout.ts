@@ -4,7 +4,7 @@ import { argv } from "node:process";
 import { fileURLToPath } from "node:url";
 import { BANNED_UNIT_NAMES, expectedPackageName, isRecord, listWorkspaceDirs, type Problem, readWorkspace, runCheck } from "./workspace.ts";
 
-const ROOT_DIRS = new Set(["apps", "packages", "notes", "results", "scripts"]);
+const ROOT_DIRS = new Set(["apps", "packages", "docs", "results", "scripts"]);
 const ROOT_FILES = new Set(["package.json", "bun.lock", "bunfig.toml", "tsconfig.base.json", "tsconfig.json", "biome.json", "README.md", "AGENTS.md", "CLAUDE.md", "LICENSE"]);
 const SHELL_SOURCES = new Set(["main.ts", "subject.ts"]);
 const BASE_TSCONFIG = "../../tsconfig.base.json";
@@ -15,7 +15,7 @@ function checkRoot(root: string): Problem[] {
   for (const entry of readdirSync(root, { withFileTypes: true })) {
     if (entry.name.startsWith(".") || entry.name === "node_modules") continue;
     const allowed = entry.isDirectory() ? ROOT_DIRS.has(entry.name) : ROOT_FILES.has(entry.name);
-    if (!allowed) problems.push({ path: entry.name, message: "not a root entry the layout allows (apps, packages, notes, results, scripts and the root manifests)" });
+    if (!allowed) problems.push({ path: entry.name, message: "not a root entry the layout allows (apps, packages, docs, results, scripts and the root manifests)" });
   }
   return problems;
 }

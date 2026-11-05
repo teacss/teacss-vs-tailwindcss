@@ -1,6 +1,6 @@
 # Optimization cards from the TeaCSS 0.9.0 round (2026-10-24)
 
-The cards come from the [third official report](../reports/2026-10-23T20-14-57-mac.md): TeaCSS 0.9.0, spec v01.1 revision 4. They follow the owner's loop in teacss-ts `notes/plans/perf-iteration-loop.md` §3. Each card covers one issue and names:
+The cards come from the [third official report](../reports/2026-10-23T20-14-57-mac.md): TeaCSS 0.9.0, spec v01.1 revision 4. They follow the owner's loop in teacss-ts `docs/plans/perf-iteration-loop.md` §3. Each card covers one issue and names:
 
 - its owner;
 - the scenario and the official numbers (median, IQR, range and runs from the raw record);

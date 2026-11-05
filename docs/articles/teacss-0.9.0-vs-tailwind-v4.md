@@ -82,7 +82,7 @@
 - **开发服务器的完成判定与工具无关。** 从写入新文件开始计时，到页面请求的样式表里第一次出现全部新类为止，每 5 ms 轮询一次，两边相同。
 - **统计规则事先写好。** 差距小于较大的四分位距、或 Mann-Whitney 检验 p ≥ 0.01，就写「无可测差异」。
 
-逐条对照 teacss-ts 的 `notes/plans/perf-iteration-loop.md` §2：
+逐条对照 teacss-ts 的 `docs/plans/perf-iteration-loop.md` §2：
 
 | 要求 | 本文 |
 | --- | --- |

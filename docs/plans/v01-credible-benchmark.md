@@ -9,9 +9,9 @@
 完成于 2026-10-21（规格仍为 draft，第一次正式运行前必须接受）。
 
 - [x] 用户让工作继续推进；提案 accepted，三个偏好项按默认值记录在提案 Status 里。
-- [x] `notes/specs/v01.1-benchmark-protocol.md`（英文，随报告公开）：被测对象与包版本、两个层级的计时起止、语料形状、规模矩阵、运行协议、两级等价、统计规则、环境记录、报告结构、验收表。
-- [x] `notes/adrs/ADR-0001`（删除 fork 的 harness）、`ADR-0002`（成对语料与两级等价）、`ADR-0003`（只用已发布包），后加 `ADR-0004`（Bun 管理依赖）。ADR 放在 `notes/adrs/`，不是 `notes/knowledge/`。
-- [x] 第 4 项待决事项用探针回答，证据在 `notes/knowledge/engine-probe-2026-10-21.md`。
+- [x] `docs/specs/v01.1-benchmark-protocol.md`（英文，随报告公开）：被测对象与包版本、两个层级的计时起止、语料形状、规模矩阵、运行协议、两级等价、统计规则、环境记录、报告结构、验收表。
+- [x] `docs/adrs/ADR-0001`（删除 fork 的 harness）、`ADR-0002`（成对语料与两级等价）、`ADR-0003`（只用已发布包），后加 `ADR-0004`（Bun 管理依赖）。ADR 放在 `docs/adrs/`，不是 `docs/knowledge/`。
+- [x] 第 4 项待决事项用探针回答，证据在 `docs/knowledge/engine-probe-2026-10-21.md`。
 - [ ] 规格接受：用户确认后把 `status` 改为 accepted。此前第 2 到第 6 片可以推进，第 7 片的正式运行不能。
 
 ## 第 1 片：仓库骨架与检查
@@ -21,7 +21,7 @@
 - [x] 删除 `bench/`、`turbo.json`、`vitest.*`、`tsconfig.build.json`、`tsconfig.dts.json`、`.github/FUNDING.yml`、`SECURITY.md`（模板占位文本）；根 `package.json` 只剩 Biome、TypeScript 6.0.3 与 `@types/node`。
 - [x] workspace：`apps/*`、`packages/*`（现在写在根 `package.json` 的 `workspaces`，由 Bun 管理）；`.node-version` 24.14.1；根 `tsconfig.base.json` 持有唯一的 strict 集合，每个包只 `extends`。Node 24 直接运行 `.ts`，没有构建步骤。
 - [x] Biome：`@biomejs/biome` + `@devjskit/biome-config`，脚本 `lint`、`lint:check`。`biome.json` 的 override 禁止 `packages/benchmark/src/features/**` 导入 `@bench/subject-*` 与 `appshell`。
-- [x] `scripts/check-layout.ts`：顶层只允许 `apps/`、`packages/`、`notes/`、`results/`、`scripts/` 与根清单；禁止 `core`、`common`、`shared`、`utils`、`domain`；包名必须是 `@bench/<目录名>`；壳的 `src` 只允许 `main.ts`、`subject.ts` 与测试；包的 `tsconfig` 只能 `extends` 基线。
+- [x] `scripts/check-layout.ts`：顶层只允许 `apps/`、`packages/`、`docs/`、`results/`、`scripts/` 与根清单；禁止 `core`、`common`、`shared`、`utils`、`domain`；包名必须是 `@bench/<目录名>`；壳的 `src` 只允许 `main.ts`、`subject.ts` 与测试；包的 `tsconfig` 只能 `extends` 基线。
 - [x] `scripts/check-dependencies.ts`：层级表在 `scripts/workspace.ts`。壳只依赖恰好一个产品；产品依赖基础层与隔离层（组合根在产品里挑实现，特性目录由 Biome override 挡住）；隔离层只依赖基础层；基础层不依赖任何工作区包；工作区依赖必须用 `workspace:` 协议。
 - [x] 每条规则一个 `node:test` 用例：植入违规后脚本返回该路径。
 - [x] `.github/workflows/check.yml`：`bun install --frozen-lockfile && bun run check`，Node 24 运行。
@@ -46,7 +46,7 @@
 完成于 2026-10-21。
 
 - [x] `features/corpus`：mulberry32 种子随机；配对表 `pairs.ts`（版本 1：12 个间距属性 × 18 个值，3 个颜色属性 × 16 族 × 5 档 × 3 种透明度加 3 个任意色，6 档字号，4 档圆角，8 种 grid 列；8 个条件的单独与两两组合，断点不两两组合）；`generateCorpus(seed, utilities, files)` 从 29 853 个用例里按种子取样并哈希；`corpusProject` 产出 `src/gen-NNN.js` 与 `index.html`，每个 `<div>` 15 个类；`profileCorpus` 统计属性族与条件分布。
-- [x] 配对表每一项经真实工具验证：teacss 与 Tailwind 各 29 853 / 29 853 匹配（证据在 `notes/knowledge/engine-probe-2026-10-21.md`）。`dark` 不进表，原因同处记录。
+- [x] 配对表每一项经真实工具验证：teacss 与 Tailwind 各 29 853 / 29 853 匹配（证据在 `docs/knowledge/engine-probe-2026-10-21.md`）。`dark` 不进表，原因同处记录。
 - [x] `bench corpus --utilities --files --seed [--profile]`。
 - 验收：同参数两次哈希一致；规模矩阵每格可生成；测试覆盖。
 
@@ -55,7 +55,7 @@
 完成于 2026-10-21。
 
 - [x] 待决事项 4 的答案见第 0 片；被测对象全部用发布包，`bun.lock` 钉死。
-- [x] `packages/subject-vite-baseline`、`subject-tailwind-v4`、`subject-teacss`（一个包、两个入口 `./ts` 与 `./rs`，同一套 teacss 包只换引擎模式）。engine 层：teacss 走 `createGenerator` + `generate`，Tailwind 走 `compile` + `build(candidates)`，都不带 preflight。build 层：Vite JS API 在临时目录构建，入口与软链见 `notes/knowledge/engine-probe-2026-10-21.md`。版本从各包自己的 `node_modules/<name>/package.json` 读。
+- [x] `packages/subject-vite-baseline`、`subject-tailwind-v4`、`subject-teacss`（一个包、两个入口 `./ts` 与 `./rs`，同一套 teacss 包只换引擎模式）。engine 层：teacss 走 `createGenerator` + `generate`，Tailwind 走 `compile` + `build(candidates)`，都不带 preflight。build 层：Vite JS API 在临时目录构建，入口与软链见 `docs/knowledge/engine-probe-2026-10-21.md`。版本从各包自己的 `node_modules/<name>/package.json` 读。
 - [x] 注册表 `subjects/registry.ts`：每个对象的模块（`import.meta.resolve` 得到的文件 URL）、环境（teacss 两个对象都带 `TEACSS_ENGINE_STRICT=1`）、语法、是否有 engine 层、原生模块的必须与禁止前缀。
 - [x] `features/verify`：css-tree 解析；强等价按哈希；覆盖与结构检查合一（每个用例的选择器存在、声明的属性集包含期望、条件结构按伪类与宽度媒体查询归类）；物理 longhand 对归一为逻辑属性；`not` 媒体查询取反；原生模块期望。
 - [x] `bench verify --utilities --files --seed`：四个对象共 7 次子进程往返，输出每项检查与失败明细，非零退出。
@@ -78,7 +78,7 @@
 
 - [x] `features/report/statistics.ts`：中位数、四分位距、p95、最小值；Mann-Whitney U（正态近似、结校正）；Cliff's delta；`compare` 按规格判「differs」或「no measurable difference」（p < 0.01 且中位数差距大于较大的 IQR）。
 - [x] `features/report/index.ts`：按层级 × 规模格 × 对象建表，build 层给出相对基线的增量；每格以最低中位数者为基准对其余对象判定；Markdown 含结论段、表格、环境、版本、语料与负载、限制因素、七问作答、已知限制；JSON 摘要。同一记录两次渲染逐字节相同。
-- [x] `bench report <results.json> --out notes/reports`。
+- [x] `bench report <results.json> --out docs/reports`。
 - 验收：统计函数对已知分布有单元测试；合成记录里分离的两组判 differs、交错的两组判无差异；报告在真实的排练记录上能渲染。
 
 ## 第 7 片：CI 与第一份报告
@@ -93,9 +93,9 @@
 - [x] ~~第一份报告只含 teacss-ts 与 Tailwind v4~~，被上一项取代。本机正式运行需要一分钟负载低于 2.4；当天 teacss-rs 会话持续运行 `cargo check`，负载在 5 到 24 之间。
 - [x] 本机正式运行（2026-10-21 17:19–17:43，四个对象全矩阵，2 700 个样本，开跑负载 13%）：`results/2026-10-21T09-19-14-mac.json`。
 - [ ] CI 交叉验证运行。
-- [x] 报告 `notes/reports/2026-10-21T09-19-14-mac.md` 与手写审核 `.audit.md`（审核单独成文件，报告保持可逐字节重生成）；README Status 给出引擎与构建两层的主数字；规格 v01.1 标为 accepted。
+- [x] 报告 `docs/reports/2026-10-21T09-19-14-mac.md` 与手写审核 `.audit.md`（审核单独成文件，报告保持可逐字节重生成）；README Status 给出引擎与构建两层的主数字；规格 v01.1 标为 accepted。
 - [x] 本地构建模式（2026-10-21，按所有者要求先写代码、不跑测量、不加新单测）：`scripts/link-local.ts`（`bun run bench:link status|link --ts <dir>|unlink`）把 teacss 被测对象的 core、vite、preset-standard 接到已构建的 teacss-ts 检出，engine 跟随 core 解析；被测对象按真实路径报告版本，`node_modules/.bun` 以外的包进 `local`，报告首行标「Local build, not for publication」。`status` 已在本机跑过；`link`/`unlink` 未实际执行，因为它会改 `packages/subject-teacss/node_modules`，而 teacss-ts 检出正由另一会话修改。
-- [x] 剖析与改法（2026-10-21）：`notes/knowledge/teacss-vite-build-profile-2026-10-21.md`；teacss-ts 已按其计划合入五个 PR（#890 到 #894），本地链接实测 ts 20000 × 300 构建 3 723 → 1 600 ms。
+- [x] 剖析与改法（2026-10-21）：`docs/knowledge/teacss-vite-build-profile-2026-10-21.md`；teacss-ts 已按其计划合入五个 PR（#890 到 #894），本地链接实测 ts 20000 × 300 构建 3 723 → 1 600 ms。
 - [x] README 摘要（2026-10-21）：`bench report --readme README.md` 在标记之间生成面向开发者的结果与解读（谁最快、快多少、每千个类的成本、随规模与文件数的变化、引擎在构建成本里的占比、怎么读这些数字），全部由记录派生，同一记录两次生成相同。
 - [x] 运行门新增 Node 版本检查：第一次运行实际跑在 Node 26.7.0（审核已记），`bench run` 现在在运行版本与 `.node-version` 不符时拒绝，`--allow-node-mismatch` 覆盖。
 - [ ] 第二份报告（进行中，2026-10-22）：被测包已升到 0.9.0-alpha.2（引擎仍 0.8.5-alpha.4），规格修订 3；`bench:verify` 5000 × 30 通过；1000 × 300 与 20000 × 300 的构建层哈希与 teacss-ts 发布前给的预期一致（`ee274f23…`、`f4ea28ce…`），ts 与 rs 逐字节相同，Node 24.14.1。所有者 2026-10-22 决定不对 alpha.2 跑全矩阵，等下一个版本再跑；alpha.2 的升级与修订 3 已合入，届时只需再升版本。

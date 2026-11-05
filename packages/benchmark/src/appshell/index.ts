@@ -50,7 +50,7 @@ const USAGE = `bench <command>
   price       what each tool ships, loads and installs, and what the native engine can serve
               --subjects <a,b>  --install-runs <n> (3)  --configs <dir> (../teacss-ts/examples)
   report      render a results file as Markdown and a JSON summary
-              <results.json>  --out <dir> (notes/reports)  --readme <README.md>
+              <results.json>  --out <dir> (docs/reports)  --readme <README.md>
               --beside <other.json>  add the same matrix on the other corpus
               --cross <ci.json>  add the same run from a second machine as a cross-check
 `;
@@ -289,7 +289,7 @@ export async function createApp(deps: AppDeps): Promise<number> {
     const [file] = invocation.positionals;
     if (file === undefined) throw new Error("report needs the results file to render");
     const model = buildReport(readRunRecord(file));
-    const out = typeof invocation.options.get("out") === "string" ? String(invocation.options.get("out")) : "notes/reports";
+    const out = typeof invocation.options.get("out") === "string" ? String(invocation.options.get("out")) : "docs/reports";
     const stem = basename(file, ".json");
     mkdirSync(out, { recursive: true });
     const besideFile = invocation.options.get("beside");
