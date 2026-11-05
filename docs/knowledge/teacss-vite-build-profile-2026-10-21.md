@@ -121,7 +121,7 @@ Rust 引擎路径下，抽取由 `@teacss/engine` 的外观层接管，不经过
 
 ## 后续（2026-10-21，teacss-ts 已实施）
 
-teacss-ts 按计划 `notes/plans/vite-build-pipeline.md` 做完了五个 PR（#890 到 #894，master `cb2252e1`），本仓库核实了合并状态与计划状态；下面的数字是 teacss-ts 会话用本地链接构建测的，本仓库未独立复测，发布 0.9.0-alpha.2 后以第二份正式报告为准。
+teacss-ts 按计划 `docs/plans/vite-build-pipeline.md` 做完了五个 PR（#890 到 #894，master `cb2252e1`），本仓库核实了合并状态与计划状态；下面的数字是 teacss-ts 会话用本地链接构建测的，本仓库未独立复测，发布 0.9.0-alpha.2 后以第二份正式报告为准。
 
 | 项 | 改法 | 结果（`vite build()` 内，3 次中位数） |
 | --- | --- | --- |
