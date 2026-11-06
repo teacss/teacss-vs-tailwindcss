@@ -46,6 +46,6 @@ test("bench subjects reaches every production subject through its own process", 
     ],
   );
   assert.match(lines[0] ?? "", /vite@8\.3\.4/);
-  assert.match(lines[1] ?? "", /@teacss\/core@0\.10\.8 .*@teacss\/vite-ts@0\.10\.8/);
-  assert.match(lines[2] ?? "", /@teacss\/engine@0\.10\.8 @teacss\/vite@0\.10\.8 vite@8\.3\.4/);
+  assert.match(lines[1] ?? "", /@teacss\/core@0\.10\.10 .*@teacss\/vite-ts@0\.10\.10/);
+  assert.match(lines[2] ?? "", /@teacss\/engine@0\.10\.10 @teacss\/vite@0\.10\.10 vite@8\.3\.4/);
 });
